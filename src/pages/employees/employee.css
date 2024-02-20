@@ -1,0 +1,81 @@
+.tablist, .tablist2 {
+  display: flex;
+}
+
+.tablist2 .tab-item {
+  margin-right: 0px;
+  border: 1px #ccc solid;
+}
+
+.tablist2 .tab-item.active {
+  border-bottom: #fff !important; 
+}
+
+.tabs-more {
+  background-color: #fff;
+
+}
+
+.tab-item:hover {
+  border-top: 1px #5a5279 solid;
+}
+
+.tab-item:focus {
+  border-top: 1px #5a5279 solid;
+}
+
+.tab-item.active {
+  border-top: 1px #5a5279 solid;
+}
+
+.tablist2 .tab-item.active {
+  border-top: 2px #5a5279 solid;
+}
+
+.tablist .tab-item {
+  list-style-type: none;
+  padding: 15px 20px 25px 20px;
+  margin-right: 15px;
+  font-weight: 500;
+}
+
+.tablist2 .tab-item {
+  list-style-type: none;
+  padding: 10px 12px 10px 12px;
+  font-weight: 500;
+}
+
+.empl-avt .delete-icon {
+  display: none;
+}
+.empl-avt:hover .delete-icon {
+  display: block;
+}
+
+.empl-avt img {
+  width: 120px;
+  height: 120px;
+}
+
+.container-grid {
+display: flex;
+flex-wrap: wrap;
+padding: 20px;
+}
+  
+.container-grid > div {
+  flex-basis: 50%;
+  max-width: 50%;
+}
+
+.form-control.more {
+  width: 46%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 20px 0px;
+
+
+}
+
+

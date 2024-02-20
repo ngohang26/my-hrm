@@ -1,0 +1,30 @@
+.navbar {
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  background-color: #f1f1f1;
+  border-bottom: 1px solid #e8e9e9;
+  /* padding: 0px 10px; */
+}
+
+.navbar-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.navbar-item .icon {
+  width: 28px;
+  height: 28px;
+}
+
+.navbar h5 {
+  margin: 18px 0px;
+  font-size: 22px;
+  line-height: 1.2;
+  color: #5a5279;
+}
+
+.title::first-letter {
+  text-transform: capitalize;
+}

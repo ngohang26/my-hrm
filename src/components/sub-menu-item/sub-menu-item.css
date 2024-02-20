@@ -1,0 +1,8 @@
+ .listItem {
+  text-decoration: none;
+  color: #2c2946;
+  padding: 10px 0px;
+  display: flex;
+  justify-content: flex-start;
+
+}

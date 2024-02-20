@@ -1,0 +1,19 @@
+.more-button button {
+  border: none;
+  background-color: #f1f1f1;
+  font-size: 1.15rem;
+  font-weight: 400;
+  font-family: montserrat,sans-serif;
+}
+
+.more-button .item {
+  width: 200px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.more-button .item img {
+  width: 24px;
+  margin: 0px 16px;
+}

@@ -1,0 +1,49 @@
+.left-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.left-sidebar-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 90vh;
+}
+.logo {
+  width: 24px;
+  height: 24px;
+  color: #fff;
+  border-radius: 50%;
+  background-color: #5a5279;
+  padding: 8px;
+  margin-bottom: 24px;
+
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.navbar-link {
+  width: 26px;
+  height: 26px; 
+  margin-bottom: 24px;
+  color: #2c2946;
+}
+
+.navbar-link:hover {
+  color: #3785d2;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.icon.setting {
+  animation: spin 2s linear infinite;
+}
+

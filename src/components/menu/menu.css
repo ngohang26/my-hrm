@@ -1,0 +1,31 @@
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 15px 20px 60px;
+}
+
+.menu h5 {
+  display: flex;
+  justify-content: flex-start;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: .5rem;
+  line-height: 1.2;
+  font-size: 1.5rem;
+}
+
+.menu div {
+  text-decoration: none;
+  color: #2c2946;
+  padding: 10px 0px;
+  display: flex;
+  justify-content: flex-start;
+
+}
+
+.menu .icon {
+  width: 21px;
+  height: 21px;
+  color: #2c2946;
+  padding-right: 20px;
+} 

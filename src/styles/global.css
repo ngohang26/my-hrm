@@ -1,0 +1,37 @@
+
+/* a {
+    text-decoration: none;
+    color: inherit;
+} */
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    margin-bottom: .5rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.container {
+    display: flex;
+}
+
+.menuContainer {
+    width:fit-content;
+    padding: 5px 20px;
+    border-right: 1px solid #e6e9ed;
+    transition: all .3s ease-in-out;
+  
+}
+
+.contentContainer {
+    padding: 5px 40px;
+    background-color: #f1f1f1;
+    width: 100%;
+
+}
+
+/* .contentContainer.menuOpen {
+}
+
+.contentContainer.menuClosed {
+    width: 100%;
+} */
+
