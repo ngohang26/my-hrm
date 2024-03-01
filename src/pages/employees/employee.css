@@ -56,26 +56,91 @@
   width: 120px;
   height: 120px;
 }
-
 .container-grid {
-display: flex;
-flex-wrap: wrap;
-padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px;
 }
   
+.form-grid {
+  flex-basis: 50%;
+  padding: 20px;
+  box-sizing: border-box; 
+}
 .container-grid > div {
   flex-basis: 50%;
   max-width: 50%;
 }
 
-.form-control.more {
-  width: 46%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin: 20px 0px;
-
-
+input[type="checkbox"] {
+  transform: scale(.7);
 }
 
+.form-control.select {
+  background-color: #fff;
+  width: 45%;
+  height: 45px;
+  font-size: 16px;
+  margin-right: 24px;
+}
 
+.form-grid .item-info {
+  display: flex;
+  align-items: center;
+}
+
+.form-grid label {
+  flex: 1;
+}
+
+.form-grid input {
+  flex: 3;
+}
+
+.form-control1{
+  width: 75%;
+  padding: 0;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: none;
+  border-bottom: 1px solid #ced4da;
+  border-color: #e8e9e9;
+  font-size: 14px;
+  height: 25px;
+}
+.form-control.more {
+  flex: 1;
+  margin: 20px 0px;
+}
+.form-control1:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #80bdff;
+  outline: 0;
+}
+
+.container-grid .grid-item input, .container-grid .grid-item select  {
+  width: 75%;
+  padding: 0;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  border: none;
+  border-bottom: 1px solid #ced4da;
+  border-color: #e8e9e9;
+  font-size: 14px;
+  height: 25px;
+  margin: 10px 5px;
+}
+
+.container-grid .grid-item input:focus, .container-grid .grid-item select:focus {
+  color: #495057;
+  border-color: #80bdff;
+  outline: 0;
+}
+
+.error {
+  border-color: red;
+}

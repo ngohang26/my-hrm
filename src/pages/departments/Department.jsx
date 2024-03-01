@@ -91,7 +91,10 @@ const Department = () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
+  const handleEdit = (id) => {
+    // const employeeToEdit = data.find((employee) => employee.id === id);
+    // setEditingEmployee(employeeToEdit);
+};
   return (
     <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
       <TabList className='tablist'>
@@ -104,7 +107,7 @@ const Department = () => {
         <div className='info'>
           <button onClick={openForm} className='btn-add'>+ Thêm</button>
         </div>
-        <DataTable columns={departmentColumns} data={departments} slug="department" />;
+        <DataTable columns={departmentColumns} data={departments} slug="department" onEdit={handleEdit}/>;
         {isFormOpen && (
           <div className="overlay" onClick={closeForm}>
             <FormComponent fields={departmentColumns} onSubmit={handleFormSubmit} />

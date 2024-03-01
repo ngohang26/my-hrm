@@ -1,132 +1,147 @@
-import React from 'react'
 import DataTable from '../../components/dataTable/DataTable.jsx'
 import './employee.css'
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import FormGrid from '../../components/Form/FormGird.jsx';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-
-
+import React, { useState } from 'react';
+import EmployeeForm from './EmployeeForm.jsx';
 
 const Employee = () => {
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [employees, setEmployees] = useState([]);
-  const [urlImage, setUrlImage] = useState(null);
-  const [position, setPosition] = useState('');
-  const [department, setDepartment] = useState('');
   const [positions, setPositions] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [data, setData] = useState({});
-  const [provinces, setProvinces] = useState([]);
+  const [tabIndex, setTabIndex] = useState(0);
+  const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [mode, setMode] = useState('add');  
+  const [showEditTab, setShowEditTab] = useState(false);
+
+  const [file, setFile] = useState(null);
+  const getImageUrl = (image) => {
+
+    return `http://localhost:8080/api/FileUpload/files/${image}`;
+
+  }
   const tableColumns = [
     {
-      field: 'urlImage',
+      field: 'image',
       headerName: 'Avatar',
       renderCell: (params) => (
-        <img src={params.value} alt="Avatar" style={{ width: '40px', height: '40px' }} />
+        <img src={getImageUrl(params.row.image)} alt="Avatar" style={{ width: '40px', height: '40px' }} />
       ),
-      flex: 1,
+      flex: 0.6,
     },
-    {field: 'employeeCode', headerName: 'MÃ NHÂN VIÊN', flex: 1,},
+    { field: 'employeeCode', headerName: 'MÃ NHÂN VIÊN', flex: 1, },
+    { field: 'fullName', headerName: 'TÊN NHÂN VIÊN', flex: 1.4, },
     {
-      field: 'position', headerName: 'CHỨC VỤ', flex: 2,
+      field: 'position', headerName: 'CHỨC VỤ', flex: 1,
       renderCell: (params) => (<span>{params.row.position?.positionName}</span>),
     },
     {
-      field: 'department', headerName: 'PHÒNG BAN', flex: 2,
+      field: 'department', headerName: 'PHÒNG BAN', flex: 1,
       renderCell: (params) => (<span>{params.row.department?.departmentName}</span>),
     },
-    {field: 'departmentName', headerName: 'PHÒNG BAN', flex: 2.5,},
-    {field: 'phoneNumber', headerName: 'PHONE NUMBER', flex: 1.7},
+    { field: 'phoneNumber', headerName: 'PHONE NUMBER', flex: 1.7 },
   ];
-  
-  const employeeColumns = [
-    {
-      field: 'urlImage',
-      headerName: 'Avatar',
-      renderCell: (params) => (
-        <img src={params.value} alt="Avatar" style={{ width: '40px', height: '40px' }} />
-      ), flex: 1,
-    },
-    {field: 'fullName', headerName: 'FULL NAME'},
-    {field: 'positionName', headerName: 'CHỨC VỤ'},
-    {field: 'departmentName', headerName: 'PHÒNG BAN',},
-    {field: 'phoneNumber', headerName: 'PHONE NUMBER'},
-    {filed: 'workEmail', headerName: 'EMAIL CÔNG VIỆC'}
-  ];
-  
-  const personalInfoColumns = [
-    {field: 'nationality', headerName: 'Quốc tịch', type: 'string'},
-    {field: 'birthPlace', headerName: 'Nơi sinh', type: 'select', options: provinces},
-    // {field: 'residence', headerName: '', type: 'string'},
-    {field: 'birthDate', headerName: 'Ngày sinh', type: 'date'},
-    {field: 'identityCardNumber', headerName: 'Số CMND', type: 'string'},
-  ] 
-  
-  const educationColumns = [
-    {field: 'certificateLevel', headerName: 'Cấp chứng chỉ', type: 'string'},
-    {field: 'fieldOfStudy', headerName: 'Chuyên ngành', type: 'string'},
-    {field: 'school', headerName: 'Trường học', type: 'string'},
-  ]
-  
-  const emergencyContactColumns = [
-    {field:'nameContactER', headerName: 'Tên liên hệ', type: 'string'},
-    {field:'phoneContactER', headerName: 'Số điện thoại', type: 'string'},
-  ]
-  
-  async function fetchEmployees() {
-    const response = await fetch('http://localhost:8080/employees/getAllEmployees');
-    return await response.json();
-  }
-  
+
   async function fetchPositions() {
     const response = await fetch('http://localhost:8080/positions/getAllPositions');
     const data = await response.json();
-    console.log('Positions:', data);
     return data;
   }
-  
+
   async function fetchDepartments() {
     const response = await fetch('http://localhost:8080/departments/getAllDepartments');
-    const data =  await response.json();
+    const data = await response.json();
     return data;
   }
-  
-  const handlePositionChange = (event) => {
-    setPosition(event.target.value);
-  };
 
-  const handleDepartmentChange = (event) => {
-    setDepartment(event.target.value);
-  };
-  const handleFormSubmit = (data) => {
-    console.log(data);
-    setIsFormOpen(false);
-  }
-  const openForm = () => {setIsFormOpen(true);}
-  const closeForm = (event) => {
-    if (event.target === event.currentTarget) {setIsFormOpen(false);}
-  }
+  const handleAddInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name in employee) {
+      setEmployee(prevEmployee => ({ ...prevEmployee, [name]: value }));
+    } else  {
+      setEmployee(prevEmployee => ({ 
+        ...prevEmployee, 
+        personalInfo: { ...prevEmployee.personalInfo, [name]: value }
+      }));
+    } 
+  }  
 
-  const handleInputChange = (event) => {
-    setData({
-      ...data,
-      [event.target.name]: event.target.value
-    });
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name in employee) {
+      setCurrentEmployee(prevEmployee => ({ ...prevEmployee, [name]: value }));
+      setEmployee(prevEmployee => ({ ...prevEmployee, [name]: value }));
+    } else  {
+      setCurrentEmployee(prevEmployee => ({ 
+        ...prevEmployee, 
+        personalInfo: { ...prevEmployee.personalInfo, [name]: value }
+      }));
+      setEmployee(prevEmployee => ({ 
+        ...prevEmployee, 
+        personalInfo: { ...prevEmployee.personalInfo, [name]: value }
+      }));
+    } 
+  }  
+   
+  const handleImageChange = (imageUrl) => {
+    setEmployee(prevEmployee => ({ ...prevEmployee, image: imageUrl }));
   };
   
+  const handleUpdate = async (e) => {
+    const updatedPersonalInfo = {
+      nationality: currentEmployee.personalInfo.nationality,
+      birthPlace: currentEmployee.personalInfo.birthPlace,
+      isResident: currentEmployee.personalInfo.isResident,
+      sex: currentEmployee.personalInfo.sex,
+      birthDate: currentEmployee.personalInfo.birthDate,
+      identityCardNumber: currentEmployee.personalInfo.identityCardNumber,
+      personalEmail: currentEmployee.personalInfo.personalEmail,
+      fieldOfStudy: currentEmployee.personalInfo.fieldOfStudy,
+      school: currentEmployee.personalInfo.school,
+    };
+    const updatedEmployee = {
+      fullName: currentEmployee.fullName,
+      phoneNumber: currentEmployee.phoneNumber,
+      workEmail: currentEmployee.workEmail,
+      positionName: currentEmployee.positionName,
+      departmentName: currentEmployee.departmentName,
+      personalInfo: updatedPersonalInfo,
+    };
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('employee', JSON.stringify(updatedEmployee));
+    console.log('File:', file);
+    console.log('Employee:', updatedEmployee);
+    
+    try {
+      const updateEmployeeResponse = await fetch(`http://localhost:8080/employees/updateEmployee/${currentEmployee.id}`, {
+        method: 'PUT',
+        body: formData,
+      });
+  
+      if (updateEmployeeResponse.ok) {
+        const updateEmployeeResult = await updateEmployeeResponse.json();
+        console.log(updateEmployeeResult);
+        // console.log(data)
+        setMode('add');
+        setCurrentEmployee(null);
+      } else {
+        console.error('Server response was not ok.');
+      }
+    } catch (error) {
+      console.error('There was an error!', error);
+    }
+  };
+  
+  
+
   useEffect(() => {
     const fetchInitialData = async () => {
       const initialEmployees = await fetchEmployees();
-      const transformedEmployees = initialEmployees.map(employee => ({
+      const transformedEmployees = initialEmployees ? initialEmployees.map(employee => ({
         ...employee,
         positionName: employee.position?.positionName,
-      }));
-      setEmployees(transformedEmployees);
+      })) : [];
       const initialPositions = await fetchPositions();
       setPositions(initialPositions);
       const initialDepartments = await fetchDepartments();
@@ -134,178 +149,365 @@ const Employee = () => {
     }
     fetchInitialData();
   }, []);
+  const [employee, setEmployee] = useState({
+    fullName: '',
+    phoneNumber: '',
+    workEmail: '',
+    positionName: '',
+    departmentName: '',
+    nameContactER: '',
+    phoneContactER: '',
+    personalInfo: {
+      nationality: '',
+      birthPlace: '',
+      isResident: true,
+      sex: '',
+      birthDate: '',
+      identityCardNumber: '',
+      // certificates: [],
+      // personalAddress: '',
+      personalEmail: '',
+      certificateLevel: '',
+      fieldOfStudy: '',
+      school: ''
+    },
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        setIsFormOpen(false);
+  });
+
+  const handleSubmitForm = async (e) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('employee', JSON.stringify(employee));
+    console.log(file);
+    console.log(employee)
+    try {
+      const addEmployeeResponse = await fetch('http://localhost:8080/employees/addEmployee', {
+        method: 'POST',
+        body: formData,
+      });
+      if (addEmployeeResponse.ok) {
+        const addEmployeeResult = await addEmployeeResponse.json();
+        setEmployees([...employees, addEmployeeResult]); // Update the list of employees
+        setTabIndex(0);
+      } else {
+        console.error('Server response was not ok.');
       }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
+    } catch (error) {
+      console.error('There was an error!', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchProvinces = async () => {
-      const response = await fetch('https://vnprovinces.pythonanywhere.com/api/provinces/?basic=true&limit=100'); 
-      const data = await response.json();
-      const provinceNames = data.results.map(province => province.name);
-      setProvinces(provinceNames);
-    }
-    fetchProvinces();
+    fetchEmployees();
   }, []);
-  
 
-  const [tabIndex, setTabIndex] = useState(0);
-  const [tabIndex2, setTabIndex2] = useState(0);
-  const [showDeleteIcon, setShowDeleteIcon] = useState(false);
-  const [backgroundImage, setBackgroundImage] = useState('/placeholder.png');
-  const handleAvatarChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      setUrlImage(event.target.files[0]);
-      setBackgroundImage(URL.createObjectURL(event.target.files[0]));
-      setShowDeleteIcon(true);
+  const fetchEmployees = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/employees/getAllEmployees');
+      const data = await response.json();
+      setEmployees(data);
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
-  
-  const handleDelete = () => {
-    setUrlImage(null);
-    setBackgroundImage('/placeholder.png');
-    setShowDeleteIcon(false);
-  };
-  
+  const handleEdit = (employee) => {
+    setCurrentEmployee(JSON.parse(JSON.stringify(employee)));
+    setMode('edit');
+    setTabIndex(2);
+    setShowEditTab(true);
+};
+
   return (
     <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
       <TabList className='tablist'>
         <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
-        <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>+ Thêm</Tab>      
+        <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>+ Thêm</Tab>
+        {showEditTab && (
+            <Tab className={`tab-item ${tabIndex === 2 ? 'active' : ''}`} style={{ color: tabIndex === 2 ? '#5a5279' : 'gray' }}>Sửa</Tab>
+        )}
       </TabList>
       <TabPanel>
-        <DataTable columns={tableColumns} data={employees} slug="employee" />;
+        <DataTable columns={tableColumns} data={employees} slug="employee" onEdit={handleEdit}/>
       </TabPanel>
       <TabPanel>
-        <Tabs>
-          <TabPanel>
-            <div className='employee-info' style={{display: "flex", flexWrap: 'wrap' }}>
-              <div className=""  style={{ flex: '9 0 50%', padding: '10px' }}>
-                {employeeColumns && employeeColumns.filter((item) => item.field !== "urlImage").map((column, index) => (
-                  column.field === 'positionName' ? (
-                    <FormControl style={{width: '45%', backgroundColor: "#fff", marginRight: "24px"}}  >
-                      <InputLabel id="position-label">Chức vụ</InputLabel>
-                      <Select
-                        labelId="position-label"
-                        id="position"
-                        value={position}
-                        onChange={handlePositionChange}
-                        label="Chức vụ"
-                      >
-                        {positions.map((pos) => (
-                          <MenuItem key={pos.id} value={pos.positionName}>
-                            {pos.positionName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  ) : column.field === 'departmentName' ? (
-                    <FormControl style={{width: '45%', backgroundColor: "#fff"}}>
-                      <InputLabel id='department-label'>Phòng ban</InputLabel>
-                      <Select
-                        labelId="department-label"
-                        id="department"
-                        value={department}
-                        onChange={handleDepartmentChange}
-                        label="Phòng ban"
-                      >
-                        {departments.map((dep) => (
-                          <MenuItem key={dep.id} value={dep.departmentName}>
-                            {dep.departmentName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  ) : column.field === 'fullName' ? (
-                    <input type={column.type} placeholder={column.headerName} onChange={handleInputChange} className='form-control' style={{height: '50px', fontSize: '26px', fontWeight: "600", width: '90%', margin: '20px 0px'}}/>
-                  ) : null
-                ))}
-                <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between", width: '93%'}}>
-                  {employeeColumns.filter((item) => item.field !== "urlImage" && item.field !== 'positionName' && item.field !== 'fullName' && item.field !== 'departmentName').map((column, index) => (
-                    <input type={column.type} placeholder={column.headerName} onChange={handleInputChange} className='form-control more'/>
-                  ))}
-                </div>
-              </div>
-
-              <div className="empl-avt" style={{flex: '1', position: 'relative'}}>
-                <input type="file" id="fileInput" onChange={handleAvatarChange} style={{display: 'none'}}/>
-                <label for="fileInput">
-                  <img src={backgroundImage} alt="Your alt text" />
-                </label>
-                {showDeleteIcon && (
-                  <img src='/delete.svg' className='delete-icon' alt="Delete" style={{position: 'absolute', right: 0, bottom: 140, cursor: 'pointer', width: '24px', height: '24px', borderRadius: '50%', color: '#000', backgroundColor: '#ccc', padding:'5px'}} onClick={handleDelete} />
-                )}
-              </div>
-            </div>
-          </TabPanel>
-          <Tabs className='tabs-more'>
-          <TabList className="tablist2">
-            <Tab className={`tab-item ${tabIndex2 === 0 ? 'active' : ''}`} onClick={() => setTabIndex2(0)}>Tiếp tục</Tab>
-            <Tab className={`tab-item ${tabIndex2 === 1 ? 'active' : ''}`} onClick={() => setTabIndex2(1)}>Thông tin công việc</Tab>
-            <Tab className={`tab-item ${tabIndex2 === 2 ? 'active' : ''}`} onClick={() => setTabIndex2(2)}>Thông tin riêng tư</Tab>
-            <Tab className={`tab-item ${tabIndex2 === 3 ? 'active' : ''}`} onClick={() => setTabIndex2(3)}>Thiết lập nhân lực</Tab>
-          </TabList>
-            <TabPanel>
-              Tiếp tục
-            </TabPanel>
-            <TabPanel>
-              Thông tin công việc 
-            </TabPanel>
-            <TabPanel>
-              <div className='container-grid'>
-                <div className='grid-item'>
-                  <label>CÔNG DÂN</label>
-                  <FormGrid fields= {personalInfoColumns}/>
-                </div>
-                <div className='grid-item'>
-                  <label>CÔNG DÂN</label>
-                  <FormGrid fields= {personalInfoColumns}/>
-                </div>
-                <div className='grid-item'>
-                  <label>LIÊN HỆ KHẨN CẤP</label>
-                  <FormGrid fields = {emergencyContactColumns}/>
-                </div>
-                <div className='grid-item'>
-                  <label>GIÁO DỤC</label>
-                  <FormGrid fields = {educationColumns}/>
-                </div>
-              </div>
-            </TabPanel>
-            <TabPanel>
-              Thông tin công việc2 
-            </TabPanel>
-          </Tabs>
-        </Tabs>
+        <EmployeeForm
+        handleInput={handleAddInputChange}
+        handleSubmit={handleSubmitForm}
+        fileName={file}
+        setFileName={setFile}
+        employee={employee}/>
+    
       </TabPanel>
+      {tabIndex === 2 && (
+    <TabPanel>
+        <EmployeeForm
+            handleInput={handleEditInputChange}
+            handleSubmit={handleUpdate}
+            fileName={file}
+            setFileName={setFile}
+            employee={currentEmployee}/>
+    </TabPanel>
+      )}
+
     </Tabs>
   );
-}
+};
+
 
 export default Employee
 
 
 
-    // <div className='users'>
-    //   <div className='info'>
-    //     <h3>Employee list</h3>
-    //     {/* <button onClick={() => setOpen(true)}>Add New User</button> */}
-    //   </div>
-    //   <DataTable columns={employeeColumns} fetchData={fetchUsers} slug="employee" />;
-    //   {/* {open && <Add columns={employeeColumns} setOpen={setOpen} />} */}
-    //   {/* <button onClick={openForm} className='btn-add'>Thêm</button> */}
 
-    //   {isFormOpen && (
-    //     <div className="overlay" onClick={closeForm}>
-    //       <FormComponent fields={employeeColumns} onSubmit={handleFormSubmit} />
-    //     </div>
-    //   )}  
-    // </div>
+// import DataTable from '../../components/dataTable/DataTable.jsx'
+// import './employee.css'
+// import { useEffect } from 'react';
+// import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+// import React, { useState } from 'react';
+// import EmployeeForm from './EmployeeForm.jsx';
+
+// const Employee = () => {
+//   const [employees, setEmployees] = useState([]);
+//   const [positions, setPositions] = useState([]);
+//   const [departments, setDepartments] = useState([]);
+//   const [backgroundImage, setBackgroundImage] = useState('/placeholder.png');
+//   const [tabIndex, setTabIndex] = useState(0);
+//   const [currentEmployee, setCurrentEmployee] = useState(null);
+//   const [mode, setMode] = useState('add');  
+//   const [showEditTab, setShowEditTab] = useState(false);
+//   const [file, setFile] = useState(null);
+//   const getImageUrl = (image) => {
+
+//     return `http://localhost:8080/api/FileUpload/files/${image}`;
+
+//   }
+//   const tableColumns = [
+//     {
+//       field: 'image',
+//       headerName: 'Avatar',
+//       renderCell: (params) => (
+//         <img src={getImageUrl(params.row.image)} alt="Avatar" style={{ width: '40px', height: '40px' }} />
+//       ),
+//       flex: 0.6,
+//     },
+//     { field: 'employeeCode', headerName: 'MÃ NHÂN VIÊN', flex: 1, },
+//     { field: 'fullName', headerName: 'TÊN NHÂN VIÊN', flex: 1.4, },
+//     {
+//       field: 'position', headerName: 'CHỨC VỤ', flex: 1,
+//       renderCell: (params) => (<span>{params.row.position?.positionName}</span>),
+//     },
+//     {
+//       field: 'department', headerName: 'PHÒNG BAN', flex: 1,
+//       renderCell: (params) => (<span>{params.row.department?.departmentName}</span>),
+//     },
+//     { field: 'phoneNumber', headerName: 'PHONE NUMBER', flex: 1.7 },
+//   ];
+
+//   async function fetchPositions() {
+//     const response = await fetch('http://localhost:8080/positions/getAllPositions');
+//     const data = await response.json();
+//     return data;
+//   }
+
+//   async function fetchDepartments() {
+//     const response = await fetch('http://localhost:8080/departments/getAllDepartments');
+//     const data = await response.json();
+//     return data;
+//   }
+
+//   useEffect(() => {
+//     const fetchInitialData = async () => {
+//       const initialEmployees = await fetchEmployees();
+//       const transformedEmployees = initialEmployees ? initialEmployees.map(employee => ({
+//         ...employee,
+//         positionName: employee.position?.positionName,
+//       })) : [];
+//       const initialPositions = await fetchPositions();
+//       setPositions(initialPositions);
+//       const initialDepartments = await fetchDepartments();
+//       setDepartments(initialDepartments);
+//     }
+//     fetchInitialData();
+//   }, []);
+//   const [employee, setEmployee] = useState({
+//     fullName: '',
+//     phoneNumber: '',
+//     workEmail: '',
+//     positionName: '',
+//     departmentName: '',
+//     nameContactER: '',
+//     phoneContactER: '',
+//     personalInfo: {
+//       nationality: '',
+//       birthPlace: '',
+//       isResident: true,
+//       sex: '',
+//       birthDate: '',
+//       identityCardNumber: '',
+//       // certificates: [],
+//       // personalAddress: '',
+//       personalEmail: '',
+//       certificateLevel: '',
+//       fieldOfStudy: '',
+//       school: ''
+//     },
+
+//   });
+  
+//   const handleAddInputChange = (e) => {
+//     const { name, value } = e.target;
+//     if (name in employee) {
+//       setEmployee(prevEmployee => ({ ...prevEmployee, [name]: value }));
+//     } else  {
+//       setEmployee(prevEmployee => ({ 
+//         ...prevEmployee, 
+//         personalInfo: { ...prevEmployee.personalInfo, [name]: value }
+//       }));
+//     } 
+//     // else if (name === "positionName") {
+//     //   setEmployee(prevEmployee => ({ 
+//     //     ...prevEmployee, 
+//     //     position: { ...prevEmployee.position, positionName: value }
+//     //   }));
+//     // } else if (name === "departmentName") {
+//     //   setEmployee(prevEmployee => ({ 
+//     //     ...prevEmployee, 
+//     //     department: { ...prevEmployee.department, departmentName: value }
+//     //   }));
+//     // }
+//   };
+  
+  
+//   const handleEditInputChange = (e) => {
+//     const { name, value } = e.target;
+//     setCurrentEmployee(prevEmployee => ({ ...prevEmployee, [name]: value }));
+//   };
+//   const handleInput = (e) => {
+//     const { name, value } = e.target;
+//     if (name === "positionName") {
+//       setEmployee(prevEmployee => ({ 
+//         ...prevEmployee, 
+//         position: { ...prevEmployee.position, positionName: value }
+//       }));
+//     } else if (name === "departmentName") {
+//       setEmployee(prevEmployee => ({ 
+//         ...prevEmployee, 
+//         department: { ...prevEmployee.department, departmentName: value }
+//       }));
+//     } else {
+//       setEmployee(prevEmployee => ({ ...prevEmployee, [name]: value }));
+//     }
+//   };
+  
+//   const handleUpdate = async (e) => {
+//     e.preventDefault();
+  
+//     const formData = new FormData();
+//     formData.append('file', file);
+//     formData.append('employee', JSON.stringify(employee));
+  
+//     try {
+//         const updateEmployeeResponse = await fetch(`/employees/update/${currentEmployee.id}`, {
+//             method: 'PUT',
+//             body: formData,
+//         });
+  
+//         if (updateEmployeeResponse.ok) {
+//             const updateEmployeeResult = await updateEmployeeResponse.json();
+//             console.log(updateEmployeeResult);
+//             setMode('add');
+//             setCurrentEmployee(null);
+//         } else {
+//             console.error('Server response was not ok.');
+//         }
+//     } catch (error) {
+//         console.error('There was an error!', error);
+//     }
+//   };
+
+//   const handleSubmitForm = async (e) => {
+//     const formData = new FormData();
+//     formData.append('file', file);
+//     formData.append('employee', JSON.stringify(employee));
+//     try {
+//       const addEmployeeResponse = await fetch('http://localhost:8080/employees/addEmployee', {
+//         method: 'POST',
+//         body: formData,
+//       });
+//       if (addEmployeeResponse.ok) {
+//         const addEmployeeResult = await addEmployeeResponse.json();
+//         setEmployees([...employees, addEmployeeResult]); // Update the list of employees
+//         setTabIndex(0);
+//       } else {
+//         console.error('Server response was not ok.');
+//       }
+//     } catch (error) {
+//       console.error('There was an error!', error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEmployees();
+//   }, []);
+
+//   const fetchEmployees = async () => {
+//     try {
+//       const response = await fetch('http://localhost:8080/employees/getAllEmployees');
+//       const data = await response.json();
+//       setEmployees(data);
+//     } catch (error) {
+//       console.error('Error:', error);
+//     }
+//   };
+
+//   const handleEdit = (employee) => {
+//     setCurrentEmployee(JSON.parse(JSON.stringify(employee)));
+//     setBackgroundImage(getImageUrl(employee.image)); // Cập nhật backgroundImage với URL hình ảnh của nhân viên
+//     setMode('edit');
+//     setTabIndex(2);
+//     setShowEditTab(true);
+//   };
+  
+// const handleImageChange = (imageUrl) => {
+//   setEmployee(prevEmployee => ({ ...prevEmployee, image: imageUrl }));
+// };
+//   return (
+//     <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
+//       <TabList className='tablist'>
+//         <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
+//         <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>+ Thêm</Tab>
+//         {showEditTab && (
+//             <Tab className={`tab-item ${tabIndex === 2 ? 'active' : ''}`} style={{ color: tabIndex === 2 ? '#5a5279' : 'gray' }}>Sửa</Tab>
+//         )}
+//       </TabList>
+//       <TabPanel>
+//         <DataTable columns={tableColumns} data={employees} slug="employee" onEdit={handleEdit}/>
+//       </TabPanel>
+//       <TabPanel>
+//         <EmployeeForm
+//         handleInput={handleAddInputChange}
+//         handleSubmit={handleSubmitForm}
+//         fileName={file}
+//         handleImageChange={handleImageChange} 
+//         setFileName={setFile}
+//         employee={employee}/>
+    
+//       </TabPanel>
+//       {tabIndex === 2 && (
+//     <TabPanel>
+//         <EmployeeForm
+//             handleInput={handleEditInputChange}
+//             handleSubmit={handleUpdate}
+//             fileName={file}
+//             setFileName={setFile}
+//             handleImageChange={handleImageChange}
+//             employee={currentEmployee}/>
+//     </TabPanel>
+//       )}
+//     </Tabs>
+//   );
+// };
+
+
+// export default Employee
+

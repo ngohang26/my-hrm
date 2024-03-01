@@ -2,69 +2,25 @@ import React, { useState } from "react";
 import './dataTable.css'
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
-const DataTable = ({ columns, rows, data, slug }) => {
+const DataTable = ({ columns, rows, data, slug, onEdit }) => {
   const [error, setError] = useState(null);
-  // const [deleteId, setDeleteId] = useState();
-  // const [undoOpen, setUndoOpen] = useState(false);
 
   if (error) {
     return <div>Đã xảy ra lỗi: {error.message}</div>;
   }
 
-  // function handleDelete(id) {
-  //   setModalOpen(true);
-  //   setDeleteId(id);
-  // }
+  const editColumn = {
+    field: 'edit',
+    headerName: 'Edit',
+    width: 100,
+    renderCell: (params) => (
+        <div className="action">
+            <button onClick={() => onEdit(params.row)}>Edit</button>
+        </div>
+    ),
+};
 
-  // function handleConfirmDelete() {
-  //   // Call API to soft delete
-  //   fetch(`http://localhost:8080/${slug}/${deleteId}`, { method: 'DELETE' })
-  //     .then(() => {
-  //       setData(data => data.filter(item => item.id !== deleteId));
-  //       setModalOpen(false);
-  //       // Show undo snackbar for 10 seconds
-  //       setUndoOpen(true);
-  //       setTimeout(() => setUndoOpen(false), 10000);
-  //     })
-  //     .catch(error => {
-  //       console.error(error);
-  //       alert('An error occurred while deteting!');
-  //     });
-  // }
-
-  // function handleUndo() {
-  //   // Call API to undo soft delete
-  //   fetch(`http://localhost:8080/${slug}/undo/${deleteId}`, { method: 'POST' })
-  //     .then(() => {
-  //       // Refresh data
-  //       fetchData()
-  //         .then(data => setData(data))
-  //         .catch(error => setError(error));
-  //       setUndoOpen(false);
-  //     })
-  //     .catch(error => {
-  //       console.error(error);
-  //       alert('An error occurred while undoing!');
-  //     });
-  // }
-
-  // const actionColumn = {
-  //   field: 'action',
-  //   headerName: 'Action',
-  //   width: 100,
-  //   renderCell: (params) => (
-  //     <div className="action">
-  //       <Link to={`/${slug}/${params.row.id}`}>
-  //         <img src="/view.svg" alt="" />
-  //       </Link>
-  //       {/* <div className="delete" onClick={() => handleDelete(params.row.id)}>
-  //         <img src="/delete.svg" alt="" />
-  //       </div> */}
-  //     </div>
-  //   ),
-  // };
-
-  const columnsWithAction = [...columns];
+  const columnsWithAction = [...columns, editColumn];
   return (
     <div className="dataTable">
       <DataGrid
@@ -74,7 +30,7 @@ const DataTable = ({ columns, rows, data, slug }) => {
         initialState={{
           pagination: {
             paginationModel: {
-              pageSize: 10,
+              pageSize: 50,
             },
           },
         }}

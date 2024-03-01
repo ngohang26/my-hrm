@@ -61,7 +61,7 @@ form .item{
 
 
  */
-.form-grid {
+/* .form-grid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   grid-gap: 10px;
@@ -73,6 +73,7 @@ form .item{
   display: flex;
   align-items: center;
 }
+
 .form-grid label {
   flex: 1;
 }
@@ -100,4 +101,4 @@ form .item{
   background-color: #fff;
   border-color: #80bdff;
   outline: 0;
-}
+} */

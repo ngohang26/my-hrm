@@ -85,13 +85,17 @@ const Position = () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+  const handleEdit = (id) => {
+    // const employeeToEdit = data.find((employee) => employee.id === id);
+    // setEditingEmployee(employeeToEdit);
+};
 
   return (
         <div className='positions'>
         <div className='info'>
           <button onClick={openForm} className='btn-add'>+ Thêm</button>
         </div>
-        <DataTable columns={positionColumns} data={positions} slug="position" />;
+        <DataTable columns={positionColumns} data={positions} slug="position" onEdit={handleEdit}/>;
         {isFormOpen && (
           <div className="overlay" onClick={closeForm}>
             <FormComponent fields={positionColumns} onSubmit={handleFormSubmit} />

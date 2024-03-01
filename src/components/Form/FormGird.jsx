@@ -10,14 +10,21 @@ class FormGrid extends React.Component {
   }
 
   handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? !target.checked : target.value;
+    const name = target.name;
+
     this.setState({
       data: {
         ...this.state.data,
-        [event.target.name]: event.target.value
+        [name]: value
       }
     });
   }
-
+  handleSubmit = (event) => {
+    event.preventDefault();
+    this.props.onSubmit(this.state.data);
+  }
   render() {
     const { fields } = this.props;
     return (
@@ -32,7 +39,10 @@ class FormGrid extends React.Component {
                 ))}
               </select>
             ) : (
-              <input type={column.type} name={column.field} onChange={this.handleInputChange} className='form-control1' />
+              // <input type={column.type} name={column.field} onChange={this.handleInputChange} className='form-control1' />
+              <input type={column.type} name={column.field} value={this.props.data[column.field]} onChange={this.props.onChange} className='form-control1' />
+
+
             )}
           </div>
         ))}

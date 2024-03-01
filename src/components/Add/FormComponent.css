@@ -1,4 +1,4 @@
-form {
+.form-component form {
   width: 45vw;
   height: auto;
   background-color: #fff;
@@ -6,17 +6,17 @@ form {
   
 }
 
-form .modal-header {
+.form-component form .modal-header {
   display: flex;
   justify-content: space-between;
 }
 
-form h2 {
+.form-component form h2 {
   color: #5a5279;
   padding: 20px;
 }
 
-form .item {
+.form-component form .item {
   margin-bottom: 25px;
 }
 
@@ -45,7 +45,7 @@ form .item {
   box-shadow: 0 0 0 0.2rem rgb(133 116 199 / 25%);
 }
 
-form .item{
+.form-component form .item{
   display: flex;
   justify-content: center;
   padding: 0px 15px;
@@ -57,7 +57,7 @@ form .item{
   padding: 25px 15px;
 }
 
-form button {
+.form-component form button {
   padding: 8px 12px;
   font-size: 16px;
   font-weight: 400;
@@ -67,33 +67,33 @@ form button {
   border: 1px solid transparent;
 }
 
-form .btn-control button[type=cancel] {
+.form-component form .btn-control button[type=cancel] {
   margin-right: 20px;
   background-color: #91959a;
 }
 
-form button[type=submit] {
+.form-component form button[type=submit] {
   background-color: #5a5279;
 }
 
-form .btn-control button[type=cancel]:focus {
+.form-component form .btn-control button[type=cancel]:focus {
   box-shadow: 0 0 0 0.2rem rgba(130,138,145,.5);
 }
 
-form button[type=submit]:focus {
+.form-component form button[type=submit]:focus {
   box-shadow: 0 0 0 0.2rem rgba(38,143,255,.5);
 }
 
-form .btn-control button[type=cancel]:hover {
+.form-component form .btn-control button[type=cancel]:hover {
   background-color: #7e8287;
 }
 
-form button[type=submit]:hover {
+.form-component form button[type=submit]:hover {
   background-color: #514a6e;
 }
 
 
-form .btn-cancel {
+.form-component form .btn-cancel {
   background-color: #fff;
   color: #ccc;
 }
