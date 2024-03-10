@@ -2,7 +2,7 @@ import React from 'react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { useState, useEffect } from 'react';
 
-const EmployeeForm = ({employee, handleSubmit, handleInput, fileName, setFileName}) => {
+const EmployeeForm = ({employee, handleSubmit, handleInput, fileName, setFileName, tabIndex, handleImageChange}) => {
   const [positions, setPositions] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [showDeleteIcon, setShowDeleteIcon] = useState(false);
@@ -67,6 +67,15 @@ const EmployeeForm = ({employee, handleSubmit, handleInput, fileName, setFileNam
   }, []);
 
   const handleFileChange = (e) => {
+    if(tabIndex === 2) {
+        if (e.target.files && e.target.files[0]) {
+          const imageUrl = URL.createObjectURL(e.target.files[0]);
+          setBackgroundImage(imageUrl);
+          setShowDeleteIcon(true);
+          handleImageChange(imageUrl); // Gọi hàm được truyền từ component cha
+        }
+      };
+    
     if (e.target.files && e.target.files[0]) {
       setFileName(e.target.files[0]);
       setBackgroundImage(URL.createObjectURL(e.target.files[0]));
