@@ -27,7 +27,7 @@ subItems: [
     title: 'Chấm công',
     icon: <SlBriefcase className='icon briefcase'/>,
 subItems: [
-      { title: 'Tổng quan', path: '/user' },
+      { title: 'Chấm công', path: '/attendances' },
       { title: 'Báo cáo', path: '/dashboard' },
     ]  
   },  

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import './dataTable.css'
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
-const DataTable = ({ columns, rows, data, slug, onEdit }) => {
+const DataTable = ({ columns, rows, data, slug, onEdit, showEditColumn }) => {
   const [error, setError] = useState(null);
 
   if (error) {
@@ -20,8 +20,11 @@ const DataTable = ({ columns, rows, data, slug, onEdit }) => {
     ),
 };
 
-  const columnsWithAction = [...columns, editColumn];
-  return (
+let columnsWithAction = [...columns];
+if (showEditColumn) {
+  columnsWithAction.push(editColumn);
+}  
+return (
     <div className="dataTable">
       <DataGrid
         className="dataGrid"
@@ -30,7 +33,7 @@ const DataTable = ({ columns, rows, data, slug, onEdit }) => {
         initialState={{
           pagination: {
             paginationModel: {
-              pageSize: 50,
+              pageSize: 20,
             },
           },
         }}
@@ -42,12 +45,11 @@ const DataTable = ({ columns, rows, data, slug, onEdit }) => {
           },
         }}
         pageSizeOptions={[10]}
-        checkboxSelection
         disableRowSelectionOnClick
         disableColumnFilter
         disableDensitySelector
         disableColumnSelector
-
+        dis
       />
       {/* <Modal
         isOpen={modalOpen}

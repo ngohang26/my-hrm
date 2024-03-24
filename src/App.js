@@ -8,6 +8,7 @@ import './styles/global.css'
 import Users from './pages/users/Users';
 import Employee from './pages/employees/Employee';
 import Department from './pages/departments/Department'
+import Attendance from './pages/Attendance/Attendance';
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,10 @@ function App() {
           path: "/departments",
           element: <Department />
         },
+        {
+          path: "/attendances",
+          element: <Attendance/>
+        }
 
       ],
     },

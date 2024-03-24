@@ -260,7 +260,7 @@ const Employee = () => {
         )}
       </TabList>
       <TabPanel>
-        <DataTable columns={tableColumns} data={employees} slug="employee" onEdit={handleEdit}/>
+        <DataTable columns={tableColumns} data={employees} slug="employee" onEdit={handleEdit} showEditColumn={true}/>
       </TabPanel>
       <TabPanel>
         <EmployeeForm

@@ -107,7 +107,7 @@ const Department = () => {
         <div className='info'>
           <button onClick={openForm} className='btn-add'>+ Thêm</button>
         </div>
-        <DataTable columns={departmentColumns} data={departments} slug="department" onEdit={handleEdit}/>;
+        <DataTable columns={departmentColumns} data={departments} slug="department" onEdit={handleEdit} showEditColumn={true}/>;
         {isFormOpen && (
           <div className="overlay" onClick={closeForm}>
             <FormComponent fields={departmentColumns} onSubmit={handleFormSubmit} />

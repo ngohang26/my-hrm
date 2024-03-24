@@ -95,7 +95,7 @@ const Position = () => {
         <div className='info'>
           <button onClick={openForm} className='btn-add'>+ Thêm</button>
         </div>
-        <DataTable columns={positionColumns} data={positions} slug="position" onEdit={handleEdit}/>;
+        <DataTable columns={positionColumns} data={positions} slug="position" onEdit={handleEdit} showEditColumn={true}/>;
         {isFormOpen && (
           <div className="overlay" onClick={closeForm}>
             <FormComponent fields={positionColumns} onSubmit={handleFormSubmit} />
