@@ -43,7 +43,7 @@ async function fetchAttendances() {
 
 const Attendance = () => {
   const [attendances, setAttendances] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date()); // thêm trạng thái này
+  const [selectedDate, setSelectedDate] = useState(null); // thay đổi giá trị mặc định này thành null
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -54,42 +54,23 @@ const Attendance = () => {
     fetchInitialData();
   }, []);
 
-  // Lọc dữ liệu chấm công dựa trên ngày được chọn
-  const filteredAttendances = attendances.filter(attendance => {
+  const filteredAttendances = selectedDate ? attendances.filter(attendance => {
     const attendanceDate = new Date(attendance.date);
     return attendanceDate.getDate() === selectedDate.getDate() &&
       attendanceDate.getMonth() === selectedDate.getMonth() &&
       attendanceDate.getFullYear() === selectedDate.getFullYear();
-  });
+  }) : attendances;
 
   return (
     <div>
       {/* Thêm một input để chọn ngày */}
-      <input type="date" value={selectedDate.toISOString().substr(0, 10)} onChange={e => setSelectedDate(new Date(e.target.value))} />
+      <input type="date" value={selectedDate ? selectedDate.toISOString().substr(0, 10) : ''} onChange={e => setSelectedDate(new Date(e.target.value))} />
+
+      {/* Thêm một nút để xóa lựa chọn ngày */}
+      <button onClick={() => setSelectedDate(null)}>Hiển thị tất cả</button>
 
       <DataTable columns={attendanceColumns} data={filteredAttendances} slug="attendance" showEditColumn={false}/>;
     </div>
-
-  
-    // <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
-    //   <TabList className='tablist'>
-    //     {/* <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Bộ phận</Tab>
-    //     <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>Chức vụ</Tab>       */}
-    //   </TabList>
-
-    //   <TabPanel>
-    //     <div className='attendances'>
-    //     <div className='info'>
-    //     </div>
-    //     <DataTable columns={attendanceColumns} data={attendances} slug="attendance" showEditColumn={false}/>;
-
-    //     </div>
-    //   </TabPanel>
-
-    //   <TabPanel>
-    //   </TabPanel>
-    //   </Tabs>
-
   );
 }
 export default Attendance
