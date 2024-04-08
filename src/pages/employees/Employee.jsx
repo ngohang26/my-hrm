@@ -11,8 +11,13 @@ const Employee = () => {
     const [showEditTab, setShowEditTab] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState(null);  
 
+    const [positions, setPositions] = useState([]);
+    const [departments, setDepartments] = useState([]); 
+    
     useEffect(() => {
         fetchEmployees();
+        fetchPositions(); 
+        fetchDepartments();
     }, []);
 
     const fetchEmployees = async () => {
@@ -22,6 +27,26 @@ const Employee = () => {
             setEmployees(data);
         } catch (error) {
             console.error('Error:', error);
+        }
+    };
+
+    const fetchPositions = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/positions/getAllPositions');
+            const data = await response.json();
+            setPositions(data);
+        } catch (error) {
+            console.error('Error fetching positions:', error);
+        }
+    };
+
+    const fetchDepartments = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/departments/getAllDepartments');
+            const data = await response.json();
+            setDepartments(data);
+        } catch (error) {
+            console.error('Error fetching departments:', error);
         }
     };
 
@@ -88,16 +113,17 @@ const Employee = () => {
                 )}
             </TabList>
             <TabPanel>
-                <DataTable columns={tableColumns} data={employees} />
+                <DataTable columns={tableColumns} data={employees} setTabIndex={setTabIndex}/>
             </TabPanel>
             <TabPanel>
-        {mode === 'add' && <EmployeeForm mode={mode} />}
+        {mode === 'add' && <EmployeeForm mode={mode}  positions={positions} departments={departments} />}
       </TabPanel>
       <TabPanel>
         {mode === 'edit' && editingEmployee && <EmployeeForm mode={mode} 
         currentEmployee={editingEmployee}  
         setTabIndex = {setTabIndex}
         setShowEditTab={setShowEditTab}
+        positions={positions} departments={departments}
         />} 
       </TabPanel>
 
