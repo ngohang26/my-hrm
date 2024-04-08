@@ -1,38 +1,13 @@
 import React from 'react'
 import DataTable from '../../components/dataTable/DataTable.jsx'
 import { useState, useEffect } from 'react';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 const attendanceColumns = [
-  {
-    field: 'employeeCode',
-    headerName: 'Mã nhân viên',
-    flex: 2,
-  },
-  {
-    field: 'employeeName',
-    headerName: 'Tên nhân viên',
-    flex: 3,
-  },
-  {
-    field: 'date',
-    headerName: 'Ngày',
-    flex: 2.5,
-  },
-  {
-    field: 'timeIn',
-    headerName: 'Giờ vào',
-    flex: 2.5,
-  },
-  {
-    field: 'timeOut',
-    headerName: 'Giờ ra',
-    flex: 2.5,
-  },
-  {
-    field: 'workTime',
-    headerName: 'Giờ làm việc',
-    flex: 2,
-  },  
+  { field: 'employeeCode', headerName: 'Mã nhân viên', flex: 2,},
+  { field: 'employeeName', headerName: 'Tên nhân viên',flex: 3,},
+  { field: 'date', headerName: 'Ngày', flex: 2.5,  },
+  { field: 'timeIn', headerName: 'Giờ vào', flex: 2.5,},
+  { field: 'timeOut', headerName: 'Giờ ra', flex: 2.5,},
+  { field: 'workTime', headerName: 'Giờ làm việc', flex: 2,},  
 
 ];
 
@@ -43,7 +18,10 @@ async function fetchAttendances() {
 
 const Attendance = () => {
   const [attendances, setAttendances] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null); // thay đổi giá trị mặc định này thành null
+  const [filterType, setFilterType] = useState('day');
+  const [dateFilter, setDateFilter] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null); 
+  const [selectedMonth, setSelectedMonth] = useState(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -52,22 +30,24 @@ const Attendance = () => {
     }
 
     fetchInitialData();
-  }, []);
+  }, [selectedMonth]);
 
-  const filteredAttendances = selectedDate ? attendances.filter(attendance => {
+  const filteredAttendances = selectedMonth ? attendances.filter(attendance => {
     const attendanceDate = new Date(attendance.date);
-    return attendanceDate.getDate() === selectedDate.getDate() &&
-      attendanceDate.getMonth() === selectedDate.getMonth() &&
-      attendanceDate.getFullYear() === selectedDate.getFullYear();
+    return attendanceDate.getMonth() === new Date(selectedMonth).getMonth() &&
+      attendanceDate.getFullYear() === new Date(selectedMonth).getFullYear();
   }) : attendances;
 
   return (
     <div>
-      {/* Thêm một input để chọn ngày */}
-      <input type="date" value={selectedDate ? selectedDate.toISOString().substr(0, 10) : ''} onChange={e => setSelectedDate(new Date(e.target.value))} />
-
-      {/* Thêm một nút để xóa lựa chọn ngày */}
-      <button onClick={() => setSelectedDate(null)}>Hiển thị tất cả</button>
+      <select name="" id="" onChange={(e) => setFilterType(e.target.value)}>
+        <option value="day" selected >Ngay</option>
+        <option value="month" >Thang</option>
+      </select>
+      { filterType === 'day' ? <input type="date" onChange={(e) => setDateFilter(new Date(e.target.value))} />
+       :<input type="month" value={selectedMonth ? selectedMonth.toISOString().substr(0, 7) : ''} onChange={e => console.log(e.target.value)} />
+      }
+      <button onClick={() => {setSelectedDate(null); setSelectedMonth(null);}}>Hiển thị tất cả</button>
 
       <DataTable columns={attendanceColumns} data={filteredAttendances} slug="attendance" showEditColumn={false}/>;
     </div>

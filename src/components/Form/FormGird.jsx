@@ -39,7 +39,6 @@ class FormGrid extends React.Component {
                 ))}
               </select>
             ) : (
-              // <input type={column.type} name={column.field} onChange={this.handleInputChange} className='form-control1' />
               <input type={column.type} name={column.field} value={this.props.data[column.field]} onChange={this.props.onChange} className='form-control1' />
 
 

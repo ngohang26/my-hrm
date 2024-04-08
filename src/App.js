@@ -9,6 +9,11 @@ import Users from './pages/users/Users';
 import Employee from './pages/employees/Employee';
 import Department from './pages/departments/Department'
 import Attendance from './pages/Attendance/Attendance';
+import Payroll from './pages/Payroll/Payroll';
+import PaySlip from './pages/PaySlip/PaySlip';
+import Contract from './pages/Contract/Contract';
+import ContractDetail from './pages/Contract/ContractDetail';
+import ContractView from './pages/Contract/ContractView';
 
 const queryClient = new QueryClient();
 
@@ -62,7 +67,27 @@ function App() {
         {
           path: "/attendances",
           element: <Attendance/>
-        }
+        },
+        {
+          path: "/payroll",
+          element: <Payroll/>
+        },
+        {
+          path: "/payslip",
+          element: <PaySlip/>
+        },
+        {
+          path: "/contracts",
+          element: <Contract/>
+        },
+        {
+          path: "/contracts/update/:employeeCode",
+          element: <ContractDetail/>
+        },
+        {
+          path: "/contracts/view/:employeeCode",
+          element: <ContractView/>
+        },
 
       ],
     },

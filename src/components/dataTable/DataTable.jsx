@@ -2,28 +2,14 @@ import React, { useState } from "react";
 import './dataTable.css'
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
-const DataTable = ({ columns, rows, data, slug, onEdit, showEditColumn }) => {
+const DataTable = ({ columns, data }) => {
   const [error, setError] = useState(null);
 
   if (error) {
     return <div>Đã xảy ra lỗi: {error.message}</div>;
   }
 
-  const editColumn = {
-    field: 'edit',
-    headerName: 'Edit',
-    width: 100,
-    renderCell: (params) => (
-        <div className="action">
-            <button onClick={() => onEdit(params.row)}>Edit</button>
-        </div>
-    ),
-};
-
 let columnsWithAction = [...columns];
-if (showEditColumn) {
-  columnsWithAction.push(editColumn);
-}  
 
 return (
     <div className="dataTable">
@@ -64,4 +50,4 @@ return (
   )
 }
 
-export default DataTable
+export default DataTable;

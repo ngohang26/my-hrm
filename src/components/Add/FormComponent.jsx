@@ -1,5 +1,4 @@
 import React from 'react';
-import {MdCancel} from 'react-icons/md'
 import './FormComponent.css'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
@@ -7,8 +6,14 @@ class FormComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {}
+      data: props.initialValues || {}
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.initialValues !== prevProps.initialValues) {
+      this.setState({ data: this.props.initialValues });
+    }
   }
 
   handleInputChange = (event) => {
@@ -22,27 +27,28 @@ class FormComponent extends React.Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    this.props.onSubmit(this.state.data);
+    const { data } = this.state;
+    this.props.onSubmit(data); 
   }
-
+  
+  
   render() {
     const { fields } = this.props;
     return (
       <div className="form-component">
         <form onSubmit={this.handleSubmit}>
           <div className='modal-header'>
-            <h2>Add department</h2>
-            <button type='cancel' className='btn-cancel'><MdCancel className='md-cancel'/></button>
+            <h2>Thêm</h2>
           </div>
           {fields.map((column) => (
             <div className="item" key={column.field}>
               {column.type === 'select' ? (
-                <FormControl>
+                <FormControl style={{ width: '100%' }}>
                   <InputLabel id={`${column.field}-label`}>{column.headerName}</InputLabel>
                   <Select
                     labelId={`${column.field}-label`}
                     name={column.field}
-                    value={this.state.data[column.field] || ''}
+                    value={this.state.data[column.field]}
                     onChange={this.handleInputChange}
                   >
                     {column.options.map((option) => (
@@ -53,13 +59,24 @@ class FormComponent extends React.Component {
                   </Select>
                 </FormControl>
               ) : (
-                <input type={column.type} name={column.field} placeholder={column.headerName} onChange={this.handleInputChange} className='form-control'/>
+                <div className="input-container">
+                  <label style={{visibility: column.type === 'date' ? 'visible' : 'hidden'}}>{column.headerName}</label>
+                  <input 
+                    type={column.type} 
+                    name={column.field} 
+                    placeholder={column.headerName} 
+                    value={this.state.data[column.field]} 
+                    onChange={this.handleInputChange} 
+                    className='form-control'
+                  />
+                </div>
               )}
             </div>
           ))}
+
           <hr></hr>
           <div className='btn-control'>
-            <button type="cancel">Close</button>
+            <button type="button" onClick={this.props.onCancel}>Close</button>
             <button type="submit">Send</button>
           </div>
         </form>
@@ -68,4 +85,4 @@ class FormComponent extends React.Component {
   }
 }
 
-export default FormComponent;
+export default FormComponent;  

@@ -1,460 +1,192 @@
-import React from 'react'
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const EmployeeForm = ({employee, handleSubmit, handleInput, fileName, setFileName, tabIndex, handleImageChange}) => {
-  const [positions, setPositions] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [showDeleteIcon, setShowDeleteIcon] = useState(false);
-  const [backgroundImage, setBackgroundImage] = useState('/placeholder.png');
-  const [provinces, setProvinces] = useState([]);
-  const [tabIndex2, setTabIndex2] = useState(0);
-  const [image, setUrlImage] = useState(null);
-  const [employees, setEmployees] = useState([]);  
+const EmployeeForm = ({ mode, currentEmployee }) => {
+    const defaultImage = '/placeholder.png';
+    const [employeeData, setEmployeeData] = useState({
+        fullName: '',
+        phoneNumber: '',
+        image: defaultImage,
+        workEmail: '',
+        positionName: '',
+        departmentName: '',
+        personalInfo: {
+            nationality: '',
+            birthPlace: '',
+            isResident: true,
+            sex: '',
+            birthDate: '',
+            identityCardNumber: '',
+            personalEmail: '',
+            fieldOfStudy: '',
+            school: ''
+        },
+        skills: [],
+        experiences: []
+    });
+    const [selectedFile, setSelectedFile] = useState();
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    handleSubmit(employee, fileName);
-  };
-      
-  async function fetchPositions() {
-    const response = await fetch('http://localhost:8080/positions/getAllPositions');
-    const data = await response.json();
-    return data;
-  }
-
-  async function fetchDepartments() {
-    const response = await fetch('http://localhost:8080/departments/getAllDepartments');
-    const data = await response.json();
-    return data;
-  }
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      const initialEmployees = await fetchEmployees();
-      const transformedEmployees = initialEmployees ? initialEmployees.map(employee => ({
-        ...employee,
-        positionName: employee.position?.positionName,
-      })) : [];
-      const initialPositions = await fetchPositions();
-      setPositions(initialPositions);
-      const initialDepartments = await fetchDepartments();
-      setDepartments(initialDepartments);
-    }
-    fetchInitialData();
-  }, []);
-
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
-  const fetchEmployees = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/employees/getAllEmployees');
-      const data = await response.json();
-      setEmployees(data);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      const response = await fetch('https://vnprovinces.pythonanywhere.com/api/provinces/?basic=true&limit=100');
-      const data = await response.json();
-      const provinceNames = data.results.map(province => province.name);
-      setProvinces(provinceNames);
-    }
-    fetchProvinces();
-  }, []);
-
-  const handleFileChange = (e) => {
-    if(tabIndex === 2) {
-        if (e.target.files && e.target.files[0]) {
-          const imageUrl = URL.createObjectURL(e.target.files[0]);
-          setBackgroundImage(imageUrl);
-          setShowDeleteIcon(true);
-          handleImageChange(imageUrl); // Gọi hàm được truyền từ component cha
+    useEffect(() => {
+        if (mode === 'edit' && currentEmployee) {
+            setEmployeeData(currentEmployee);
+        } else {
+            setEmployeeData({
+                fullName: '',
+                phoneNumber: '',
+                image: defaultImage,
+                workEmail: '',
+                positionName: '',
+                departmentName: '',
+                personalInfo: {
+                    nationality: '',
+                    birthPlace: '',
+                    isResident: true,
+                    sex: '',
+                    birthDate: '',
+                    identityCardNumber: '',
+                    personalEmail: '',
+                    fieldOfStudy: '',
+                    school: ''
+                },
+                skills: [],
+                experiences: []
+            });
         }
-      };
+    }, [currentEmployee, mode]);
+
+    const handleFileChange = (e) => {
+        setSelectedFile(e.target.files[0]);
+    };
+
+    const handleUpload = async () => {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        const response = await fetch('http://localhost:8080/api/FileUpload', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const data = await response.json();
+        if (data) {
+            console.log("Response from FileUpload:", data);
+        }
+
+        return data.generatedFileName;
+    };
+
+    const getImageUrl = (image) => {
+        return `http://localhost:8080/api/FileUpload/files/${image}`;
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        const [parent, child] = name.split('.'); // Tách đường dẫn
     
-    if (e.target.files && e.target.files[0]) {
-      setFileName(e.target.files[0]);
-      setBackgroundImage(URL.createObjectURL(e.target.files[0]));
-      setShowDeleteIcon(true);
-    }
-  };
-  const handleDelete = () => {
-    setUrlImage(null);
-    setBackgroundImage('/placeholder.png');
-    setShowDeleteIcon(false);
-  };
-  return (
-    <form onSubmit={handleFormSubmit}>
-    <button type="submit" className='btn-add'>Lưu</button>
-    <Tabs>
-      <TabPanel>
-      <div className='employee-info' style={{display: "flex", flexWrap: 'wrap' }}>
-      <div className=""  style={{ flex: '2 0 50%', padding: '10px' }}>
-        <input type="text" name="fullName" value={employee?.fullName ?? ''} onChange={handleInput} placeholder="Full Name" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90%', margin: '20px 0px' }} />
-        <select name="positionName" value={employee?.positionName ?? ''} onChange={handleInput} className='form-control select' >
-          <option value=''>Chọn chức vụ ...</option>
-          {positions.map((position, index) => (
-            <option key={index} value={position.positionName}>
-              {position.positionName}
-            </option>
-          ))}
-        </select>
-        <select name="departmentName" value={employee?.departmentName ?? ''} onChange={handleInput} className='form-control select'>
-          <option value=''>Chọn bộ phận ...</option>
-          {departments.map((department, index) => (
-            <option key={index} value={department.departmentName}>
-              {department.departmentName}
-            </option>
-          ))}
-        </select>
-        <div style={{ display: "flex", gap: '20px', width: '93%'}}>
-          <input type="text" name="phoneNumber" value={employee?.phoneNumber ?? ''} onChange={handleInput} placeholder="Phone Number" className='form-control more' />
-          <input type="text" name="workEmail" value={employee?.workEmail ?? ''} onChange={handleInput} placeholder="Work Email" className='form-control more' />
-        </div>
-        </div>
-        <div className="empl-avt" style={{flex: '1', position: 'relative', marginTop: '45px'}}>
-          <input type="file" id="fileInput" onChange={handleFileChange} style={{display: 'none'}}/>
-          <label htmlFor="fileInput">
-            <img src={backgroundImage} alt="Your alt text" style={{border: '1px #ccc solid'}}/>
-          </label>
-          {showDeleteIcon && (
-            <img src='/delete.svg' className='delete-icon' alt="Delete" style={{position: 'absolute', left: 80, bottom: 50, cursor: 'pointer', width: '24px', height: '24px', borderRadius: '50%', color: '#000', backgroundColor: '#ccc', padding:'5px'}} onClick={handleDelete} />
-          )}
-        </div>
-        </div>
-      </TabPanel>
-      <Tabs style={{ backgroundColor: '#fff' }}>
-        <TabList className="tablist2">
-          <Tab className={`tab-item ${tabIndex2 === 0 ? 'active' : ''}`} onClick={() => setTabIndex2(0)}>Tiếp tục</Tab>
-          <Tab className={`tab-item ${tabIndex2 === 1 ? 'active' : ''}`} onClick={() => setTabIndex2(1)}>Thông tin công việc</Tab>
-          <Tab className={`tab-item ${tabIndex2 === 2 ? 'active' : ''}`} onClick={() => setTabIndex2(2)}>Thông tin riêng tư</Tab>
-          <Tab className={`tab-item ${tabIndex2 === 3 ? 'active' : ''}`} onClick={() => setTabIndex2(3)}>Thiết lập nhân lực</Tab>
-        </TabList>
-        <TabPanel>
-          Tiếp tục
-        </TabPanel>
-        <TabPanel>
-          Thông tin công việc
-        </TabPanel>
-        <TabPanel>
-          <div className='container-grid'>
-            <div className="form-grid grid-item">
-              <label>LIÊN HỆ CÁ NHÂN</label>
-              <div className="item-info">
-                <label htmlFor="personalEmail">Email</label>
-                <input type="text" name="personalEmail" value={employee?.personalInfo?.personalEmail ?? ''} onChange={handleInput} />
-              </div>
-            </div>
-            <div className="form-grid grid-item">
-              <label>LIÊN HỆ KHẨN CẤP</label>
-              <div className="item-info">
-                <label htmlFor="nameContactER">Tên liên hệ</label>
-                <input type="text" name="nameContactER" value={employee?.nameContactER ?? ''} onChange={handleInput} />
-              </div>
-              <div className="item-info">
-                <label htmlFor="phoneContactER">Số điện thoại</label>
-                <input type="text" name="phoneContactER" value={employee?.phoneContactER ?? ''} onChange={handleInput} />
-              </div>
-            </div>
-            <div className="form-grid grid-item">
-              <label>CÔNG DÂN</label>
-              <div className="item-info">
-                <label htmlFor='nationality'>Quốc tịch</label>
-                <input type="text" name="nationality" value={employee?.personalInfo?.nationality ?? ''} onChange={handleInput} className='f' />
-              </div>
-              <div className="item-info">
-                <label htmlFor='birthPlace'>Nơi sinh</label>
-                <select name="birthPlace" value={employee?.personalInfo?.birthPlace ?? ''} onChange={handleInput}>
-                  <option value="">Chọn tỉnh ...</option>
-                  {provinces.map((province, index) => (
-                    <option key={index} value={province}>
-                      {province}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="item-info">
-                <label htmlFor="sex">Giới tính</label>
-                <select name="sex" value={employee?.personalInfo?.sex ?? ''} onChange={handleInput}>
-                  <option value="">Chọn giới tính...</option>
-                  <option value="Nam">Nam</option>
-                  <option value="Nữ">Nữ</option>
-                  <option value="Khác">Khác</option>
-                </select>
-              </div>
-              <div className="item-info">
-                <label htmlFor="birthDate">Ngày sinh</label>
-                <input type="date" name="birthDate" value={employee?.personalInfo?.birthDate ?? ''} onChange={handleInput} />
-              </div>
-              <div className="item-info">
-                <label htmlFor="identityCardNumber">Số CCCD</label>
-                <input type="text" name="identityCardNumber" value={employee?.personalInfo?.identityCardNumber ?? ''} onChange={handleInput} />
-              </div>
-            </div>
-            <div className="form-grid grid-item">
-              <label>GIÁO DỤC</label>
-              <div className="item-info">
-                <label htmlFor="certificateLevel">Cấp bằng</label>
-                <select name="certificateLevel" value={employee?.personalInfo?.certificateLevel ?? ''} onChange={handleInput}>
-                  <option value="">Chọn cấp...</option>
-                  <option value="Tốt nghiệp">Tốt nghiệp</option>
-                  <option value="Cử nhân">Cử nhân</option>
-                  <option value="Thạc sĩ">Thạc sĩ</option>
-                  <option value="Tiến sĩ">Tiến sĩ</option>
-                  <option value="Khác">Khác</option>
-                </select>
-              </div>
-              <div className="item-info">
-                <label htmlFor="fieldOfStudy">Chuyên ngành</label>
-                <input type="text" name="fieldOfStudy" value={employee?.personalInfo?.fieldOfStudy ?? ''} onChange={handleInput} />
-              </div>
-              <div className="item-info">
-                <label htmlFor="school">Trường học</label>
-                <input type="text" name="school" value={employee?.personalInfo?.school ?? ''} onChange={handleInput} />
-              </div>
-            </div>
-          </div>
-        </TabPanel>
-        <TabPanel>
-          Tttt
-        </TabPanel>
-      </Tabs>
-    </Tabs>
-  </form>
+        // Nếu có đường dẫn con
+        if (parent && child) {
+            setEmployeeData(prevState => ({
+                ...prevState,
+                personalInfo: {
+                    ...prevState.personalInfo,
+                    [child]: value // Cập nhật trường con cụ thể
+                }
+            }));
+        } else {
+            // Nếu không có đường dẫn con, cập nhật trường thông thường
+            setEmployeeData(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        }
+    };
+    
 
-  )
-}
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        let image = employeeData.image;
+        if (selectedFile) {
+            image = await handleUpload();
+        } else {
+            console.log("No file selected.");
+        }
 
-export default EmployeeForm
+        const employeeToSend = {
+            ...employeeData,
+            image: image
+        };
 
+        console.log("Data sent to server:", employeeToSend);
 
+        if (mode === 'add') {
+            fetch('http://localhost:8080/employees/addEmployee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(employeeToSend),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        } else if (mode === 'edit') {
+            fetch(`http://localhost:8080/employees/${employeeToSend.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(employeeToSend),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    };
 
-// import React from 'react'
-// import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-// import { useState, useEffect } from 'react';
+    return (
+        <form onSubmit={handleSubmit}>
+            <label>
+                <input type="file" onChange={handleFileChange} style={{ opacity: 0, position: 'absolute', zIndex: 1 }} />
+                {selectedFile ? <img src={URL.createObjectURL(selectedFile)} alt="Preview" width="100px" height="100px" /> : <img src={defaultImage} alt="Default" width="100px" height="100px" />}
+            </label>
+            <label>
+                Full Name:
+                <input type="text" value={employeeData.fullName} name="fullName" onChange={handleChange} />
+            </label>
+            <label>
+                Phone Number:
+                <input type="text" name="phoneNumber" value={employeeData.phoneNumber} onChange={handleChange} />
+            </label>
+            <label>
+                CMND:
+                <input type="text" name="personalInfo.identityCardNumber" value={employeeData.personalInfo.identityCardNumber} onChange={handleChange} />
+            </label>
+            <label>
+                Work Email:
+                <input type="email" name="workEmail" value={employeeData.workEmail} onChange={handleChange} />
+            </label>
+            <label>
+                Position Name:
+                <input type="text" name="positionName" value={employeeData.positionName} onChange={handleChange} />
+            </label>
+            <label>
+                Department Name:
+                <input type="text" name="departmentName" value={employeeData.departmentName} onChange={handleChange} />
+            </label>
+            <label>
+                Nationality:
+                <input type="text" name="personalInfo.nationality" value={employeeData.personalInfo.nationality} onChange={handleChange} />
+            </label>
+            <input type="submit" value="Submit" />
+        </form>
+    );
+};
 
-// const EmployeeForm = ({employee, handleSubmit, handleInput, fileName, setFileName, handleImageChange}) => {
-//   const [positions, setPositions] = useState([]);
-//   const [departments, setDepartments] = useState([]);
-//   const [showDeleteIcon, setShowDeleteIcon] = useState(false);
-//   const [backgroundImage, setBackgroundImage] = useState('/placeholder.png');
-//   const [provinces, setProvinces] = useState([]);
-//   const [tabIndex2, setTabIndex2] = useState(0);
-//   const [image, setUrlImage] = useState(null);
-//   const [employees, setEmployees] = useState([]);  
-//   // const [employee, setEmployee] = useState(employeeT);
-  
-//   const handleFormSubmit = (e) => {
-//     e.preventDefault();
-//     handleSubmit(employee, fileName);
-//   };
-
-
-//   async function fetchPositions() {
-//     const response = await fetch('http://localhost:8080/positions/getAllPositions');
-//     const data = await response.json();
-//     return data;
-//   }
-
-//   async function fetchDepartments() {
-//     const response = await fetch('http://localhost:8080/departments/getAllDepartments');
-//     const data = await response.json();
-//     return data;
-//   }
-//   useEffect(() => {
-//     const fetchInitialData = async () => {
-//       const initialEmployees = await fetchEmployees();
-//       const transformedEmployees = initialEmployees ? initialEmployees.map(employee => ({
-//         ...employee,
-//         positionName: employee.position?.positionName,
-//       })) : [];
-//       const initialPositions = await fetchPositions();
-//       setPositions(initialPositions);
-//       const initialDepartments = await fetchDepartments();
-//       setDepartments(initialDepartments);
-//     }
-//     fetchInitialData();
-//   }, []);
-
-//   useEffect(() => {
-//     fetchEmployees();
-//   }, []);
-
-//   const fetchEmployees = async () => {
-//     try {
-//       const response = await fetch('http://localhost:8080/employees/getAllEmployees');
-//       const data = await response.json();
-//       setEmployees(data);
-//     } catch (error) {
-//       console.error('Error:', error);
-//     }
-//   };
-//   useEffect(() => {
-//     const fetchProvinces = async () => {
-//       const response = await fetch('https://vnprovinces.pythonanywhere.com/api/provinces/?basic=true&limit=100');
-//       const data = await response.json();
-//       const provinceNames = data.results.map(province => province.name);
-//       setProvinces(provinceNames);
-//     }
-//     fetchProvinces();
-//   }, []);
-
-//   const handleFileChange = (e) => {
-//     if (e.target.files && e.target.files[0]) {
-//       const imageUrl = URL.createObjectURL(e.target.files[0]);
-//       setBackgroundImage(imageUrl);
-//       setShowDeleteIcon(true);
-//       handleImageChange(imageUrl); // Gọi hàm được truyền từ component cha
-//     }
-//   };
-//   const handleDelete = () => {
-//     setUrlImage(null);
-//     setBackgroundImage('/placeholder.png');
-//     setShowDeleteIcon(false);
-//   };
-//   return (
-  //   <form onSubmit={handleFormSubmit}>
-  //   <button type="submit" className='btn-add'>Lưu</button>
-  //   <Tabs>
-  //     <TabPanel>
-  //     <div className='employee-info' style={{display: "flex", flexWrap: 'wrap' }}>
-  //     <div className=""  style={{ flex: '2 0 50%', padding: '10px' }}>
-  //       <input type="text" name="fullName" value={employee?.fullName ?? ''} onChange={handleInput} placeholder="Full Name" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90%', margin: '20px 0px' }} />
-  //       <select name="positionName" value={employee?.positionName ?? ''} onChange={handleInput} className='form-control select' >
-  //         <option value=''>Chọn chức vụ ...</option>
-  //         {positions.map((position, index) => (
-  //           <option key={index} value={position.positionName}>
-  //             {position.positionName}
-  //           </option>
-  //         ))}
-  //       </select>
-  //       <select name="departmentName" value={employee?.departmentName ?? ''} onChange={handleInput} className='form-control select'>
-  //         <option value=''>Chọn bộ phận ...</option>
-  //         {departments.map((department, index) => (
-  //           <option key={index} value={department.departmentName}>
-  //             {department.departmentName}
-  //           </option>
-  //         ))}
-  //       </select>
-  //       <div style={{ display: "flex", gap: '20px', width: '93%'}}>
-  //         <input type="text" name="phoneNumber" value={employee?.phoneNumber ?? ''} onChange={handleInput} placeholder="Phone Number" className='form-control more' />
-  //         <input type="text" name="workEmail" value={employee?.workEmail ?? ''} onChange={handleInput} placeholder="Work Email" className='form-control more' />
-  //       </div>
-  //       </div>
-  //       <div className="empl-avt" style={{flex: '1', position: 'relative', marginTop: '45px'}}>
-  //         <input type="file" id="fileInput" onChange={handleFileChange} style={{display: 'none'}}/>
-  //         <label htmlFor="fileInput">
-  //           <img src={backgroundImage} alt="Your alt text" style={{border: '1px #ccc solid'}}/>
-  //         </label>
-  //         {showDeleteIcon && (
-  //           <img src='/delete.svg' className='delete-icon' alt="Delete" style={{position: 'absolute', left: 80, bottom: 50, cursor: 'pointer', width: '24px', height: '24px', borderRadius: '50%', color: '#000', backgroundColor: '#ccc', padding:'5px'}} onClick={handleDelete} />
-  //         )}
-  //       </div>
-  //       </div>
-  //     </TabPanel>
-  //     <Tabs style={{ backgroundColor: '#fff' }}>
-  //       <TabList className="tablist2">
-  //         <Tab className={`tab-item ${tabIndex2 === 0 ? 'active' : ''}`} onClick={() => setTabIndex2(0)}>Tiếp tục</Tab>
-  //         <Tab className={`tab-item ${tabIndex2 === 1 ? 'active' : ''}`} onClick={() => setTabIndex2(1)}>Thông tin công việc</Tab>
-  //         <Tab className={`tab-item ${tabIndex2 === 2 ? 'active' : ''}`} onClick={() => setTabIndex2(2)}>Thông tin riêng tư</Tab>
-  //         <Tab className={`tab-item ${tabIndex2 === 3 ? 'active' : ''}`} onClick={() => setTabIndex2(3)}>Thiết lập nhân lực</Tab>
-  //       </TabList>
-  //       <TabPanel>
-  //         Tiếp tục
-  //       </TabPanel>
-  //       <TabPanel>
-  //         Thông tin công việc
-  //       </TabPanel>
-  //       <TabPanel>
-  //         <div className='container-grid'>
-  //           <div className="form-grid grid-item">
-  //             <label>LIÊN HỆ CÁ NHÂN</label>
-  //             <div className="item-info">
-  //               <label htmlFor="personalEmail">Email</label>
-  //               <input type="text" name="personalEmail" value={employee?.personalInfo?.personalEmail ?? ''} onChange={handleInput} />
-  //             </div>
-  //           </div>
-  //           <div className="form-grid grid-item">
-  //             <label>LIÊN HỆ KHẨN CẤP</label>
-  //             <div className="item-info">
-  //               <label htmlFor="nameContactER">Tên liên hệ</label>
-  //               <input type="text" name="nameContactER" value={employee?.nameContactER ?? ''} onChange={handleInput} />
-  //             </div>
-  //             <div className="item-info">
-  //               <label htmlFor="phoneContactER">Số điện thoại</label>
-  //               <input type="text" name="phoneContactER" value={employee?.phoneContactER ?? ''} onChange={handleInput} />
-  //             </div>
-  //           </div>
-  //           <div className="form-grid grid-item">
-  //             <label>CÔNG DÂN</label>
-  //             <div className="item-info">
-  //               <label htmlFor='nationality'>Quốc tịch</label>
-  //               <input type="text" name="nationality" value={employee?.personalInfo?.nationality ?? ''} onChange={handleInput} className='f' />
-  //             </div>
-  //             <div className="item-info">
-  //               <label htmlFor='birthPlace'>Nơi sinh</label>
-  //               <select name="birthPlace" value={employee?.personalInfo?.birthPlace ?? ''} onChange={handleInput}>
-  //                 <option value="">Chọn tỉnh ...</option>
-  //                 {provinces.map((province, index) => (
-  //                   <option key={index} value={province}>
-  //                     {province}
-  //                   </option>
-  //                 ))}
-  //               </select>
-  //             </div>
-  //             <div className="item-info">
-  //               <label htmlFor="sex">Giới tính</label>
-  //               <select name="sex" value={employee?.personalInfo?.sex ?? ''} onChange={handleInput}>
-  //                 <option value="">Chọn giới tính...</option>
-  //                 <option value="Nam">Nam</option>
-  //                 <option value="Nữ">Nữ</option>
-  //                 <option value="Khác">Khác</option>
-  //               </select>
-  //             </div>
-  //             <div className="item-info">
-  //               <label htmlFor="birthDate">Ngày sinh</label>
-  //               <input type="date" name="birthDate" value={employee?.personalInfo?.birthDate ?? ''} onChange={handleInput} />
-  //             </div>
-  //             <div className="item-info">
-  //               <label htmlFor="identityCardNumber">Số CCCD</label>
-  //               <input type="text" name="identityCardNumber" value={employee?.personalInfo?.identityCardNumber ?? ''} onChange={handleInput} />
-  //             </div>
-  //           </div>
-  //           <div className="form-grid grid-item">
-  //             <label>GIÁO DỤC</label>
-  //             <div className="item-info">
-  //               <label htmlFor="certificateLevel">Cấp bằng</label>
-  //               <select name="certificateLevel" value={employee?.personalInfo?.certificateLevel ?? ''} onChange={handleInput}>
-  //                 <option value="">Chọn cấp...</option>
-  //                 <option value="Tốt nghiệp">Tốt nghiệp</option>
-  //                 <option value="Cử nhân">Cử nhân</option>
-  //                 <option value="Thạc sĩ">Thạc sĩ</option>
-  //                 <option value="Tiến sĩ">Tiến sĩ</option>
-  //                 <option value="Khác">Khác</option>
-  //               </select>
-  //             </div>
-  //             <div className="item-info">
-  //               <label htmlFor="fieldOfStudy">Chuyên ngành</label>
-  //               <input type="text" name="fieldOfStudy" value={employee?.personalInfo?.fieldOfStudy ?? ''} onChange={handleInput} />
-  //             </div>
-  //             <div className="item-info">
-  //               <label htmlFor="school">Trường học</label>
-  //               <input type="text" name="school" value={employee?.personalInfo?.school ?? ''} onChange={handleInput} />
-  //             </div>
-  //           </div>
-  //         </div>
-  //       </TabPanel>
-  //       <TabPanel>
-  //         Tttt
-  //       </TabPanel>
-  //     </Tabs>
-  //   </Tabs>
-  // </form>
-//   )
-// }
-
-// export default EmployeeForm
+export default EmployeeForm;

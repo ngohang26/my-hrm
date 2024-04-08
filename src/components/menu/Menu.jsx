@@ -19,9 +19,9 @@ const menuItems = [
     title: 'Bảng lương',
     icon: <PiProjectorScreenLight className='icon project'/>,
 subItems: [
-      { title: 'Bảng thông tin', path: '/user' },
-      { title: 'Hợp đồng', path: '/dashboard' },
-      { title: 'Phiếu lương', path: '/department' },
+      { title: 'Bảng lương', path: '/payroll' },
+      { title: 'Hợp đồng', path: '/contracts' },
+      { title: 'Phiếu lương', path: '/payslip' },
       { title: 'Báo cáo', path: '/employee' }
     ]  },  {
     title: 'Chấm công',
