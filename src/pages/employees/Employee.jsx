@@ -94,7 +94,11 @@ const Employee = () => {
         {mode === 'add' && <EmployeeForm mode={mode} />}
       </TabPanel>
       <TabPanel>
-        {mode === 'edit' && editingEmployee && <EmployeeForm mode={mode} currentEmployee={editingEmployee} />} 
+        {mode === 'edit' && editingEmployee && <EmployeeForm mode={mode} 
+        currentEmployee={editingEmployee}  
+        setTabIndex = {setTabIndex}
+        setShowEditTab={setShowEditTab}
+        />} 
       </TabPanel>
 
         </Tabs>

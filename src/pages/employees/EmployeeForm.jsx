@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const EmployeeForm = ({ mode, currentEmployee }) => {
+const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab }) => {
     const defaultImage = '/placeholder.png';
+    
     const [employeeData, setEmployeeData] = useState({
         fullName: '',
         phoneNumber: '',
@@ -28,6 +31,7 @@ const EmployeeForm = ({ mode, currentEmployee }) => {
     useEffect(() => {
         if (mode === 'edit' && currentEmployee) {
             setEmployeeData(currentEmployee);
+            setSelectedFile(currentEmployee.image); // Cập nhật selectedFile
         } else {
             setEmployeeData({
                 fullName: '',
@@ -81,7 +85,7 @@ const EmployeeForm = ({ mode, currentEmployee }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         const [parent, child] = name.split('.'); // Tách đường dẫn
-    
+
         // Nếu có đường dẫn con
         if (parent && child) {
             setEmployeeData(prevState => ({
@@ -99,7 +103,7 @@ const EmployeeForm = ({ mode, currentEmployee }) => {
             }));
         }
     };
-    
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -125,13 +129,18 @@ const EmployeeForm = ({ mode, currentEmployee }) => {
                 },
                 body: JSON.stringify(employeeToSend),
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    // console.log('Success:', data);
+                    toast.success("Thêm nhân viên thành công")
+                    setTimeout(() => {
+                        setTabIndex(0);
+                    }, 1200);
+
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
         } else if (mode === 'edit') {
             fetch(`http://localhost:8080/employees/${employeeToSend.id}`, {
                 method: 'PUT',
@@ -140,52 +149,60 @@ const EmployeeForm = ({ mode, currentEmployee }) => {
                 },
                 body: JSON.stringify(employeeToSend),
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    // console.log('Success:', data);
+                    toast.success("Sửa nhân viên thành công")
+                    setTimeout(() => {
+                        setTabIndex(0);
+                        setShowEditTab(false);
+                    }, 1200);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label>
-                <input type="file" onChange={handleFileChange} style={{ opacity: 0, position: 'absolute', zIndex: 1 }} />
-                {selectedFile ? <img src={URL.createObjectURL(selectedFile)} alt="Preview" width="100px" height="100px" /> : <img src={defaultImage} alt="Default" width="100px" height="100px" />}
-            </label>
-            <label>
-                Full Name:
-                <input type="text" value={employeeData.fullName} name="fullName" onChange={handleChange} />
-            </label>
-            <label>
-                Phone Number:
-                <input type="text" name="phoneNumber" value={employeeData.phoneNumber} onChange={handleChange} />
-            </label>
-            <label>
-                CMND:
-                <input type="text" name="personalInfo.identityCardNumber" value={employeeData.personalInfo.identityCardNumber} onChange={handleChange} />
-            </label>
-            <label>
-                Work Email:
-                <input type="email" name="workEmail" value={employeeData.workEmail} onChange={handleChange} />
-            </label>
-            <label>
-                Position Name:
-                <input type="text" name="positionName" value={employeeData.positionName} onChange={handleChange} />
-            </label>
-            <label>
-                Department Name:
-                <input type="text" name="departmentName" value={employeeData.departmentName} onChange={handleChange} />
-            </label>
-            <label>
-                Nationality:
-                <input type="text" name="personalInfo.nationality" value={employeeData.personalInfo.nationality} onChange={handleChange} />
-            </label>
-            <input type="submit" value="Submit" />
-        </form>
+        <>
+             <ToastContainer/>
+            <form onSubmit={handleSubmit}>
+                <label>
+                    <input type="file" onChange={handleFileChange} style={{ opacity: 0, position: 'absolute', zIndex: 1 }} />
+                    {selectedFile instanceof File ? <img src={URL.createObjectURL(selectedFile)} alt="Preview" width="100px" height="100px" /> : <img src={mode === 'add' ? defaultImage : getImageUrl(employeeData.image)} alt="Default" width="100px" height="100px" />}
+                </label>
+                <label>
+                    Full Name:
+                    <input type="text" value={employeeData.fullName} name="fullName" onChange={handleChange} />
+                </label>
+                <label>
+                    Phone Number:
+                    <input type="text" name="phoneNumber" value={employeeData.phoneNumber} onChange={handleChange} />
+                </label>
+                <label>
+                    CMND:
+                    <input type="text" name="personalInfo.identityCardNumber" value={employeeData.personalInfo.identityCardNumber} onChange={handleChange} />
+                </label>
+                <label>
+                    Work Email:
+                    <input type="email" name="workEmail" value={employeeData.workEmail} onChange={handleChange} />
+                </label>
+                <label>
+                    Position Name:
+                    <input type="text" name="positionName" value={employeeData.positionName} onChange={handleChange} />
+                </label>
+                <label>
+                    Department Name:
+                    <input type="text" name="departmentName" value={employeeData.departmentName} onChange={handleChange} />
+                </label>
+                <label>
+                    Nationality:
+                    <input type="text" name="personalInfo.nationality" value={employeeData.personalInfo.nationality} onChange={handleChange} />
+                </label>
+                <input type="submit" value="Submit" />
+            </form>
+        </>
     );
 };
 
