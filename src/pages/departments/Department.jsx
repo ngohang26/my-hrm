@@ -17,7 +17,12 @@ const addDepartmentColumns = [
 
 
 async function fetchDepartments() {
-  const response = await fetch('http://localhost:8080/departments/getAllDepartments');
+  const token = localStorage.getItem('accessToken');
+  const response = await fetch('http://localhost:8080/departments/getAllDepartments', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
   const departments = await response.json();
   return departments.map((department, index) => ({
     order: index + 1,  
@@ -29,11 +34,13 @@ async function fetchDepartments() {
 
 async function addDepartment(department, employeeCode) {
   const encodedEmployeeCode = encodeURIComponent(employeeCode);
+  const token = localStorage.getItem('accessToken');
   try {
     const response = await fetch(`http://localhost:8080/departments/addDepartment?employeeCode=${encodedEmployeeCode}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(department)
     });
@@ -53,12 +60,13 @@ async function addDepartment(department, employeeCode) {
 }
 
 async function editDepartment(id, departmentDetails) {
+  const token = localStorage.getItem('accessToken');
   try {
-
     const response = await fetch(`http://localhost:8080/departments/update/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(departmentDetails)
     });
@@ -79,9 +87,13 @@ async function editDepartment(id, departmentDetails) {
 
 
 async function deleteDepartment(id) {
+  const token = localStorage.getItem('accessToken');
   try {
     const response = await fetch(`http://localhost:8080/departments/delete/${id}`, {
       method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
     if (!response.ok) {

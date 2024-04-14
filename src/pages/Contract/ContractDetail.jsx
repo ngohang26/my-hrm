@@ -10,9 +10,14 @@ function ContractDetail() {
   const [displaySalary, setDisplaySalary] = useState('');
 
   const { employeeCode } = useParams();
+  const token = localStorage.getItem('accessToken');
 
   useEffect(() => {
-    fetch(`http://localhost:8080/employees/${employeeCode}/contract`)
+    fetch(`http://localhost:8080/employees/${employeeCode}/contract`,{
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
       .then(response => response.json())
       .then(data => {
         setContract(data);
@@ -29,6 +34,7 @@ function ContractDetail() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(contract),
     })

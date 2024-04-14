@@ -14,6 +14,7 @@ import PaySlip from './pages/PaySlip/PaySlip';
 import Contract from './pages/Contract/Contract';
 import ContractDetail from './pages/Contract/ContractDetail';
 import ContractView from './pages/Contract/ContractView';
+import Login from './pages/login/Login';
 
 const queryClient = new QueryClient();
 
@@ -44,10 +45,10 @@ function App() {
       path: "/",
       element: <Layout />,
       children: [
-        // {
-        //   path: "/",
-        //   element: <Home />
-        // },
+        {
+          path: "/login",
+          element: <Login />
+        },
         {
           path: "/dashboard",
           element: <Dashboard />

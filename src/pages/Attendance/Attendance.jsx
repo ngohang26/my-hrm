@@ -11,8 +11,14 @@ const attendanceColumns = [
 
 ];
 
+const token = localStorage.getItem('accessToken');
+
 async function fetchAttendances() {
-  const response = await fetch('http://localhost:8080/attendances/getAllAttendances');
+  const response = await fetch('http://localhost:8080/attendances/getAllAttendances', {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
   return await response.json();
 }
 

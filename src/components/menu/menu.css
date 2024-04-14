@@ -29,3 +29,7 @@
   color: #2c2946;
   padding-right: 20px;
 } 
+
+.menu-item-title {
+  font-weight: bold;
+}

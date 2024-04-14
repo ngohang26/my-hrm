@@ -19,10 +19,17 @@ const Employee = () => {
         fetchPositions(); 
         fetchDepartments();
     }, []);
+    const token = localStorage.getItem('accessToken');
+
 
     const fetchEmployees = async () => {
+
         try {
-            const response = await fetch('http://localhost:8080/employees/getAllEmployees');
+            const response = await fetch('http://localhost:8080/employees/getAllEmployees', {
+            headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
             const data = await response.json();
             setEmployees(data);
         } catch (error) {
@@ -32,7 +39,11 @@ const Employee = () => {
 
     const fetchPositions = async () => {
         try {
-            const response = await fetch('http://localhost:8080/positions/getAllPositions');
+            const response = await fetch('http://localhost:8080/positions/getAllPositions', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                  }
+                });
             const data = await response.json();
             setPositions(data);
         } catch (error) {
@@ -42,7 +53,11 @@ const Employee = () => {
 
     const fetchDepartments = async () => {
         try {
-            const response = await fetch('http://localhost:8080/departments/getAllDepartments');
+            const response = await fetch('http://localhost:8080/departments/getAllDepartments', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                  }
+                });
             const data = await response.json();
             setDepartments(data);
         } catch (error) {
@@ -86,7 +101,7 @@ const Employee = () => {
 
     // index là tab muốn chuyển sang
     const handleTabSelect = (index) => {
-      if ((tabIndex === 2 || tabIndex === 1) && index === 0) {
+      if (((tabIndex === 2 || tabIndex === 1) && index === 0) || (tabIndex === 2 && index === 1)) {
         const confirmLeave = window.confirm('Bạn có chắc chắn muốn rời đi mà không lưu?');
         if (!confirmLeave) {
           return;
@@ -95,7 +110,7 @@ const Employee = () => {
   
       setTabIndex(index);
   
-      if (index === 1 || index == 0) {
+      if (index === 1 || index === 0) {
         setEditingEmployee(null);
         setMode('add');
         setShowEditTab(false);  
@@ -113,10 +128,10 @@ const Employee = () => {
                 )}
             </TabList>
             <TabPanel>
-                <DataTable columns={tableColumns} data={employees} setTabIndex={setTabIndex}/>
+                <DataTable columns={tableColumns} data={employees}/>
             </TabPanel>
             <TabPanel>
-        {mode === 'add' && <EmployeeForm mode={mode}  positions={positions} departments={departments} />}
+        {mode === 'add' && <EmployeeForm mode={mode}  setTabIndex={setTabIndex} positions={positions} departments={departments} fetchEmployees={fetchEmployees}/>}
       </TabPanel>
       <TabPanel>
         {mode === 'edit' && editingEmployee && <EmployeeForm mode={mode} 
@@ -124,6 +139,7 @@ const Employee = () => {
         setTabIndex = {setTabIndex}
         setShowEditTab={setShowEditTab}
         positions={positions} departments={departments}
+        fetchEmployees={fetchEmployees}
         />} 
       </TabPanel>
 

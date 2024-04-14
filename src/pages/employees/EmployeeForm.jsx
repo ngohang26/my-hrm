@@ -3,16 +3,18 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import './employee.css'
-const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, positions, departments }) => {
+const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, positions, departments, fetchEmployees }) => {
     const defaultImage = '/placeholder.png';
 
     const [employeeData, setEmployeeData] = useState({
-        fullName: '',
+        fullName: null,
         phoneNumber: '',
         image: defaultImage,
         workEmail: '',
         positionName: '',
         departmentName: '',
+        nameContactER: '',
+        phoneContactER: '',
         personalInfo: {
             nationality: '',
             birthPlace: '',
@@ -36,7 +38,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
             setSelectedFile(currentEmployee.image); // Cập nhật selectedFile
         } else {
             setEmployeeData({
-                fullName: '',
+                fullName: null,
                 phoneNumber: '',
                 image: defaultImage,
                 workEmail: '',
@@ -48,7 +50,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                     isResident: true,
                     sex: '',
                     birthDate: '',
-                    identityCardNumber: '',
+                    identityCardNumber: null,
                     personalEmail: '',
                     fieldOfStudy: '',
                     school: ''
@@ -58,6 +60,96 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
             });
         }
     }, [currentEmployee, mode]);
+
+    const addSkill = () => {
+        setEmployeeData(prevState => ({
+            ...prevState,
+            skills: [...prevState.skills, { name: '', proficiency: '' }]
+        }));
+    };
+
+    const handleSkillChange = (e, index) => {
+        const { value } = e.target;
+        setEmployeeData(prevState => ({
+            ...prevState,
+            skills: prevState.skills.map((skill, i) =>
+                i === index ? { ...skill, name: value } : skill
+            )
+        }));
+    };
+
+    const handleSkillProficiencyChange = (e, index) => {
+        const { value } = e.target;
+        setEmployeeData(prevState => ({
+            ...prevState,
+            skills: prevState.skills.map((skill, i) =>
+                i === index ? { ...skill, proficiency: value } : skill
+            )
+        }));
+    };
+
+    const removeSkill = (index) => {
+        setEmployeeData(prevState => ({
+            ...prevState,
+            skills: prevState.skills.filter((_, i) => i !== index)
+        }));
+    };
+
+    const addExperience = () => {
+        setEmployeeData(prevState => ({
+            ...prevState,
+            experiences: [...prevState.experiences, { jobTitle: '', company: '', startDate: '', endDate: '' }]
+        }));
+    };
+
+    const handleExperienceChange = (e, index) => {
+        const { value } = e.target;
+        setEmployeeData(prevState => ({
+            ...prevState,
+            experiences: prevState.experiences.map((experience, i) =>
+                i === index ? { ...experience, jobTitle: value } : experience
+            )
+        }));
+    };
+
+    const handleExperienceCompanyChange = (e, index) => {
+        const { value } = e.target;
+        setEmployeeData(prevState => ({
+            ...prevState,
+            experiences: prevState.experiences.map((experience, i) =>
+                i === index ? { ...experience, company: value } : experience
+            )
+        }));
+    };
+
+    const handleExperienceStartDateChange = (e, index) => {
+        const { value } = e.target;
+        setEmployeeData(prevState => ({
+            ...prevState,
+            experiences: prevState.experiences.map((experience, i) =>
+                i === index ? { ...experience, startDate: value } : experience
+            )
+        }));
+    };
+
+    const handleExperienceEndDateChange = (e, index) => {
+        const { value } = e.target;
+        setEmployeeData(prevState => ({
+            ...prevState,
+            experiences: prevState.experiences.map((experience, i) =>
+                i === index ? { ...experience, endDate: value } : experience
+            )
+        }));
+    };
+
+    const removeExperience = (index) => {
+        setEmployeeData(prevState => ({
+            ...prevState,
+            experiences: prevState.experiences.filter((_, i) => i !== index)
+        }));
+    };
+
+    const token = localStorage.getItem('accessToken');
 
     useEffect(() => {
         const fetchProvinces = async () => {
@@ -79,6 +171,9 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 
         const response = await fetch('http://localhost:8080/api/FileUpload', {
             method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
             body: formData,
         });
 
@@ -103,11 +198,10 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                 ...prevState,
                 personalInfo: {
                     ...prevState.personalInfo,
-                    [child]: value // Cập nhật trường con cụ thể
+                    [child]: value
                 }
             }));
         } else {
-            // Nếu không có đường dẫn con, cập nhật trường thông thường
             setEmployeeData(prevState => ({
                 ...prevState,
                 [name]: value
@@ -116,24 +210,29 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Kiểm tra trường fullName trong trạng thái employeeData
-        if (!employeeData.fullName.trim()) {
-            toast.error('Please enter your full name.');
+        if (!employeeData.fullName) {
+            toast.error('Vui lòng nhập đầy đủ tên');
+            return;
+        } else if (!employeeData.identityCardNumber) {
+            toast.error('Vui lòng nhập số căn cước công dân')
         } else {
             let image = employeeData.image;
-            if (selectedFile) {
+
+            if (selectedFile instanceof File) {
                 image = await handleUpload();
+            } else if (!employeeData.image || employeeData.image === defaultImage) {
+                image = defaultImage;
             } else {
-                console.log("No file selected.");
+                console.log("No file selected or user did not choose to update the image.");
             }
-    
+
             const employeeToSend = {
                 ...employeeData,
                 image: image
             };
-    
+
             console.log("Data sent to server:", employeeToSend);
-    
+
             try {
                 let response;
                 if (mode === 'add') {
@@ -141,6 +240,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`
                         },
                         body: JSON.stringify(employeeToSend),
                     });
@@ -149,19 +249,28 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
-                        },
+                            Authorization: `Bearer ${token}`
+                          },
                         body: JSON.stringify(employeeToSend),
                     });
                 }
-    
+
                 if (response.ok) {
                     if (mode === 'add') {
                         toast.success('Thêm bộ phận thành công');
+                        fetchEmployees();
+                        setTimeout(() => {
+                            setTabIndex(0);
+                        }, 1200);
                     } else if (mode === 'edit') {
                         toast.success('Chỉnh sửa bộ phận thành công');
+                        fetchEmployees();
+                        setTimeout(() => {
+                            setTabIndex(0);
+                        }, 1200);
+
                     }
                 } else {
-                    // Handle error response from server
                     const errorMessage = await response.text();
                     toast.error(errorMessage);
                 }
@@ -170,66 +279,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
             }
         }
     };
-    
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     let image = employeeData.image;
-    //     if (selectedFile) {
-    //         image = await handleUpload();
-    //     } else {
-    //         console.log("No file selected.");
-    //     }
-
-    //     const employeeToSend = {
-    //         ...employeeData,
-    //         image: image
-    //     };
-
-    //     console.log("Data sent to server:", employeeToSend);
-
-    //     if (mode === 'add') {
-    //         fetch('http://localhost:8080/employees/addEmployee', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(employeeToSend),
-    //         })
-    //             .then(response => response.json())
-    //             .then(data => {
-    //                 // console.log('Success:', data);
-    //                 toast.success("Thêm nhân viên thành công")
-    //                 setTimeout(() => {
-    //                     setTabIndex(0);
-    //                 }, 1200);
-
-    //             })
-    //             .catch((error) => {
-    //                 console.error('Error:', error);
-    //             });
-    //     } else if (mode === 'edit') {
-    //         fetch(`http://localhost:8080/employees/${employeeToSend.id}`, {
-    //             method: 'PUT',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(employeeToSend),
-    //         })
-    //             .then(response => response.json())
-    //             .then(data => {
-    //                 // console.log('Success:', data);
-    //                 toast.success("Sửa nhân viên thành công")
-    //                 setTimeout(() => {
-    //                     setTabIndex(0);
-    //                     setShowEditTab(false);
-    //                 }, 1200);
-    //             })
-    //             .catch((error) => {
-    //                 console.error('Error:', error);
-    //             });
-    //     }
-    // };
 
     return (
         <>
@@ -241,7 +291,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                     <TabPanel>
                         <div className='employee-info' style={{ display: "flex", flexWrap: 'wrap' }}>
                             <div className="" style={{ flex: '2 0 50%', padding: '10px' }}>
-                                <input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Full Name" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90%', margin: '20px 0px' }} required />
+                                <input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Full Name" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90%', margin: '20px 0px' }} />
                                 <select name="positionName" value={employeeData.positionName} onChange={handleChange} className='form-control select' >
                                     <option value=''>Chọn chức vụ ...</option>
                                     {positions && positions.map((position, index) => (
@@ -279,8 +329,68 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                             <Tab className={`tab-item ${tabIndex2 === 3 ? 'active' : ''}`} onClick={() => setTabIndex2(3)}>Thiết lập nhân lực</Tab>
                         </TabList>
                         <TabPanel>
-                            Tiếp tục
+                            <div className='container-grid'>
+                                {/* Phần nhập thông tin kỹ năng */}
+                                <div className="form-grid grid-item">
+                                    <label>KỸ NĂNG</label>
+                                    {employeeData.skills.map((skill, index) => (
+                                        <div key={index} className="item-info">
+                                            <input
+                                                type="text"
+                                                value={skill.name}
+                                                onChange={e => handleSkillChange(e, index)}
+                                                placeholder="Skill Name"
+                                            />
+                                            <select
+                                                value={skill.proficiency}
+                                                onChange={e => handleSkillProficiencyChange(e, index)}
+                                            >
+                                                <option value="Beginner">Beginner</option>
+                                                <option value="Intermediate">Intermediate</option>
+                                                <option value="Advanced">Advanced</option>
+                                                <option value="Expert">Expert</option>
+                                            </select>
+                                            <button onClick={() => removeSkill(index)}>Remove</button>
+                                        </div>
+                                    ))}
+                                    <button onClick={addSkill}>Add Skill</button>
+                                </div>
+
+                                {/* Phần nhập thông tin kinh nghiệm */}
+                                <div className="form-grid grid-item">
+                                    <label>KINH NGHIỆM</label>
+                                    {employeeData.experiences.map((experience, index) => (
+                                        <div key={index} className="item-info">
+                                            <input
+                                                type="text"
+                                                value={experience.jobTitle}
+                                                onChange={e => handleExperienceChange(e, index)}
+                                                placeholder="Job Title"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={experience.company}
+                                                onChange={e => handleExperienceCompanyChange(e, index)}
+                                                placeholder="Company"
+                                            />
+                                            <input
+                                                type="date"
+                                                value={experience.startDate}
+                                                onChange={e => handleExperienceStartDateChange(e, index)}
+                                            />
+                                            <input
+                                                type="date"
+                                                value={experience.endDate}
+                                                onChange={e => handleExperienceEndDateChange(e, index)}
+                                            />
+                                            <button onClick={() => removeExperience(index)}>Remove</button>
+                                        </div>
+                                    ))}
+                                    <button onClick={addExperience}>Add Experience</button>
+                                </div>
+                            </div>
                         </TabPanel>
+
                         <TabPanel>
                             Thông tin công việc
                         </TabPanel>

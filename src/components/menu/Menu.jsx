@@ -6,7 +6,7 @@ import { PiLockKeyLight } from "react-icons/pi";
 import './menu.css'
 const menuItems = [
   {
-    title: 'HRMS',
+    title: <strong>HRMS</strong>,
     icon: <IoRocketOutline className='icon rocket'/>,
     subItems: [
       { title: 'Dashboard', path: '/dashboard' },
@@ -16,7 +16,7 @@ const menuItems = [
     ]
   },
   {
-    title: 'Bảng lương',
+    title: <strong>Bảng lương</strong>,
     icon: <PiProjectorScreenLight className='icon project'/>,
 subItems: [
       { title: 'Bảng lương', path: '/payroll' },
@@ -24,7 +24,7 @@ subItems: [
       { title: 'Phiếu lương', path: '/payslip' },
       { title: 'Báo cáo', path: '/employee' }
     ]  },  {
-    title: 'Chấm công',
+    title: <strong>Chấm công</strong>,
     icon: <SlBriefcase className='icon briefcase'/>,
 subItems: [
       { title: 'Chấm công', path: '/attendances' },
@@ -32,23 +32,23 @@ subItems: [
     ]  
   },  
   {
-    title: 'Tuyển dụng',
+    title: <strong>Tuyển dụng</strong>,
     icon: <PiLockKeyLight className='icon lock'/>,
 subItems: [
       { title: 'Ứng viên', path: '/users' },
       { title: 'Báo cáo', path: '/dashboard' },
     ]  
   },
-  {
-    title: 'Nghỉ phép',
-    icon: <PiProjectorScreenLight className='icon project'/>,
-subItems: [
-      { title: 'Bảng thông tin', path: '/user' },
-      { title: 'Tổng quan', path: '/dashboard' },
-      { title: 'Quản lý', path: '/department' },
-      { title: 'Báo cáo', path: '/employee' }
-    ]   
-  },
+//   {
+//     title: 'Nghỉ phép',
+//     icon: <PiProjectorScreenLight className='icon project'/>,
+// subItems: [
+//       { title: 'Bảng thông tin', path: '/user' },
+//       { title: 'Tổng quan', path: '/dashboard' },
+//       { title: 'Quản lý', path: '/department' },
+//       { title: 'Báo cáo', path: '/employee' }
+//     ]   
+//   },
   
 ];
 

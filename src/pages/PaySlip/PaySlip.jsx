@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Grid } from '@mui/material';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const PaySlip = () => {
   const [setEmployeeSalaryDetails] = useState([]);
   const [payroll, setPayroll] = useState([]);
@@ -23,13 +24,34 @@ const PaySlip = () => {
   const [month, setMonth] = useState(prevMonth);
   const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
+  const token = localStorage.getItem('accessToken');
 
   async function fetchEmployeeSalaryDetails(employeeCode, year, month) {
-    const response = await fetch(`http://localhost:8080/employeeSalary/salaryDetails/${employeeCode}/${year}/${month}`);
-    return await response.json();
+    try {
+      const response = await fetch(`http://localhost:8080/employeeSalary/salaryDetails/${employeeCode}/${year}/${month}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage); // Ném ra lỗi khi không thành công
+      }
+      return await response.json();
+    } catch (error) {
+      // Kiểm tra nếu có thông báo lỗi từ máy chủ thì hiển thị thông báo đó trên toast
+      if (error.message) {
+        toast.error(error.message);
+      } else {
+        toast.error('Có lỗi xảy ra khi tải dữ liệu từ máy chủ.');
+      }
+      console.error('Error fetching data: ', error);
+      throw error;
+    }
   }
 
-  useEffect(() => {
+
+  const fetchData = () => {
     fetchEmployeeSalaryDetails(employeeCode, year, month)
       .then(data => {
         setEmployeeSalary(data);
@@ -37,11 +59,30 @@ const PaySlip = () => {
       .catch(error => {
         console.error('Error fetching data: ', error);
       });
-  }, [employeeCode, year, month]);
-  let totalDeductions = employeeSalary.totalInsurance + employeeSalary.incomeTax;
+  };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleSubmit = () => {
+    fetchData();
+  };
+ 
+  function formatCurrency(amount) {
+    if (amount === undefined) {
+      return '';
+    }
+    
+    const formattedAmount = amount.toLocaleString('vi-VN',);
+    const integerPart = formattedAmount.split(',')[0];
+    return integerPart;
+  }
+  
+  
   return (
     <div>
+      <ToastContainer />
       <input type="text" value={employeeCode} onChange={e => setEmployeeCode(e.target.value)} placeholder="Nhập ID nhân viên" />
       <select value={year} onChange={e => setYear(Number(e.target.value))}>
         {years.map(year => (
@@ -53,10 +94,14 @@ const PaySlip = () => {
           <option key={month} value={month}>{month}</option>
         ))}
       </select>
+      <button onClick={fetchData}>Submit</button>
       <Card>
         <CardContent>
-          <Typography variant="h5" component="div">
+          <Typography variant="h6" align="center" gutterBottom>
             PHIẾU CHI TIẾT LƯƠNG
+          </Typography>
+          <Typography variant="subtitle1" align="center" gutterBottom>
+            Tháng {month} - Năm {year}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -65,7 +110,7 @@ const PaySlip = () => {
                   <TableBody>
                     <TableRow>
                       <TableCell>Họ và tên</TableCell>
-                      <TableCell>{employeeSalary.employeeName}</TableCell>
+                      <TableCell>{employeeSalary.employeeName ? employeeSalary.employeeName : 'Loading...'}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Chức vụ</TableCell>
@@ -78,11 +123,11 @@ const PaySlip = () => {
                     </TableRow>
                     <TableRow>
                       <TableCell>Lương tháng</TableCell>
-                      <TableCell>{employeeSalary.monthlySalary}</TableCell>
+                      <TableCell>{formatCurrency(employeeSalary.monthlySalary)}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Lương tăng ca</TableCell>
-                      <TableCell>{employeeSalary.overTimeSalary}</TableCell>
+                      <TableCell>{formatCurrency(employeeSalary.overTimeSalary)}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell><b>Các khoản phụ cấp</b></TableCell>
@@ -96,18 +141,18 @@ const PaySlip = () => {
                     ))}
                     <TableRow>
                       <TableCell>Tổng phụ cấp</TableCell>
-                      <TableCell><b>{employeeSalary.totalAllowance}</b></TableCell>
+                      <TableCell><b>{formatCurrency(employeeSalary.totalAllowance)}</b></TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Tổng thu nhập trước thuế</TableCell>
-                      <TableCell><b>{employeeSalary.totalIncome}</b></TableCell>
+                      <TableCell><b>{formatCurrency(employeeSalary.totalIncome)}</b></TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell><b>Thực lãnh</b></TableCell>
-                      <TableCell><b>{employeeSalary.netSalary}</b></TableCell>
+                      <TableCell><b>{formatCurrency(employeeSalary.netSalary)}</b></TableCell>
+                      {/* <TableCell>{employeeSalary.netSalary}</TableCell> */}
                     </TableRow>
 
-                    {/* Thêm các hàng khác tương tự */}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -134,18 +179,17 @@ const PaySlip = () => {
                     </TableRow>
                     <TableRow>
                       <TableCell>Phí BHXH, BHYT, BHTN</TableCell>
-                      <TableCell>{employeeSalary.totalInsurance}</TableCell>
+                      <TableCell>{formatCurrency(employeeSalary.totalInsurance)}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Thuế TNCN</TableCell>
-                      <TableCell>{employeeSalary.incomeTax}</TableCell>
+                      <TableCell>{formatCurrency(employeeSalary.incomeTax)}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Các khoản trừ</TableCell>
-                      <TableCell><b>{totalDeductions}</b></TableCell>
+                      <TableCell><b>{formatCurrency(employeeSalary.totalDeductions)}</b></TableCell>
                     </TableRow>
 
-                    {/* Thêm các hàng khác tương tự */}
                   </TableBody>
                 </Table>
               </TableContainer>

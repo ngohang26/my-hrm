@@ -40,14 +40,23 @@ const contractColumns = [
 ];
 
 
+const token = localStorage.getItem('accessToken');
 
 async function fetchContracts() {
-  const response = await fetch('http://localhost:8080/employees/contracts');
+  const response = await fetch('http://localhost:8080/employees/contracts', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
   return await response.json();
 }
 
 async function fetchEmployeeCodes() {
-  const response = await fetch('http://localhost:8080/employees/employeeCodes');
+  const response = await fetch('http://localhost:8080/employees/employeeCodes', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
   return await response.json();
 }
 
@@ -76,6 +85,7 @@ const Contract = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
         startDate: formData.startDate,

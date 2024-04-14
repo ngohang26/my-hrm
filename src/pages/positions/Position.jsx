@@ -21,10 +21,15 @@ const addPositionColumns = [
 ];
 
 async function fetchPositions() {
-  const response = await fetch('http://localhost:8080/positions/getAllPositions');
+  const token = localStorage.getItem('accessToken');
+  const response = await fetch('http://localhost:8080/positions/getAllPositions', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
   const positions = await response.json();
   return positions.map((position, index) => ({
-    order: index + 1,  
+    order: index + 1,
     id: index,
     ...position,
   }));
@@ -32,11 +37,13 @@ async function fetchPositions() {
 
 
 async function addPosition(position) {
+  const token = localStorage.getItem('accessToken');
   try {
     const response = await fetch(`http://localhost:8080/positions/addPosition`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(position)
     });
@@ -56,11 +63,13 @@ async function addPosition(position) {
 }
 
 async function editPosition(id, positionDetails) {
+  const token = localStorage.getItem('accessToken');
   try {
     const response = await fetch(`http://localhost:8080/positions/update/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(positionDetails)
     });
@@ -80,9 +89,14 @@ async function editPosition(id, positionDetails) {
 }
 
 async function deletePosition(id) {
+  const token = localStorage.getItem('accessToken');
+
   try {
     const response = await fetch(`http://localhost:8080/positions/delete/${id}`, {
       method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
     if (!response.ok) {
@@ -103,11 +117,11 @@ const Position = () => {
     setPositionToDelete(id);
     setIsDeleteModalOpen(true);
   };
-  
+
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
   };
-  
+
   const handleConfirmDelete = async () => {
     if (positionToDelete !== null) {
       await deletePosition(positionToDelete);
@@ -120,8 +134,8 @@ const Position = () => {
   const handleFormSubmit = async (data) => {
     try {
       const positionDetails = {
-          positionName: data.positionName,
-          jobSummary: data.jobSummary
+        positionName: data.positionName,
+        jobSummary: data.jobSummary
       };
       if (!editing.id) {
         await addPosition(positionDetails, data);
@@ -130,11 +144,11 @@ const Position = () => {
         setIsFormOpen(false);
         setEditing({});
       } else {
-        await editPosition(editing.id, data);  
+        await editPosition(editing.id, data);
         const updatedPositions = await fetchPositions();
 
         setPositions(updatedPositions);
-      
+
         setIsFormOpen(false);
         setEditing({});
       }
@@ -178,38 +192,39 @@ const Position = () => {
   const handleEdit = (row) => {
     setEditing(row)
     setIsFormOpen(true)
-};
+  };
 
-const positionColumns = [
-  { field: 'order', headerName: 'STT', flex: 1,  },
-  { field: 'positionName', headerName: 'CHỨC VỤ', flex: 1.5,  },
-  { field: 'jobSummary', headerName: 'TÓM TẮT', flex: 2.5,  },
-  { field: 'actions', headerName: 'Hành động', flex: 1, renderCell: (params) => (
-      <div>
-          <button onClick={() => handleEdit(params.row)}>        
-            <FiEdit color='#000'/>
+  const positionColumns = [
+    { field: 'order', headerName: 'STT', flex: 1, },
+    { field: 'positionName', headerName: 'CHỨC VỤ', flex: 1.5, },
+    { field: 'jobSummary', headerName: 'TÓM TẮT', flex: 2.5, },
+    {
+      field: 'actions', headerName: 'Hành động', flex: 1, renderCell: (params) => (
+        <div>
+          <button onClick={() => handleEdit(params.row)}>
+            <FiEdit color='#000' />
           </button>
           <button onClick={() => openDeleteModal(params.row.id)}>
-            <FiTrash color='#ff0000'/>
+            <FiTrash color='#ff0000' />
           </button>
-      </div>
-    ),
-  },
-];
+        </div>
+      ),
+    },
+  ];
   return (
-        <div className='positions'>
-          <ToastContainer/>
-        <div className='info'>
-          <button onClick={openForm} className='btn-add'>+ Thêm</button>
+    <div className='positions'>
+      <ToastContainer />
+      <div className='info'>
+        <button onClick={openForm} className='btn-add'>+ Thêm</button>
+      </div>
+      <DataTable columns={positionColumns} data={positions} slug="position" showEditColumn={false} />;
+      {isFormOpen && (
+        <div className="overlay" onClick={closeForm}>
+          <FormComponent fields={addPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
         </div>
-        <DataTable columns={positionColumns} data={positions} slug="position" showEditColumn={false}/>;
-        {isFormOpen && (
-          <div className="overlay" onClick={closeForm}>
-            <FormComponent fields={addPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing}/>
-          </div>
-        )}
-        <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
-        </div>
+      )}
+      <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+    </div>
 
 
   );
