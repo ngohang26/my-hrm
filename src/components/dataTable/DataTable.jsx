@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import './dataTable.css'
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar, GridToolbarContainer, GridToolbarExport } from "@mui/x-data-grid";
+
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarExport csvOptions={{ utf8WithBom: true }} />
+    </GridToolbarContainer>
+  );
+}
 
 const DataTable = ({ columns, data }) => {
   const [error, setError] = useState(null);
@@ -25,12 +33,9 @@ return (
               },
             },
           }}
-          slots={{ toolbar: GridToolbar }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-            },
+
+          components={{
+            Toolbar: CustomToolbar,
           }}
           pageSizeOptions={[10]}
           disableRowSelectionOnClick

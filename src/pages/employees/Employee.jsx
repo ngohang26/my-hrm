@@ -6,7 +6,6 @@ import DataTable from '../../components/dataTable/DataTable';
 const Employee = () => {
     const [employees, setEmployees] = useState([]);
     const [tabIndex, setTabIndex] = useState(0);
-    const [currentEmployee, setCurrentEmployee] = useState(null);
     const [mode, setMode] = useState('add');
     const [showEditTab, setShowEditTab] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState(null);  
@@ -89,7 +88,7 @@ const Employee = () => {
             field: 'edit',
             headerName: 'Edit',
             renderCell: (params) => (
-                <button onClick={() => handleEditEmployee(params.row)}>Edit</button>
+                <button onClick={() => handleEditEmployee(params.row)} className='btn-action'>Edit</button>
             ),
             flex: 0.6,
         },
@@ -120,31 +119,33 @@ const Employee = () => {
   
     return (
         <Tabs selectedIndex={tabIndex} onSelect={handleTabSelect}>
-            <TabList className='tablist'>
-                <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
-                <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>+ Thêm</Tab>
-                {showEditTab && (
-                    <Tab className={`tab-item ${tabIndex === 2 ? 'active' : ''}`} style={{ color: tabIndex === 2 ? '#5a5279' : 'gray' }}>Sửa</Tab>
-                )}
-            </TabList>
+          <TabList className='tablist'>
+            <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
+            <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>+ Thêm</Tab>
+            {showEditTab && (
+              <Tab className={`tab-item ${tabIndex === 2 ? 'active' : ''}`} style={{ color: tabIndex === 2 ? '#5a5279' : 'gray' }}>Sửa</Tab>
+            )}
+          </TabList>
+          <TabPanel>
+            <DataTable columns={tableColumns} data={employees}/>
+          </TabPanel>
+          <TabPanel>
+            {mode === 'add' && <EmployeeForm mode={mode}  setTabIndex={setTabIndex} positions={positions} departments={departments} fetchEmployees={fetchEmployees}/>}
+          </TabPanel>
+          {showEditTab && (
             <TabPanel>
-                <DataTable columns={tableColumns} data={employees}/>
+              {mode === 'edit' && editingEmployee && <EmployeeForm mode={mode} 
+              currentEmployee={editingEmployee}  
+              setTabIndex = {setTabIndex}
+              setShowEditTab={setShowEditTab}
+              positions={positions} departments={departments}
+              fetchEmployees={fetchEmployees}
+              />} 
             </TabPanel>
-            <TabPanel>
-        {mode === 'add' && <EmployeeForm mode={mode}  setTabIndex={setTabIndex} positions={positions} departments={departments} fetchEmployees={fetchEmployees}/>}
-      </TabPanel>
-      <TabPanel>
-        {mode === 'edit' && editingEmployee && <EmployeeForm mode={mode} 
-        currentEmployee={editingEmployee}  
-        setTabIndex = {setTabIndex}
-        setShowEditTab={setShowEditTab}
-        positions={positions} departments={departments}
-        fetchEmployees={fetchEmployees}
-        />} 
-      </TabPanel>
-
+          )}
         </Tabs>
-    );
+      );
+      
 };
 
 export default Employee;

@@ -200,11 +200,11 @@ const Position = () => {
     { field: 'jobSummary', headerName: 'TÓM TẮT', flex: 2.5, },
     {
       field: 'actions', headerName: 'Hành động', flex: 1, renderCell: (params) => (
-        <div>
-          <button onClick={() => handleEdit(params.row)}>
+        <div className='action'>
+          <button onClick={() => handleEdit(params.row)} className='btn-action'>
             <FiEdit color='#000' />
           </button>
-          <button onClick={() => openDeleteModal(params.row.id)}>
+          <button onClick={() => openDeleteModal(params.row.id)} className='btn-action'>
             <FiTrash color='#ff0000' />
           </button>
         </div>

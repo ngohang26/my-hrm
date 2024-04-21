@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Grid } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './PaySlip.css'
+
 const PaySlip = () => {
   const [setEmployeeSalaryDetails] = useState([]);
   const [payroll, setPayroll] = useState([]);
@@ -81,20 +83,20 @@ const PaySlip = () => {
   
   
   return (
-    <div>
+    <div className='pay-slip'>
       <ToastContainer />
-      <input type="text" value={employeeCode} onChange={e => setEmployeeCode(e.target.value)} placeholder="Nhập ID nhân viên" />
-      <select value={year} onChange={e => setYear(Number(e.target.value))}>
+      <input type="text" value={employeeCode} onChange={e => setEmployeeCode(e.target.value)} placeholder="Nhập ID nhân viên" className='input-control'/>
+      <select value={year} onChange={e => setYear(Number(e.target.value))} className='input-control' >
         {years.map(year => (
           <option key={year} value={year}>{year}</option>
         ))}
       </select>
-      <select value={month} onChange={e => setMonth(Number(e.target.value))}>
+      <select value={month} onChange={e => setMonth(Number(e.target.value))} className='input-control'>
         {months.map(month => (
           <option key={month} value={month}>{month}</option>
         ))}
       </select>
-      <button onClick={fetchData}>Submit</button>
+      <button onClick={fetchData} className='btn-view'>Xem</button>
       <Card>
         <CardContent>
           <Typography variant="h6" align="center" gutterBottom>

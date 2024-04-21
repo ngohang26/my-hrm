@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
+import './Login.css'
+import { TbBrand4Chan } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 
-const Login=() => {
+const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isCheckingToken, setIsCheckingToken] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsCheckingToken(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/login', {
+      const response = await fetch('http://localhost:8080/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -24,26 +30,43 @@ const Login=() => {
       }
 
       const data = await response.json();
-
-      // Lưu accessToken vào localStorage hoặc context để sử dụng cho các yêu cầu sau
+      console.log(data)
       localStorage.setItem('accessToken', data.accessToken);
+      navigate('/hrm/dashboard');
     } catch (error) {
       console.error('Lỗi đăng nhập', error);
+    } finally {
+      setIsCheckingToken(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Tên đăng nhập:
-        <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
-      </label>
-      <label>
-        Mật khẩu:
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      </label>
-      <button type="submit">Đăng nhập</button>
-    </form>
+    <div className="login-container">
+      <div className="gray-section">
+        <img src='/hrm.png'></img>
+      </div>
+      <div className="form-section">
+        <form onSubmit={handleSubmit}>
+          <a href="/login" className='logo-login'><TbBrand4Chan className='logo'/></a>
+          <div className='card-title'>Đăng nhập tài khoản của bạn</div>
+          
+          <div className='form-div'>Tên tài khoản/ Mã nhân viên</div>
+          <label>
+            <input className='form-control' type="text" value={username} placeholder='Nhập tên tài khoản' onChange={e => setUsername(e.target.value)} />
+          </label>
+          <div className='form-div'>Mật khẩu</div>
+
+          <label>
+            <input className='form-control' type="password" value={password} placeholder='Nhập mật khẩu' onChange={e => setPassword(e.target.value)} />
+          </label>
+          <a class="float-right small" href="/forgotpassword">Quên mật khẩu?</a>
+          <br/>
+          <button type="submit">Đăng nhập</button>
+        </form>
+        <div className='form-div'>Nếu bạn chưa có tài khảo hãy liên hệ với quản lý của bạn!</div>
+      </div>
+      <div className="purple-section"></div>
+    </div>
   );
 }
 

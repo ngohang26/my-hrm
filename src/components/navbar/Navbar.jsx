@@ -11,8 +11,8 @@ export const Navbar = () => {
   const pageName = location.pathname.substring(1);
   return (
     <div className='navbar'>  
-      <div className="title">
-        <h5>{pageName}</h5>
+    <br/>
+      {/* <div className="title">
       </div>
       <div className="navbar-item">
         <div className="item language">
@@ -54,7 +54,7 @@ export const Navbar = () => {
         <div className="icon user">
           <FaUser/>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

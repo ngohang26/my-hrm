@@ -1,11 +1,94 @@
-
-.users .info{
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 20px;
+.user-container .info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
 }
-.users .info button{
-      padding: 5px;
-      cursor: pointer;
-    }
+
+.user-container .info button {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.user-container .info a:hover {
+  color: red;
+  transition: color 0.3s;
+}
+
+.btn-action {
+  border: none;
+  background-color: transparent;
+  font-size: 17px;
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  margin-left: 8px;
+}
+
+.action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.btn-action:hover {
+  border-radius: 5px;
+  background-color: #ccc;
+}
+
+.user-container .user-form,
+.change-permit {
+  width: 70%;
+  padding: 30px;
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.user-container .user-form,
+.reset-password {
+  width: 40%;
+  padding: 30px;
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.reset-password .form-control {
+  width: 100% !important;
+}
+
+.user-form .btn-control button{
+  margin-top: 10px;
+  margin-left: 30px;
+  width: 72px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border: none;
+  border-radius: .25rem;
+  font-size: 15.5px;
+  cursor: pointer;
+}
+
+.btn-control .btn-close {
+  background-color: #9b9b9b;
+}
+
+.btn-control .btn-save {
+  background-color: #4f4d6c;
+}
+
+.reset-password .btn-control {
+
+  padding: 0px !important;
+}
+
+.reset-password .btn-control .btn-save {
+  width: 120px;
+}

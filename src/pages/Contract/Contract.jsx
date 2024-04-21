@@ -24,13 +24,13 @@ const contractColumns = [
   },
   {
     field: 'detail',
-    headerName: 'Detail',
+    headerName: 'Hành động',
     renderCell: (params) => (
       <div style={{marginLeft: '10px'}}>
-        <Link to={`/contracts/update/${params.row.employeeCode}`} style={{marginRight: '15px'}}>
+        <Link to={`/hrm/contracts/update/${params.row.employeeCode}`} style={{marginRight: '15px'}}>
         <FiEdit color='#000'/>
         </Link>
-        <Link to={`/contracts/view/${params.row.employeeCode}`}>
+        <Link to={`/hrm/contracts/view/${params.row.employeeCode}`}>
         <FiEye color='#000'/>
       </Link>
       </div>
@@ -40,9 +40,9 @@ const contractColumns = [
 ];
 
 
-const token = localStorage.getItem('accessToken');
 
 async function fetchContracts() {
+  const token = localStorage.getItem('accessToken');
   const response = await fetch('http://localhost:8080/employees/contracts', {
     headers: {
       Authorization: `Bearer ${token}`
@@ -52,6 +52,8 @@ async function fetchContracts() {
 }
 
 async function fetchEmployeeCodes() {
+  const token = localStorage.getItem('accessToken');
+
   const response = await fetch('http://localhost:8080/employees/employeeCodes', {
     headers: {
       Authorization: `Bearer ${token}`
@@ -81,6 +83,8 @@ const Contract = () => {
   ];
 
   const handleFormSubmit = (formData) => {
+  const token = localStorage.getItem('accessToken');
+
     fetch(`http://localhost:8080/employees/${formData.employeeCode}/contract`, {
       method: 'POST',
       headers: {

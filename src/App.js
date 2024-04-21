@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
-import {SideBar} from './components/sidebar/SideBar'
+import React, { useState, useEffect } from 'react';
+import { Navigate, Outlet, RouterProvider, createBrowserRouter, Route } from 'react-router-dom';
+import { SideBar } from './components/sidebar/SideBar'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Dashboard } from './pages/dashboard/Dashboard';
 import { Navbar } from './components/navbar/Navbar';
@@ -14,87 +14,90 @@ import PaySlip from './pages/PaySlip/PaySlip';
 import Contract from './pages/Contract/Contract';
 import ContractDetail from './pages/Contract/ContractDetail';
 import ContractView from './pages/Contract/ContractView';
-import Login from './pages/login/Login';
+import AuthHandler from './AuthHandler';
+import { ProtectedRoute } from './ProtectedRoute';
 
 const queryClient = new QueryClient();
 
 function App() {
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+const [isMenuOpen, setIsMenuOpen] = useState(true);
 
-  const Layout = () => {
-    return (
-      <div className='main'>
-        <div className='container'>
-          <div className='menuContainer'>
-          <SideBar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-          </div>
-          <div className='contentContainer'>
-            <Navbar />    
-            <QueryClientProvider client={queryClient}>
+const Layout = () => {
+return (
+<div className='main'>
+<div className='container'>
+<div className='menuContainer'>
+<SideBar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+</div>
+<div className='contentContainer'>
+<br/>
+<QueryClientProvider client={queryClient}>
 
-              <Outlet />
-            </QueryClientProvider>
-          </div>
-        </div>
-        {/* <Footer /> */}
-      </div>
-    )
-  }
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Layout />,
-      children: [
-        {
-          path: "/login",
-          element: <Login />
-        },
-        {
-          path: "/dashboard",
-          element: <Dashboard />
-        },
-        {
-          path: "/users",
-          element: <Users />
-        },
-        {
-          path: "/employees",
-          element: <Employee />
-        },
-        {
-          path: "/departments",
-          element: <Department />
-        },
-        {
-          path: "/attendances",
-          element: <Attendance/>
-        },
-        {
-          path: "/payroll",
-          element: <Payroll/>
-        },
-        {
-          path: "/payslip",
-          element: <PaySlip/>
-        },
-        {
-          path: "/contracts",
-          element: <Contract/>
-        },
-        {
-          path: "/contracts/update/:employeeCode",
-          element: <ContractDetail/>
-        },
-        {
-          path: "/contracts/view/:employeeCode",
-          element: <ContractView/>
-        },
+<Outlet />
+</QueryClientProvider>
+</div>
+</div>
+{/* <Footer /> */}
+</div>
+)
+}
+const router = createBrowserRouter([
+{
+path: "/",
+element: <AuthHandler />
+},
+{
+path: "/hrm",
+element: <ProtectedRoute>
+<Layout />
+</ProtectedRoute>,
+children: [
+{
+path: "dashboard",
+element: <Dashboard />
+},
+{
+path: "users",
+element: <Users />
+},
+{
+path: "employees",
+element: <Employee />
+},
+{
+path: "departments",
+element: <Department />
+},
+{
+path: "attendances",
+element: <Attendance />
+},
+{
+path: "payroll",
+element: <Payroll />
+},
+{
+path: "payslip",
+element: <PaySlip />
+},
+{
+path: "contracts",
+element: <Contract />
+},
+{
+path: "contracts/update/:employeeCode",
+element: <ContractDetail />
+},
+{
+path: "contracts/view/:employeeCode",
+element: <ContractView />
+},
 
-      ],
-    },
-    
-  ])
-  return <RouterProvider router={router} />
+],
+},
+
+])
+return <RouterProvider router={router} />
 }
 
 export default App;

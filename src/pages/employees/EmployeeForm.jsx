@@ -32,6 +32,8 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
     const [selectedFile, setSelectedFile] = useState();
     const [provinces, setProvinces] = useState([]);
     const [tabIndex2, setTabIndex2] = useState(0);
+    const [value, setValue] = useState();
+
     useEffect(() => {
         if (mode === 'edit' && currentEmployee) {
             setEmployeeData(currentEmployee);
@@ -285,13 +287,14 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
         <>
             <ToastContainer />
             <form onSubmit={handleSubmit}>
-                <input type="submit" value="Submit" />
-
+                <input type="submit" value="Thêm" className='btn-submit' style={{margin: '0px 0px  0px 10px'}}/>
                 <Tabs>
-                    <TabPanel>
+                    <div>
                         <div className='employee-info' style={{ display: "flex", flexWrap: 'wrap' }}>
                             <div className="" style={{ flex: '2 0 50%', padding: '10px' }}>
-                                <input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Full Name" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90%', margin: '20px 0px' }} />
+                                <input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Full Name" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} />
+                                <div style={{ display: "flex", gap: '20px', width: '101%' }}>
+                                
                                 <select name="positionName" value={employeeData.positionName} onChange={handleChange} className='form-control select' >
                                     <option value=''>Chọn chức vụ ...</option>
                                     {positions && positions.map((position, index) => (
@@ -309,7 +312,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                                         </option>
                                     ))}
                                 </select>
-
+</div>
                                 <div style={{ display: "flex", gap: '20px', width: '93%' }}>
                                     <input type="text" name="phoneNumber" value={employeeData.phoneNumber} onChange={handleChange} placeholder="Phone Number" className='form-control more' />
                                     <input type="text" name="workEmail" value={employeeData.workEmail} onChange={handleChange} placeholder="Work Email" className='form-control more' />
@@ -320,7 +323,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                                 {selectedFile instanceof File ? <img src={URL.createObjectURL(selectedFile)} alt="Preview" /> : <img src={mode === 'add' ? defaultImage : getImageUrl(employeeData.image)} alt="Default" width="100px" height="100px" />}
                             </label>
                         </div>
-                    </TabPanel>
+                    </div>
                     <Tabs style={{ backgroundColor: '#fff' }}>
                         <TabList className="tablist2">
                             <Tab className={`tab-item ${tabIndex2 === 0 ? 'active' : ''}`} onClick={() => setTabIndex2(0)}>Tiếp tục</Tab>

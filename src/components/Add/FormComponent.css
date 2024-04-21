@@ -30,7 +30,7 @@
   margin-bottom: 25px;
 }
 
-.form-control{
+.form-component .form-control{
   width: 100%;
   padding: .375rem .75rem;
   font-size: 1rem;
@@ -47,7 +47,7 @@
   height: 25px;
 }
 
-.form-control:focus {
+.form-component .form-control:focus {
   color: #495057;
   background-color: #fff;
   border-color: #80bdff;

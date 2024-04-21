@@ -1,0 +1,9 @@
+.attendance-header {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0px;
+}
+
+.attendance-header .btn-submit {
+  margin: 0px;
+}

@@ -1,0 +1,106 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+}
+
+.login-container .gray-section img {
+  width: 45vw;
+  height: 50vh;
+  margin-left: 10vh;
+}
+
+.gray-section {
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  flex: 5;
+  background-color: #f1f1f1;
+}
+
+.purple-section {
+  flex: 2;
+  background-color: #39374e;
+}
+
+.form-section {
+  position: absolute;
+  top: 50%;
+  left: 72%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 400px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo-login {
+  display: flex;
+  justify-content: center;
+}
+
+.logo-login .logo {
+  margin-bottom: 10px;
+}
+
+.login-container .card-title {
+  font-size: 17px;
+  margin-bottom: 22px;
+  font-weight: 500;
+  color: #39374e;
+}
+
+.form-control {
+  display: block;
+  width: 92%;
+  height: 27px;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.form-div {
+  font-size: 14.5px;
+  margin-bottom: 10px;
+  margin-top: 20px;
+  color: #39374e;
+  font-weight: 500;
+}
+
+.form-section a {
+  text-decoration: none;
+  font-size: 13px;
+  color: #39374e;
+  margin: 5px 0px;
+}
+
+.form-section a:hover {
+  color: #5e9fd4;
+}
+
+.float-right {
+  float: right !important;
+}
+
+.form-section button {
+  width: 100%;
+  height: 33px;
+  color: #fff;
+  background-color: #464460;
+  border: none;
+  border-radius: .25rem;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.form-section button:hover {
+  background-color: #39374e;
+}

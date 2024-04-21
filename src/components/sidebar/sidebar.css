@@ -47,3 +47,43 @@
   animation: spin 2s linear infinite;
 }
 
+.user-menu {
+  position: absolute;
+  left: 50px;
+  top: 82%;
+  background-color: white;
+  border-radius: 5px;
+  width: 200px; 
+  z-index: 1;  
+  box-shadow: 0 0 12px rgba(0,0,0,0.4); 
+  text-align: center;
+}
+
+.user-menu a, .user-menu button {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: black;
+  /* border-bottom: 1px solid #ccc; */
+  /* transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; */
+
+}
+
+.user-menu button {
+  border: none;
+  background-color: #fff;
+  font-size: 16px;
+  width: 100%;
+}
+
+.user-menu a:last-child {
+  border-bottom: none;
+}
+
+.user-menu a:hover {
+  background-color: #ddd;
+}
+
+.user-menu button:hover {
+  background-color: #ddd;
+}

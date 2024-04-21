@@ -9,9 +9,9 @@ const payrollColumns = [
   { field: 'positionName', headerName: 'Chức vụ', flex: 2.5 },
   { field: 'netSalary', headerName: 'Lương', flex: 2.5 },
 ];
-const token = localStorage.getItem('accessToken');
 
 async function fetchPayroll(year, month) {
+  const token = localStorage.getItem('accessToken');
   const response = await fetch(`http://localhost:8080/employeeSalary/allSalaryDetails/${year}/${month}`, {
     headers: {
       Authorization: `Bearer ${token}`
@@ -46,15 +46,15 @@ const Payroll = () => {
   const handleEdit = () => {};
 
   return (
-    <div>
-      <select value={year} onChange={e => setYear(Number(e.target.value))}>
+    <div className='pay-slip'>
+      <select value={year} onChange={e => setYear(Number(e.target.value))} className='input-control'>
         {Array.from({ length: 50 }, (_, i) => (
           <option key={new Date().getFullYear() - i} value={new Date().getFullYear() - i}>
             {new Date().getFullYear() - i}
           </option>
         ))}
       </select>
-      <select value={month} onChange={e => setMonth(Number(e.target.value))}>
+      <select value={month} onChange={e => setMonth(Number(e.target.value))} className='input-control'>
         {Array.from({ length: 12 }, (_, i) => (
           <option key={i + 1} value={i + 1}>
             {i + 1}

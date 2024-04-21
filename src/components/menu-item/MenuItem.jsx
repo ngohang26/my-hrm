@@ -15,8 +15,9 @@ export const MenuItem = ({ title, icon, subItems }) => {
         {title}
       </div>
       {isOpen && subItems.map((subItem, index) => (
-        <SubMenuItem title={subItem.title} path={subItem.path} subItemSelected={subItemSelected} index={index} setSubItemSelected={setSubItemSelected}/>
-      ))}
+  <SubMenuItem key={index} title={subItem.title} path={subItem.path} subItemSelected={subItemSelected} index={index} setSubItemSelected={setSubItemSelected}/>
+))}
+
     </div>
   );
 };
