@@ -239,7 +239,7 @@ const Department = () => {
         <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
         </div>
       </TabPanel>
-      <TabPanel>
+      <TabPanel style={{display: 'flex', justifyContent: 'center'}}>
         <Position/>
       </TabPanel>
       </Tabs>

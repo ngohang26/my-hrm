@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Grid } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './PaySlip.css'
+import { jwtDecode } from 'jwt-decode';
 
 const PaySlip = () => {
-  const [setEmployeeSalaryDetails] = useState([]);
-  const [payroll, setPayroll] = useState([]);
-  const [employeeCode, setEmployeeCode] = useState(2403001);
+  const [employeeCode, setEmployeeCode] = useState(null);
   const [employeeSalary, setEmployeeSalary] = useState({});
   let currentDate = new Date();
   let currentMonth = currentDate.getMonth() + 1; // getMonth() trả về từ 0 (tháng 1) đến 11 (tháng 12)
@@ -27,6 +26,10 @@ const PaySlip = () => {
   const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const token = localStorage.getItem('accessToken');
+  useEffect(() => {
+    const decodedToken = jwtDecode(token);
+    setEmployeeCode(decodedToken.username);
+  }, [token]);
 
   async function fetchEmployeeSalaryDetails(employeeCode, year, month) {
     try {
@@ -37,11 +40,10 @@ const PaySlip = () => {
       });
       if (!response.ok) {
         const errorMessage = await response.text();
-        throw new Error(errorMessage); // Ném ra lỗi khi không thành công
+        throw new Error(errorMessage); 
       }
       return await response.json();
     } catch (error) {
-      // Kiểm tra nếu có thông báo lỗi từ máy chủ thì hiển thị thông báo đó trên toast
       if (error.message) {
         toast.error(error.message);
       } else {
@@ -53,7 +55,7 @@ const PaySlip = () => {
   }
 
 
-  const fetchData = () => {
+  const fetchData = useCallback(() => {
     fetchEmployeeSalaryDetails(employeeCode, year, month)
       .then(data => {
         setEmployeeSalary(data);
@@ -61,15 +63,14 @@ const PaySlip = () => {
       .catch(error => {
         console.error('Error fetching data: ', error);
       });
-  };
-
+  }, [employeeCode, year, month]);
+  
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  const handleSubmit = () => {
-    fetchData();
-  };
+    if (employeeCode !== null) {
+      fetchData();
+    }
+  }, [fetchData, employeeCode]);
+  
  
   function formatCurrency(amount) {
     if (amount === undefined) {

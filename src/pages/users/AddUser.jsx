@@ -28,24 +28,50 @@ const AddUser = ({ onUserAdded }) => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [roleId, setRoleId] = useState('');
-  const [roleName, setRoleName] = useState('');
-  const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [selectedUserPermissions, setSelectedUserPermissions] = useState([]);
+  const [selectedRolePermissions, setSelectedRolePermissions] = useState([]);
 
   const token = localStorage.getItem('accessToken');
 
   const handleCheckboxChange = (module, permission) => {
+    const isDefaultPermission = selectedRolePermissions.some(p => p.module === module && p.permission === permission);
+
+    if (isDefaultPermission) {
+        return;
+    }
+
     setSelectedUserPermissions(prevState => {
-      let updatedPermissions;
-      const existingPermission = prevState.find(p => p.module === module && p.permission === permission);
-      if (existingPermission) {
-        updatedPermissions = prevState.filter(p => p !== existingPermission);
-      } else {
-        updatedPermissions = [...prevState, { module, permission }];
-      }
-      return updatedPermissions;
+        let updatedPermissions;
+        const existingPermission = prevState.find(p => p.module === module && p.permission === permission);
+        if (existingPermission) {
+            updatedPermissions = prevState.filter(p => p !== existingPermission);
+        } else {
+            updatedPermissions = [...prevState, { module, permission }];
+        }
+        return updatedPermissions;
     });
-  };
+};
+
+  const fetchRolePermissions = async (id) => {
+    const token = localStorage.getItem('accessToken');
+    try {
+        const response = await fetch(`http://localhost:8080/users/role/${id}/permissions`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.ok) {
+            const permissionsRoleFromApi = await response.json();
+            setSelectedRolePermissions(permissionsRoleFromApi);
+            console.log(permissionsRoleFromApi)
+            return permissionsRoleFromApi; // Add this line
+        } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error fetching role permissions:', error);
+    }
+};
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -79,11 +105,21 @@ const AddUser = ({ onUserAdded }) => {
       console.error('Thêm người dùng không thành công:', error);
     }
   }
+  const handleRoleChange = async (event) => {
+    const roleId = event.target.value;
+    setRoleId(roleId);
 
-  const handleRoleChange = (event) => {
-    setRoleId(roleMap[event.target.value]);
-    setRoleName(event.target.value);
-  };
+    const permissionsRoleFromApi = await fetchRolePermissions(roleId);
+    console.log(permissionsRoleFromApi)
+    const formattedPermissions = permissionsRoleFromApi.map(p => ({
+        module: p.module,
+        permission: p.permission
+    }));
+
+    setSelectedUserPermissions(formattedPermissions);
+};
+
+
   return (
     <div className='user-form'>
       <ToastContainer />
@@ -105,12 +141,13 @@ const AddUser = ({ onUserAdded }) => {
 
         <div className="input-group">
           <label>Chọn vai trò</label>
-          <select value={roleName} onChange={handleRoleChange} className='form-control'>
+          <select value={roleId} onChange={handleRoleChange} className='form-control'>
             <option value="">Select a role</option>
-            {Object.keys(roleMap).map(role => (
-              <option key={role} value={role}>{role}</option>
+            {Object.entries(roleMap).map(([role, id]) => (
+              <option key={id} value={id}>{role}</option>
             ))}
           </select>
+
         </div>
         <h4 style={{ marginTop: '30px' }}>Phân quyền</h4>
         {selectedUserPermissions && (
@@ -118,7 +155,8 @@ const AddUser = ({ onUserAdded }) => {
             permissionMap={permissionMap}
             modules={modules}
             permissions={permissions}
-            selectedUserPermissions={selectedUserPermissions}  
+            selectedUserPermissions={selectedUserPermissions}
+            selectedRolePermissions={selectedRolePermissions}
             handleCheckboxChange={handleCheckboxChange}
           />
         )}

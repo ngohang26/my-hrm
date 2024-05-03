@@ -7,6 +7,7 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isCheckingToken, setIsCheckingToken] = useState(false);
+  const [error, setError] = useState({username: '', password: ''});  
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -26,6 +27,8 @@ const Login = () => {
       });
 
       if (!response.ok) {
+        const errorData = await response.json();  
+        setError({...error, [errorData.field]: errorData.message}); 
         throw new Error('Lỗi đăng nhập');
       }
 
@@ -52,14 +55,16 @@ const Login = () => {
           
           <div className='form-div'>Tên tài khoản/ Mã nhân viên</div>
           <label>
-            <input className='form-control' type="text" value={username} placeholder='Nhập tên tài khoản' onChange={e => setUsername(e.target.value)} />
+            <input className={`form-control ${error.username ? 'input-error' : ''}`} type="text" value={username} placeholder='Nhập tên tài khoản' onChange={e => {setUsername(e.target.value); setError({...error, username: ''})}} />
+            {error.username && <p>{error.username}</p>}
           </label>
           <div className='form-div'>Mật khẩu</div>
 
           <label>
-            <input className='form-control' type="password" value={password} placeholder='Nhập mật khẩu' onChange={e => setPassword(e.target.value)} />
+            <input className={`form-control ${error.password ? 'input-error' : ''}`} type="password" value={password} placeholder='Nhập mật khẩu' onChange={e => {setPassword(e.target.value); setError({...error, password: ''})}} />
+            {error.password && <p>{error.password}</p>}  
           </label>
-          <a class="float-right small" href="/forgotpassword">Quên mật khẩu?</a>
+          <a class="float-right small" href="/forgotpassword">Quên mật khẩu?</a>  
           <br/>
           <button type="submit">Đăng nhập</button>
         </form>

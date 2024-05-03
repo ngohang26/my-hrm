@@ -7,92 +7,86 @@ import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx'
 import { FiTrash, FiEdit } from 'react-icons/fi';
 
-const addPositionColumns = [
-  {
-    field: 'positionName',
-    headerName: 'CHỨC VỤ',
-    flex: 1.5,
-  },
-  {
-    field: 'jobSummary',
-    headerName: 'TÓM TẮT',
-    flex: 2.5,
-  }
+const addJobPositionColumns = [
+  { field: 'jobPositionName', headerName: 'CHỨC VỤ', flex: 1.5, },
+  { field: 'jobDescription', headerName: 'Mô tả công việc', flex: 2.5, },
+  { field: 'skillsRequired', headerName: 'Yêu cầu', flex: 2.5, },
+  { field: 'applicationDeadline', headerName: 'Thời hạn', flex: 2.5, },
 ];
 
-async function fetchPositions() {
+async function fetchJobPositions() {
   const token = localStorage.getItem('accessToken');
-  const response = await fetch('http://localhost:8080/positions/getAllPositions', {
+  const response = await fetch('http://localhost:8080/jobPositions/getAllJobPositions', {
     headers: {
       Authorization: `Bearer ${token}`
     }
   });
-  const positions = await response.json();
-  return positions.map((position, index) => ({
+  const jobPositions = await response.json();
+  return jobPositions.map((jobPosition, index) => ({
     order: index + 1,
     id: index,
-    ...position,
+    ...jobPosition,
   }));
 }
 
 
-async function addPosition(position) {
+async function addJobPosition(jobPosition) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/positions/addPosition`, {
+    const response = await fetch(`http://localhost:8080/jobPositions/addJobPosition`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(position)
+      body: JSON.stringify(jobPosition)
     });
 
     if (response.ok) {
-      toast.success('Thêm chức vụ thành công');
+      toast.success('Thêm vị trí ứng tuyển thành công');
     } else if (response.status === 500) {
-      toast.error('Tên chức vụ/ mô tả không hợp lệ');
+      toast.error('Tên vị trí ứng tuyển không hợp lệ');
     } else if (response.status === 409) {
-      toast.error('Chức vụ đã tồn tại');
+      toast.error('Vị trí ứng tuyển đã tồn tại');
     } else {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   } catch (error) {
-    console.error('Failed to add position:', error);
+    console.error('Failed to add jobPosition:', error);
   }
 }
 
-async function editPosition(id, positionDetails) {
+async function editJobPosition(id, jobPositionDetails) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/positions/update/${id}`, {
+    const response = await fetch(`http://localhost:8080/jobPositions/update/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(positionDetails)
+      body: JSON.stringify(jobPositionDetails)
     });
 
     if (response.ok) {
-      toast.success('Sửa chức vụ thành công');
+      toast.success('Sửa vị trí ứng tuyển thành công');
     } else if (response.status === 500) {
-      toast.error('Tên chức vụ/ mô tả không hợp lệ');
+      toast.error('Tên vị trí ứng tuyển/ mô tả không hợp lệ');
     } else if (response.status === 409) {
       toast.error('Chức vụ đã tồn tại');
     } else {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   } catch (error) {
-    console.error('Failed to update position:', error);
+    console.error('Failed to update jobPosition:', error);
   }
 }
 
-async function deletePosition(id) {
+async function deleteJobPosition(id) {
   const token = localStorage.getItem('accessToken');
 
   try {
-    const response = await fetch(`http://localhost:8080/positions/delete/${id}`, {
+    const response = await fetch(`http://localhost:8080/jobPositions/hardDelete/${id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`
@@ -103,18 +97,18 @@ async function deletePosition(id) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   } catch (error) {
-    console.error('Failed to delete position:', error);
+    console.error('Failed to delete jobPosition:', error);
   }
 }
 
-const Position = () => {
+const JobPosition = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [positions, setPositions] = useState([]);
+  const [jobPositions, setJobPositions] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [positionToDelete, setPositionToDelete] = useState(null);
+  const [jobPositionToDelete, setJobPositionToDelete] = useState(null);
   const [editing, setEditing] = useState({});
   const openDeleteModal = (id) => {
-    setPositionToDelete(id);
+    setJobPositionToDelete(id);
     setIsDeleteModalOpen(true);
   };
 
@@ -123,44 +117,44 @@ const Position = () => {
   };
 
   const handleConfirmDelete = async () => {
-    if (positionToDelete !== null) {
-      await deletePosition(positionToDelete);
-      const updatedPositions = await fetchPositions();
-      setPositions(updatedPositions);
+    if (jobPositionToDelete !== null) {
+      await deleteJobPosition(jobPositionToDelete);
+      const updatedJobPositions = await fetchJobPositions();
+      setJobPositions(updatedJobPositions);
     }
     closeDeleteModal();
   };
 
   const handleFormSubmit = async (data) => {
     try {
-      const positionDetails = {
-        positionName: data.positionName,
+      const jobPositionDetails = {
+        jobPositionName: data.jobPositionName,
         jobSummary: data.jobSummary
       };
       if (!editing.id) {
-        await addPosition(positionDetails, data);
-        const updatedPositions = await fetchPositions();
-        setPositions(updatedPositions);
+        await addJobPosition(jobPositionDetails, data);
+        const updatedJobPositions = await fetchJobPositions();
+        setJobPositions(updatedJobPositions);
         setIsFormOpen(false);
         setEditing({});
       } else {
-        await editPosition(editing.id, data);
-        const updatedPositions = await fetchPositions();
+        await editJobPosition(editing.id, data);
+        const updatedJobPositions = await fetchJobPositions();
 
-        setPositions(updatedPositions);
+        setJobPositions(updatedJobPositions);
 
         setIsFormOpen(false);
         setEditing({});
       }
     } catch (error) {
-      console.error('Failed to add or update position:', error);
+      console.error('Failed to add or update jobPosition:', error);
     }
   }
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      const initialPositions = await fetchPositions();
-      setPositions(initialPositions);
+      const initialJobPositions = await fetchJobPositions();
+      setJobPositions(initialJobPositions);
     }
 
     fetchInitialData();
@@ -194,10 +188,12 @@ const Position = () => {
     setIsFormOpen(true)
   };
 
-  const positionColumns = [
+  const jobPositionColumns = [
     { field: 'order', headerName: 'STT', flex: 1, },
-    { field: 'positionName', headerName: 'CHỨC VỤ', flex: 1.5, },
-    { field: 'jobSummary', headerName: 'TÓM TẮT', flex: 2.5, },
+    { field: 'jobPositionName', headerName: 'CHỨC VỤ', flex: 1.5, },
+    { field: 'jobDescription', headerName: 'Mô tả công việc', flex: 2.5, },
+    { field: 'skillsRequired', headerName: 'Yêu cầu', flex: 2.5, },
+    { field: 'applicationDeadline', headerName: 'Thời hạn', flex: 2.5, },
     {
       field: 'actions', headerName: 'Hành động', flex: 1, renderCell: (params) => (
         <div className='action'>
@@ -212,23 +208,27 @@ const Position = () => {
     },
   ];
   return (
-    <div className='positions' style={{width: '50vw'}}>
+    <div style={{display: 'flex', justifyContent: 'center'}}>
+
+    <div className='jobPositions' style={{ width: '50vw' }}>
       <ToastContainer />
+      <h4>Vị trí tuyển dụng</h4>
       <div className='info'>
         <button onClick={openForm} className='btn-add'>+ Thêm</button>
       </div>
 
-        <DataTable columns={positionColumns} data={positions} slug="position" showEditColumn={false} />;
-        {isFormOpen && (
-          <div className="overlay" onClick={closeForm}>
-            <FormComponent fields={addPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
-          </div>
-        )}
+      <DataTable columns={jobPositionColumns} data={jobPositions} slug="jobPosition" showEditColumn={false} />;
+      {isFormOpen && (
+        <div className="overlay" onClick={closeForm}>
+          <FormComponent fields={addJobPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
+        </div>
+      )}
       <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+    </div>
     </div>
 
 
   );
 }
 
-export default Position
+export default JobPosition

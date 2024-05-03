@@ -1,0 +1,68 @@
+.dashboard {
+  display: flex;
+  max-height:0%;
+}
+
+.dashboard .left-dashboard {
+  flex: 2;
+}
+
+.dashboard .right-dashboard {
+  flex: 1;
+}
+
+.dashboard .top-dashboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #e4dbff;
+  width: 94.5%;
+  height: 130px;
+  margin: 30px 0px;
+  padding: 4px 20px;
+  border-radius: 20px;
+}
+
+.dashboard .top-dashboard img {
+  width: 25vw;
+  height: 22vh;
+}
+
+.dashboard .calendar {
+
+  margin-left: 20px;
+  margin-top: 30px;
+}
+
+.calendar .react-calendar {
+  border: none;
+  padding: 8px 6px;
+  border-radius: 15px ;
+}
+
+.calendar .react-calendar__tile {
+  width: 30px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 0px;
+}
+
+.calendar .react-calendar__tile--active {
+  background: #5f5c82;
+  color: white;
+}
+
+.calendar .react-calendar__month-view__weekdays {
+  background-color: #f3f1f1;
+  padding: 2px;
+  border-radius: 7px;
+}
+
+.dashboard .chart-dashboard {
+  background-color: #fff;
+  border-radius: 15px;
+  width: 310px;
+  margin-left: 20px;
+  margin-top: 20px;
+  padding: 20px;
+}

@@ -11,7 +11,6 @@ const contractColumns = [
   { field: 'employeeCode', headerName: 'Mã nhân viên', flex: 2,},
   { field: 'fullName', headerName: 'Tên nhân viên',flex: 3,},
   { field: 'positionName', headerName: 'Chức vụ', flex: 2.5,},
-  // { field: 'departmentName', headerName: 'Phòng ban', flex: 2,},  
   { field: 'startDate', headerName: 'Ngày bắt đầu', flex: 2.5,  },
   { field: 'endDate', headerName: 'Ngày kết thúc', flex: 2.5,},
   {

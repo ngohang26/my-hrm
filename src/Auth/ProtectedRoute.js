@@ -23,7 +23,6 @@ export function ProtectedRoute({ children }) {
         .then(response => response.json())
         .then(data => {
           if (!data) {
-            // Nếu accessToken không hợp lệ, xóa nó khỏi localStorage và điều hướng về trang đăng nhập
             localStorage.removeItem('accessToken');
             navigate('/', { state: { from: location } });
           }

@@ -32,7 +32,6 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
     const [selectedFile, setSelectedFile] = useState();
     const [provinces, setProvinces] = useState([]);
     const [tabIndex2, setTabIndex2] = useState(0);
-    const [value, setValue] = useState();
 
     useEffect(() => {
         if (mode === 'edit' && currentEmployee) {
@@ -40,7 +39,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
             setSelectedFile(currentEmployee.image); // Cập nhật selectedFile
         } else {
             setEmployeeData({
-                fullName: null,
+                fullName: '',
                 phoneNumber: '',
                 image: defaultImage,
                 workEmail: '',
@@ -72,13 +71,15 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 
     const handleSkillChange = (e, index) => {
         const { value } = e.target;
+        console.log(`handleSkillChange called with value: ${value} and index: ${index}`);
         setEmployeeData(prevState => ({
-            ...prevState,
-            skills: prevState.skills.map((skill, i) =>
-                i === index ? { ...skill, name: value } : skill
-            )
+          ...prevState,
+          skills: prevState.skills.map((skill, i) =>
+            i === index ? { ...skill, name: value } : skill
+          )
         }));
-    };
+      };
+      
 
     const handleSkillProficiencyChange = (e, index) => {
         const { value } = e.target;
@@ -151,7 +152,6 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
         }));
     };
 
-    const token = localStorage.getItem('accessToken');
 
     useEffect(() => {
         const fetchProvinces = async () => {
@@ -170,6 +170,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
     const handleUpload = async () => {
         const formData = new FormData();
         formData.append('file', selectedFile);
+        const token = localStorage.getItem('accessToken');
 
         const response = await fetch('http://localhost:8080/api/FileUpload', {
             method: 'POST',
@@ -193,7 +194,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        const [parent, child] = name.split('.'); // Tách đường dẫn
+        const [parent, child] = name.split('.');
 
         if (parent && child) {
             setEmployeeData(prevState => ({
@@ -212,12 +213,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!employeeData.fullName) {
-            toast.error('Vui lòng nhập đầy đủ tên');
-            return;
-        } else if (!employeeData.identityCardNumber) {
-            toast.error('Vui lòng nhập số căn cước công dân')
-        } else {
+
             let image = employeeData.image;
 
             if (selectedFile instanceof File) {
@@ -234,6 +230,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
             };
 
             console.log("Data sent to server:", employeeToSend);
+            const token = localStorage.getItem('accessToken');
 
             try {
                 let response;
@@ -252,34 +249,35 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                         headers: {
                             'Content-Type': 'application/json',
                             Authorization: `Bearer ${token}`
-                          },
+                        },
                         body: JSON.stringify(employeeToSend),
                     });
                 }
 
                 if (response.ok) {
                     if (mode === 'add') {
-                        toast.success('Thêm bộ phận thành công');
+                        toast.success('Thêm nhân viên thành công');
                         fetchEmployees();
                         setTimeout(() => {
                             setTabIndex(0);
                         }, 1200);
                     } else if (mode === 'edit') {
-                        toast.success('Chỉnh sửa bộ phận thành công');
+                        toast.success('Chỉnh sửa thông tin nhân viên thành công');
                         fetchEmployees();
+                        setShowEditTab(false)
                         setTimeout(() => {
                             setTabIndex(0);
-                        }, 1200);
+                        }, 1000);
 
                     }
                 } else {
-                    const errorMessage = await response.text();
-                    toast.error(errorMessage);
+                    const errorResponse = await response.text();
+                    toast.error(errorResponse);
                 }
             } catch (error) {
-                console.error('Failed to handle department:', error);
+                console.error('Failed to handle employee:', error);
             }
-        }
+        
     };
 
 
@@ -287,32 +285,32 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
         <>
             <ToastContainer />
             <form onSubmit={handleSubmit}>
-                <input type="submit" value="Thêm" className='btn-submit' style={{margin: '0px 0px  0px 10px'}}/>
+                <input type="submit" value="Lưu" className='btn-submit' style={{ margin: '0px 0px  0px 10px' }} />
                 <Tabs>
                     <div>
                         <div className='employee-info' style={{ display: "flex", flexWrap: 'wrap' }}>
                             <div className="" style={{ flex: '2 0 50%', padding: '10px' }}>
                                 <input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Full Name" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} />
                                 <div style={{ display: "flex", gap: '20px', width: '101%' }}>
-                                
-                                <select name="positionName" value={employeeData.positionName} onChange={handleChange} className='form-control select' >
-                                    <option value=''>Chọn chức vụ ...</option>
-                                    {positions && positions.map((position, index) => (
-                                        <option key={index} value={position.positionName}>
-                                            {position.positionName}
-                                        </option>
-                                    ))}
-                                </select>
 
-                                <select name="departmentName" value={employeeData.departmentName} onChange={handleChange} className='form-control select'>
-                                    <option value=''>Chọn bộ phận ...</option>
-                                    {departments && departments.map((department, index) => (
-                                        <option key={index} value={department.departmentName}>
-                                            {department.departmentName}
-                                        </option>
-                                    ))}
-                                </select>
-</div>
+                                    <select name="positionName" value={employeeData.positionName} onChange={handleChange} className='form-control select' >
+                                        <option value=''>Chọn chức vụ ...</option>
+                                        {positions && positions.map((position, index) => (
+                                            <option key={index} value={position.positionName}>
+                                                {position.positionName}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <select name="departmentName" value={employeeData.departmentName} onChange={handleChange} className='form-control select'>
+                                        <option value=''>Chọn bộ phận ...</option>
+                                        {departments && departments.map((department, index) => (
+                                            <option key={index} value={department.departmentName}>
+                                                {department.departmentName}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <div style={{ display: "flex", gap: '20px', width: '93%' }}>
                                     <input type="text" name="phoneNumber" value={employeeData.phoneNumber} onChange={handleChange} placeholder="Phone Number" className='form-control more' />
                                     <input type="text" name="workEmail" value={employeeData.workEmail} onChange={handleChange} placeholder="Work Email" className='form-control more' />
@@ -356,7 +354,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                                             <button onClick={() => removeSkill(index)}>Remove</button>
                                         </div>
                                     ))}
-                                    <button onClick={addSkill}>Add Skill</button>
+                                    <button type='button' onClick={addSkill}>Add Skill</button>
                                 </div>
 
                                 {/* Phần nhập thông tin kinh nghiệm */}
@@ -389,7 +387,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
                                             <button onClick={() => removeExperience(index)}>Remove</button>
                                         </div>
                                     ))}
-                                    <button onClick={addExperience}>Add Experience</button>
+                                    <button type='button' onClick={addExperience}>Add Experience</button>
                                 </div>
                             </div>
                         </TabPanel>

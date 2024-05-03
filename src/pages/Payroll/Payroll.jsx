@@ -8,6 +8,7 @@ const payrollColumns = [
   { field: 'employeeName', headerName: 'Tên nhân viên', flex: 3 },
   { field: 'positionName', headerName: 'Chức vụ', flex: 2.5 },
   { field: 'netSalary', headerName: 'Lương', flex: 2.5 },
+  { field: 'totalOvertimeHours', headerName: 'Giờ làm thêm', flex: 1.5 },
 ];
 
 async function fetchPayroll(year, month) {

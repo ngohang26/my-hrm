@@ -19,14 +19,7 @@ import { SlLike, SlEvent, SlCreditCard, SlCalculator, SlPieChart } from "react-i
       icon: <SlCreditCard   />,
       label: "Payroll"
     },
-    {
-      icon: <SlCalculator />,
-      label: "Accounts"
-    },
-    {
-      icon: <SlPieChart />,
-      label: "Report"
-    },
+
     
   ]
 export const CardBox = () => {

@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import '../employees/employee.css'
 import './ContractDetail.css'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { jwtDecode } from 'jwt-decode';
 
-function ContractView() {
+function YourContract() {
   const [contract, setContract] = useState(null);
   const [displaySalary, setDisplaySalary] = useState('');
 
-  const { employeeCode } = useParams();
   const token = localStorage.getItem('accessToken');
-
+  const decodedToken = jwtDecode(token);
+  const employeeCode = decodedToken.username;
   useEffect(() => {
     fetch(`http://localhost:8080/employees/${employeeCode}/contract`, {
       headers: {
@@ -89,4 +89,4 @@ function ContractView() {
 
 }
 
-export default ContractView;
+export default YourContract;

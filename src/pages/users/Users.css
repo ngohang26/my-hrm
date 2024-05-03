@@ -48,7 +48,7 @@
 }
 
 .user-container .user-form,
-.reset-password {
+.form-box {
   width: 40%;
   padding: 30px;
   position: fixed;
@@ -57,7 +57,7 @@
   transform: translate(-50%, -50%);
 }
 
-.reset-password .form-control {
+.form-box .form-control {
   width: 100% !important;
 }
 
@@ -84,11 +84,11 @@
   background-color: #4f4d6c;
 }
 
-.reset-password .btn-control {
+.form-box .btn-control {
 
   padding: 0px !important;
 }
 
-.reset-password .btn-control .btn-save {
+.form-box .btn-control .btn-save {
   width: 120px;
 }

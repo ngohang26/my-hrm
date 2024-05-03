@@ -87,3 +87,11 @@
 .user-menu button:hover {
   background-color: #ddd;
 }
+
+.user-form label {
+  margin-bottom: 10px;
+}
+
+.password-input {
+  position: relative;
+}

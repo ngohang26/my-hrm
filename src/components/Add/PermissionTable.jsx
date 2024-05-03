@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PermissionTable = ({ selectedUserPermissions, permissionMap, modules, permissions, handleCheckboxChange }) => {
+const PermissionTable = ({ selectedUserPermissions,selectedRolePermissions, permissionMap, modules, permissions, handleCheckboxChange }) => {
   return (
     <table>
       <thead>
@@ -14,17 +14,19 @@ const PermissionTable = ({ selectedUserPermissions, permissionMap, modules, perm
         {permissions.map(permission => (
           <tr key={permission}>
             {modules.map(module => (
-              <td key={module}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={selectedUserPermissions.some(p => p.module === module && p.permission === permission)}
-                    onChange={() => handleCheckboxChange(module, permission)}
-                  />
-                  {permission}
-                </label>
-              </td>
-            ))}
+    <td key={module}>
+        <label>
+            <input
+                type="checkbox"
+                checked={selectedUserPermissions.some(p => p.module === module && p.permission === permission)}
+                onChange={() => handleCheckboxChange(module, permission)}
+                disabled={selectedRolePermissions.some(p => p.module === module && p.permission === permission)} // Disable the checkbox if it's a default permission
+            />
+            {permission}
+        </label>
+    </td>
+))}
+
           </tr>
         ))}
       </tbody>
