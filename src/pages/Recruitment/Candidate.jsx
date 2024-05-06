@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import CandidateForm from './CandidateForm';
 import DataTable from '../../components/dataTable/DataTable';
+import { FiEdit } from 'react-icons/fi';
+import { MdOutlineSettings } from 'react-icons/md';
+import UpdateStatusModal from './UpdateStatusModal';
+import { type } from '@testing-library/user-event/dist/type';
 
 const Candidate = () => {
   const [candidates, setCandidates] = useState([]);
@@ -12,16 +16,26 @@ const Candidate = () => {
 
   const [jobPositions, setJobPositions] = useState([]);
   const [selectedJobPositionId, setSelectedJobPositionId] = useState();
-
   useEffect(() => {
     fetchCandidates();
     fetchJobPositions();
-    // fetchDepartments();
   }, []);
-  const token = localStorage.getItem('accessToken');
 
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+
+  const handleOpenModal = (candidate) => {
+    setSelectedCandidate(candidate);
+    setOpenModal(true);
+  };
+
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const fetchCandidates = async () => {
+    const token = localStorage.getItem('accessToken');
     try {
       const response = await fetch('http://localhost:8080/candidates/getAllCandidates', {
         headers: {
@@ -36,6 +50,8 @@ const Candidate = () => {
   };
 
   const fetchJobPositions = async () => {
+    const token = localStorage.getItem('accessToken');
+
     try {
       const response = await fetch('http://localhost:8080/jobPositions/getAllJobPositions', {
         headers: {
@@ -48,6 +64,79 @@ const Candidate = () => {
       console.error('Error:', error);
     }
   };
+
+  const handleUpdateStatus = async (id, newStatus, interviewTime, secondInterviewTime, startDate, endDate, noteContract, monthlySalary, identityCardNumber) => {
+    const token = localStorage.getItem('accessToken');
+    let body = {};
+    switch (newStatus) {
+      case 'INITIAL_REVIEW':
+        body = {
+          newStatus: newStatus
+        };
+        break;
+      case 'FIRST_INTERVIEW':
+        body = {
+          newStatus: newStatus,
+          candidateDetails: {
+            interviewTime: interviewTime
+          }
+        };
+        break;
+      case 'SECOND_INTERVIEW':
+        body = {
+          newStatus: newStatus,
+          candidateDetails: {
+            secondInterviewTime: secondInterviewTime
+          }
+        };
+        break;
+      case 'OFFER_MADE':
+        body = {
+          newStatus: newStatus,
+          candidateDetails: {
+            jobOffer: {
+              startDate: startDate,
+              endDate: endDate,
+              noteContract: noteContract,
+              monthlySalary: monthlySalary
+            }
+          }
+        };
+        break;
+      case 'REFUSE':
+        body = {
+          newStatus: newStatus
+        };
+        break;
+      case 'CONTRACT_SIGNED':
+        body = {
+          newStatus: newStatus,
+          candidateDetails: {
+            identityCardNumber: identityCardNumber
+          }
+        };
+        break;
+      default:
+        break;
+    }
+
+    const response = await fetch(`http://localhost:8080/candidates/${id}/updateStatus`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      console.error('Error:', await response.text());
+    } else {
+      fetchCandidates();
+    }
+  };
+
+
   const handleEditCandidate = (candidate) => {
     setEditingCandidate(candidate);
     setSelectedJobPositionId(candidate.jobPosition.id); // Thêm dòng này
@@ -57,24 +146,32 @@ const Candidate = () => {
     setTabIndex(2);
   };
   const tableColumns = [
-    { field: 'candidateName', headerName: 'MÃ NHÂN VIÊN', flex: 1 },
-    { field: 'email', headerName: 'TÊN NHÂN VIÊN', flex: 1.4 },
-    { field: 'phoneNumber', headerName: 'CHỨC VỤ', flex: 1 },
-    {
-      field: 'jobPosition',
-      headerName: 'PHÒNG BAN',
-      flex: 1,
-      valueGetter: (params) => params.row.jobPosition.jobPositionName,
-    },
-    { field: 'currentStatus', headerName: 'PHÒNG BAN', flex: 1 },
+    { field: 'candidateName', headerName: 'TÊN ỨNG VIÊN', flex: 1 },
+    { field: 'email', headerName: 'ĐỊA CHỈ EMAIL', flex: 1.4 },
+    { field: 'phoneNumber', headerName: 'SỐ ĐIỆN THOẠI', flex: 1 },
+    // { field: 'jobPosition', headerName: 'VỊ TRÍ CÔNG  VIỆC', flex: 1, valueGetter: (params) => params.row.jobPosition.jobPositionName, },
+    { field: 'dateApplied', headerName: 'NGÀY ỨNG TUYỂN', flex: 1.2, type: Date },
+    { field: 'currentStatus', headerName: 'TRẠNG THÁI', flex: 1 }, // them mau 
     {
       field: 'edit',
-      headerName: 'Edit',
+      headerName: 'HÀNH ĐỘNG',
       renderCell: (params) => (
-        <button onClick={() => handleEditCandidate(params.row)} className='btn-action'>Edit</button>
+        <div>
+          <button
+            onClick={() => handleOpenModal(params.row)}
+            className='btn-action'
+            disabled={params.row.currentStatus === 'REFUSE' || params.row.currentStatus === 'CONTRACT_SIGNED'}
+            style={{ opacity: (params.row.currentStatus === 'REFUSE' || params.row.currentStatus === 'CONTRACT_SIGNED') ? 0.5 : 1 }}>            <MdOutlineSettings color='#000' title='Cập nhật trạng thái' />
+          </button>
+          <button onClick={() => handleEditCandidate(params.row)} className='btn-action'>
+            {/* viet API */}
+            <FiEdit color='#000' title='Sửa' />
+          </button>
+        </div>
       ),
       flex: 0.6,
     },
+
   ];
 
   const handleTabSelect = (index) => {
@@ -131,6 +228,13 @@ const Candidate = () => {
           />}
         </TabPanel>
       )}
+      <UpdateStatusModal
+        open={openModal}
+        onClose={handleCloseModal}
+        onUpdate={handleUpdateStatus}
+        candidate={selectedCandidate}
+        selectedCandidate={selectedCandidate}
+      />
     </Tabs>
   );
 

@@ -12,7 +12,7 @@ import PermissionTable from '../../components/Add/PermissionTable.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const getImageUrl = (image) => {
-  return `http://localhost:8080/api/FileUpload/files/${image}`;
+  return `http://localhost:8080/api/FileUpload/files/images/${image}`;
 };
 
 const Users = () => {
@@ -34,7 +34,8 @@ const Users = () => {
     "ALLOWANCE": { "VIEW": 17, "ADD": 18, "EDIT": 19, "DELETE": 20 },
     "SALARY": { "VIEW": 21, "ADD": 22, "EDIT": 23, "DELETE": 24 },
     "CONTRACT": { "VIEW": 25, "ADD": 26, "EDIT": 27, "DELETE": 28 },
-    "USER": { "VIEW": 29, "ADD": 30, "EDIT": 31, "DELETE": 32 },
+    "CANDIDATE": { "VIEW": 29, "ADD": 30, "EDIT": 31, "DELETE": 32 },
+    "USER": { "VIEW": 33, "ADD": 34, "EDIT": 35, "DELETE": 36 },
   };
 
   const modules = Object.keys(permissionMap);

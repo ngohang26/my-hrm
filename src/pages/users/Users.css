@@ -39,10 +39,10 @@
 
 .user-container .user-form,
 .change-permit {
-  width: 70%;
+  width: 80%;
   padding: 30px;
   position: fixed;
-  top: 40%;
+  top: 44%;
   left: 50%;
   transform: translate(-50%, -50%);
 }

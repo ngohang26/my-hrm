@@ -95,7 +95,7 @@ const Employee = () => {
     ];
 
     const getImageUrl = (image) => {
-        return `http://localhost:8080/api/FileUpload/files/${image}`;
+        return `http://localhost:8080/api/FileUpload/files/images/${image}`;
     };
 
     // index là tab muốn chuyển sang

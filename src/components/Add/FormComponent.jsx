@@ -37,13 +37,11 @@ class FormComponent extends React.Component {
     return (
       <div className="form-component">
         <form onSubmit={this.handleSubmit}>
-          <div className='modal-header'>
-            <h2>Thêm</h2>
-          </div>
+
           {fields.map((column) => (
             <div className="item" key={column.field}>
               {column.type === 'select' ? (
-                <FormControl style={{ width: '100%' }}>
+                <FormControl style={{ width: '100%', paddingTop: '10px' }}>
                   <InputLabel id={`${column.field}-label`}>{column.headerName}</InputLabel>
                   <Select
                     labelId={`${column.field}-label`}

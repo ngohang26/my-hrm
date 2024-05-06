@@ -23,7 +23,6 @@ const Attendance = () => {
     const fetchInitialData = async () => {
       const initialAttendances = await fetchAttendances();
       setAttendances(initialAttendances);
-      console.log(initialAttendances)
     }
 
     fetchInitialData();

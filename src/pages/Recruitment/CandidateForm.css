@@ -1,0 +1,69 @@
+.candidate-info {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.candidate-info .input-group {
+  flex: 1 0;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.candidate-info .input-group > div {
+  display: flex;
+  gap: 20px;
+}
+
+.candidate-info .input-group > div:first-child {
+  width: 100%;
+}
+
+.candidate-info .input-group > div:last-child {
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.candidate-info .form-control.select{
+  width: 200%;
+  margin-top: 20px;
+  height: 40px;
+}
+
+.candidate-info .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;  
+}
+
+.candidate-info .root {
+  z-index: 1001; 
+}
+
+.candidate-info .blur {
+  filter: blur(3px);  
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  border: none;
+  background: #f1f2f5;
+  color: #64728c;
+  font-weight: 400;
+  border-radius: 5px;
+  padding: 5px;
+  margin-right: 8px;
+  font-size: 13px;
+}
+
+#cvUpLoadLabel {
+  font-size: 11px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+
