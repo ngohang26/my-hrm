@@ -20,8 +20,8 @@ const UpdateStatusModal = ({ open, onClose, onUpdate, candidate, selectedCandida
 
   useEffect(() => {
     if (selectedCandidate !== previousCandidate) {
-      setInterviewTime(''); // Reset interviewTime
-      setSecondInterviewTime(''); // Reset secondInterviewTime
+      setInterviewTime(''); 
+      setSecondInterviewTime('');  
       setPreviousCandidate(selectedCandidate);
     }
   }, [selectedCandidate]);

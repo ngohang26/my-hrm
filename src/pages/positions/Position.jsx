@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx'
 import { FiTrash, FiEdit } from 'react-icons/fi';
+import { apiUrl } from '../../config.js';
 
 const addPositionColumns = [
   {
@@ -22,8 +23,9 @@ const addPositionColumns = [
 
 async function fetchPositions() {
   const token = localStorage.getItem('accessToken');
-  const response = await fetch('http://localhost:8080/positions/getAllPositions', {
+  const response = await fetch(`${apiUrl}/positions/getAllPositions`, {
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     }
   });
@@ -39,7 +41,7 @@ async function fetchPositions() {
 async function addPosition(position) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/positions/addPosition`, {
+    const response = await fetch(`${apiUrl}/positions/addPosition`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +67,7 @@ async function addPosition(position) {
 async function editPosition(id, positionDetails) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/positions/update/${id}`, {
+    const response = await fetch(`${apiUrl}/positions/update/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -92,9 +94,10 @@ async function deletePosition(id) {
   const token = localStorage.getItem('accessToken');
 
   try {
-    const response = await fetch(`http://localhost:8080/positions/delete/${id}`, {
+    const response = await fetch(`${apiUrl}/positions/delete/${id}`, {
       method: 'DELETE',
       headers: {
+        
         Authorization: `Bearer ${token}`
       }
     });

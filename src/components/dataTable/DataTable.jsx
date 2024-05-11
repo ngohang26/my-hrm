@@ -6,7 +6,6 @@ function CustomToolbar() {
   return (
     <GridToolbarContainer>
       <GridToolbarExport csvOptions={{ utf8WithBom: true }} />
-      {/* <GridToolbarFilterButton /> */}
     </GridToolbarContainer>
   );
 }
@@ -66,7 +65,7 @@ const DataTable = ({ columns, data }) => {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 20,
+                pageSize: 100,
               },
             },
           }}

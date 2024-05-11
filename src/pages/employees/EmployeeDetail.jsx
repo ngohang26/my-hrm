@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
+import { apiUrl } from '../../config'
+
 export const EmployeeDetail = () => {
   const [provinces, setProvinces] = useState([]);
   const [tabIndex2, setTabIndex2] = useState(0);
-    const getImageUrl = (image) => {
-        return `http://localhost:8080/api/FileUpload/files/${image}`;
-    };
-
+  const getImageUrl = (image) => {
+    return `${apiUrl}/api/FileUpload/files/images/${image}`;
+  };
+  const [skillNames, setSkillNames] = useState([]);
+  const [experienceNames, setExperienceNames] = useState([]);
   const [employeeData, setEmployeeData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -34,34 +37,34 @@ export const EmployeeDetail = () => {
   const [employeeCode, setEmployeeCode] = useState('');
 
   useEffect(() => {
-      const token = localStorage.getItem('accessToken');
-      const decodedToken = jwtDecode(token);
-      setEmployeeCode(decodedToken.username || '');
+    const token = localStorage.getItem('accessToken');
+    const decodedToken = jwtDecode(token);
+    setEmployeeCode(decodedToken.username || '');
   }, []);
 
   useEffect(() => {
-      const fetchEmployeeData = async () => {
-          try {
-              const response = await fetch(`http://localhost:8080/employees/employee/${employeeCode}`, {
-                  headers: {
-                      'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                  }
-              });
-
-              if (!response.ok) {
-                  throw new Error("Loi");
-              }
-
-              const data = await response.json();
-              setEmployeeData(data);
-          } catch (error) {
-              console.error('loi', error);
+    const fetchEmployeeData = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/employees/employee/${employeeCode}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
           }
-      };
+        });
 
-      if (employeeCode) {
-          fetchEmployeeData();
+        if (!response.ok) {
+          throw new Error("Loi");
+        }
+
+        const data = await response.json();
+        setEmployeeData(data);
+      } catch (error) {
+        console.error('loi', error);
       }
+    };
+
+    if (employeeCode) {
+      fetchEmployeeData();
+    }
   }, [employeeCode]);
   return (
     <>
@@ -74,11 +77,11 @@ export const EmployeeDetail = () => {
               <div style={{ display: "flex", gap: '20px', width: '101%' }}>
 
                 <select name="positionName" value={employeeData.positionName} className='form-control select' disabled>
-                  <option value=''>{employeeData.positionName}</option>
+                  <option value=''>{employeeData.position.positionName}</option>
                 </select>
 
                 <select name="departmentName" value={employeeData.departmentName} className='form-control select' disabled>
-                  <option value=''>{employeeData.departmentName}</option>
+                  <option value=''>{employeeData.department.departmentName}</option>
                 </select>
 
               </div>
@@ -88,8 +91,8 @@ export const EmployeeDetail = () => {
               </div>
             </div>
             <label className='empl-avt'>
-    {employeeData.image ? <img src={getImageUrl(employeeData.image)} alt="Employee" width="100px" height="100px" /> : <p>No image available</p>}
-</label>
+              {employeeData.image ? <img src={getImageUrl(employeeData.image)} alt="Employee" width="100px" height="100px" /> : <p>No image available</p>}
+            </label>
 
 
           </div>
@@ -106,20 +109,13 @@ export const EmployeeDetail = () => {
               <div className="form-grid grid-item">
                 <label>KỸ NĂNG</label>
                 {employeeData.skills.map((skill, index) => (
-                  <div key={index} className="item-info">
-                    <input
-                      type="text"
-                      value={skill.name}
-                      placeholder="Skill Name"
-                    />
-                    <select
-                      value={skill.proficiency}
-                    >
-                      <option value="Beginner">Beginner</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
-                      <option value="Expert">Expert</option>
-                    </select>
+                  <div key={index} className="skill-experience-item">
+                    <label>{skill.skillName.name}</label>
+                    <progress value={skill.rating || 0} max="100" />
+                    <div className='skill-experience-input'>
+                      <input type="number" min="0" max="100" value={skill.rating || ''} readOnly />
+                      <span>%</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -127,31 +123,18 @@ export const EmployeeDetail = () => {
               <div className="form-grid grid-item">
                 <label>KINH NGHIỆM</label>
                 {employeeData.experiences.map((experience, index) => (
-                  <div key={index} className="item-info">
-                    <input
-                      type="text"
-                      value={experience.jobTitle}
-                      placeholder="Job Title"
-                    />
-                    <input
-                      type="text"
-                      value={experience.company}
-                      placeholder="Company"
-                    />
-                    <input
-                      type="date"
-                      value={experience.startDate}
-                    />
-                    <input
-                      type="date"
-                      value={experience.endDate}
-                    />
+                  <div key={index} className="skill-experience-item">
+                    <label>{experience.experienceName.name}</label>
+                    <progress value={experience.rating || 0} max="100" />
+                    <div className='skill-experience-input'>
+                      <input type="number" min="0" max="100" value={experience.rating || ''} readOnly />
+                      <span>%</span>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           </TabPanel>
-
           <TabPanel>
             Thông tin công việc
           </TabPanel>
@@ -208,7 +191,7 @@ export const EmployeeDetail = () => {
                 </div>
                 <div className="item-info">
                   <label htmlFor="identityCardNumber">Số CCCD</label>
-                  <input type="text" name="personalInfo.identityCardNumber" value={employeeData.personalInfo.identityCardNumber}  />
+                  <input type="text" name="personalInfo.identityCardNumber" value={employeeData.personalInfo.identityCardNumber} />
                 </div>
               </div>
               <div className="form-grid grid-item">
@@ -226,11 +209,11 @@ export const EmployeeDetail = () => {
                 </div>
                 <div className="item-info">
                   <label>Chuyên ngành</label>
-                  <input type="text" name="personalInfo.fieldOfStudy" value={employeeData.personalInfo.fieldOfStudy}  />
+                  <input type="text" name="personalInfo.fieldOfStudy" value={employeeData.personalInfo.fieldOfStudy} />
                 </div>
                 <div className="item-info">
                   <label>Trường học</label>
-                  <input type="text" name="personalInfo.school" value={employeeData.personalInfo.school}  />
+                  <input type="text" name="personalInfo.school" value={employeeData.personalInfo.school} />
                 </div>
               </div>
             </div>

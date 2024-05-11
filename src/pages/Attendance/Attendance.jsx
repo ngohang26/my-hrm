@@ -7,10 +7,11 @@ import { FiEdit } from 'react-icons/fi'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PermissionContext from '../../Auth/PermissionContext';
+import {apiUrl} from '../../config'
 
 const Attendance = () => {
   const [attendances, setAttendances] = useState([]);
-  const [filterType, setFilterType] = useState('day');
+  const [filterType, setFilterType] = useState('all');
   const [dateFilter, setDateFilter] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -30,7 +31,7 @@ const Attendance = () => {
 
   async function fetchAttendances() {
     const token = localStorage.getItem('accessToken');
-    const response = await fetch('http://localhost:8080/attendances/getAllAttendances', {
+    const response = await fetch(`${apiUrl}/attendances/getAllAttendances`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -45,9 +46,12 @@ const Attendance = () => {
     } else if (filterType === 'month') {
       return selectedMonth && attendanceDate.getMonth() === new Date(selectedMonth).getMonth() &&
         attendanceDate.getFullYear() === new Date(selectedMonth).getFullYear();
+    } else if (filterType === 'all') {
+      return true;
     }
-    return true;
+    return false;
   });
+  
 
   const handleEditTime = (attendance) => {
     setEditingAttendance(attendance);
@@ -61,7 +65,7 @@ const Attendance = () => {
   const handleUpdateTime = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`http://localhost:8080/attendances/update/${editingAttendance.id}`, {
+      const response = await fetch(`${apiUrl}/attendances/update/${editingAttendance.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +126,7 @@ const Attendance = () => {
 
           }
         </div>
-        <button onClick={() => { setSelectedDate(null); setSelectedMonth(null); }} className='btn-submit'>Hiển thị tất cả</button>
+        <button onClick={() => { setFilterType('all'); setDateFilter(new Date()); setSelectedMonth(null); }} className='btn-submit'>Hiển thị tất cả</button>
       </div>
 
       <DataTable columns={attendanceColumns} data={filteredAttendances} slug="attendance" />;

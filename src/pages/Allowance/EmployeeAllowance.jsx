@@ -5,6 +5,7 @@ import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal';
 import { FiTrash, FiEdit } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {apiUrl} from '../../config'
 
 const EmployeeAllowance = () => {
   const [employeeCode, setEmployeeCode] = useState("2403001");
@@ -45,7 +46,7 @@ const EmployeeAllowance = () => {
 
   const fetchAllowanceList = async () => {
     const token = localStorage.getItem('accessToken');
-    const response = await fetch('http://localhost:8080/allowance/getAllAllowances', {
+    const response = await fetch(`${apiUrl}/allowance/getAllAllowances`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -68,7 +69,7 @@ const EmployeeAllowance = () => {
   async function fetchEmployeeAllowances() {
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://localhost:8080/employee-allowances/${employeeCode}`, {
+      const response = await fetch(`${apiUrl}/employee-allowances/${employeeCode}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -94,7 +95,7 @@ const EmployeeAllowance = () => {
   async function addEmployeeAllowance(allowanceDetails) {
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://localhost:8080/employee-allowances/${employeeCode}`, {
+      const response = await fetch(`${apiUrl}/employee-allowances/${employeeCode}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +122,7 @@ const EmployeeAllowance = () => {
   async function editEmployeeAllowance(id, allowanceDetails) {
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://localhost:8080/employee-allowances/${employeeCode}/allowances/${id}`, {
+      const response = await fetch(`${apiUrl}/employee-allowances/${employeeCode}/allowances/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +148,7 @@ const EmployeeAllowance = () => {
     console.log('Deleting allowance with id:', id);  // Thêm dòng này để kiểm tra giá trị của id
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://localhost:8080/employee-allowances/${employeeCode}/allowances/${id}`, {
+      const response = await fetch(`${apiUrl}/employee-allowances/${employeeCode}/allowances/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`
@@ -214,12 +215,12 @@ const EmployeeAllowance = () => {
     <div>
       <ToastContainer/>
   <div className="employee-code-input">
-    <label htmlFor="employeeCode">Employee Code:</label>
+    <label htmlFor="employeeCode">Nhập mã nhân viên    </label>
     <input
       type="text"
       id="employeeCode"
       value={employeeCode}
-      onChange={(e) => setEmployeeCode(e.target.value)}
+      onChange={(e) => setEmployeeCode(e.target.value)} className='input-control'
     />
   </div>
   <div style={{width: '100%', textAlign: 'right'}}>

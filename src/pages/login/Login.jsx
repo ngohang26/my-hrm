@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Login.css'
 import { TbBrand4Chan } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
+import {apiUrl} from '../../config'
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -15,7 +16,7 @@ const Login = () => {
     setIsCheckingToken(true);
 
     try {
-      const response = await fetch('http://localhost:8080/users/login', {
+      const response = await fetch(`${apiUrl}/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

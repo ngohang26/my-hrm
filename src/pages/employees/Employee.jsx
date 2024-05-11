@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import EmployeeForm from './EmployeeForm'; 
 import DataTable from '../../components/dataTable/DataTable';
+import {apiUrl} from '../../config'
 
 const Employee = () => {
     const [employees, setEmployees] = useState([]);
@@ -12,6 +13,8 @@ const Employee = () => {
 
     const [positions, setPositions] = useState([]);
     const [departments, setDepartments] = useState([]); 
+  const [selectedPositionId, setSelectedPositionId] = useState();
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState();
     
     useEffect(() => {
         fetchEmployees();
@@ -24,7 +27,7 @@ const Employee = () => {
     const fetchEmployees = async () => {
 
         try {
-            const response = await fetch('http://localhost:8080/employees/getAllEmployees', {
+            const response = await fetch(`${apiUrl}/employees/getAllEmployees`, {
             headers: {
                 Authorization: `Bearer ${token}`
               }
@@ -38,7 +41,7 @@ const Employee = () => {
 
     const fetchPositions = async () => {
         try {
-            const response = await fetch('http://localhost:8080/positions/getAllPositions', {
+            const response = await fetch(`${apiUrl}/positions/getAllPositions`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                   }
@@ -52,7 +55,7 @@ const Employee = () => {
 
     const fetchDepartments = async () => {
         try {
-            const response = await fetch('http://localhost:8080/departments/getAllDepartments', {
+            const response = await fetch(`${apiUrl}/departments/getAllDepartments`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                   }
@@ -66,36 +69,49 @@ const Employee = () => {
 
     const handleEditEmployee = (employee) => {
       setEditingEmployee(employee); // Cập nhật biến trạng thái với dữ liệu của nhân viên
+    setSelectedPositionId(employee.position.id);
+    setSelectedDepartmentId(employee.department.id);
+
       setMode('edit'); 
       setShowEditTab(true); 
       setTabIndex(2); 
   };
-    const tableColumns = [
-        {
-            field: 'image',
-            headerName: 'Avatar',
-            renderCell: (params) => (
-                <img src={getImageUrl(params.row.image)} alt="Avatar" style={{ width: '40px', height: '40px' }} />
-            ),
-            flex: 0.6,
-        },
-        { field: 'employeeCode', headerName: 'MÃ NHÂN VIÊN', flex: 1 },
-        { field: 'fullName', headerName: 'TÊN NHÂN VIÊN', flex: 1.4 },
-        { field: 'positionName', headerName: 'CHỨC VỤ', flex: 1 },
-        { field: 'departmentName', headerName: 'PHÒNG BAN', flex: 1 },
-        { field: 'phoneNumber', headerName: 'PHONE NUMBER', flex: 1.7 },
-        {
-            field: 'edit',
-            headerName: 'Edit',
-            renderCell: (params) => (
-                <button onClick={() => handleEditEmployee(params.row)} className='btn-action'>Edit</button>
-            ),
-            flex: 0.6,
-        },
-    ];
+  const tableColumns = [
+    {
+        field: 'image',
+        headerName: 'Avatar',
+        renderCell: (params) => (
+            <img src={getImageUrl(params.row.image)} alt="Avatar" style={{ width: '40px', height: '40px' }} />
+        ),
+        flex: 0.6,
+    },
+    { field: 'employeeCode', headerName: 'MÃ NHÂN VIÊN', flex: 1 },
+    { field: 'fullName', headerName: 'TÊN NHÂN VIÊN', flex: 1.4 },
+    { 
+        field: 'position', 
+        headerName: 'CHỨC VỤ', 
+        flex: 1,
+        valueGetter: (params) => params.row.position.positionName,
+    },
+    { 
+        field: 'department', 
+        headerName: 'PHÒNG BAN', 
+        flex: 1,
+        valueGetter: (params) => params.row.department.departmentName,
+    },
+    { field: 'phoneNumber', headerName: 'PHONE NUMBER', flex: 1.7 },
+    {
+        field: 'edit',
+        headerName: 'Edit',
+        renderCell: (params) => (
+            <button onClick={() => handleEditEmployee(params.row)} className='btn-action'>Edit</button>
+        ),
+        flex: 0.6,
+    },
+];
 
     const getImageUrl = (image) => {
-        return `http://localhost:8080/api/FileUpload/files/images/${image}`;
+        return `${apiUrl}/api/FileUpload/files/images/${image}`;
     };
 
     // index là tab muốn chuyển sang
@@ -130,7 +146,16 @@ const Employee = () => {
             <DataTable columns={tableColumns} data={employees}/>
           </TabPanel>
           <TabPanel>
-            {mode === 'add' && <EmployeeForm mode={mode}  setTabIndex={setTabIndex} positions={positions} departments={departments} fetchEmployees={fetchEmployees}/>}
+            {mode === 'add' && <EmployeeForm mode={mode}  
+            setTabIndex={setTabIndex} 
+            positions={positions} 
+            departments={departments}
+            fetchEmployees={fetchEmployees}
+          selectedPositionId={selectedPositionId}
+          selectedDepartmentId={selectedDepartmentId}
+          setSelectedPositionId={setSelectedPositionId}
+          setSelectedDepartmentId={setSelectedDepartmentId}
+            />}
           </TabPanel>
           {showEditTab && (
             <TabPanel>
@@ -138,8 +163,13 @@ const Employee = () => {
               currentEmployee={editingEmployee}  
               setTabIndex = {setTabIndex}
               setShowEditTab={setShowEditTab}
-              positions={positions} departments={departments}
+              positions={positions} 
+              departments={departments}
               fetchEmployees={fetchEmployees}
+            selectedPositionId={selectedPositionId}
+            selectedDepartmentId={selectedDepartmentId}
+            setSelectedPositionId={setSelectedPositionId}
+            setSelectedDepartmentId={setSelectedDepartmentId}
               />} 
             </TabPanel>
           )}

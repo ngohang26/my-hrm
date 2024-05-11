@@ -4,6 +4,7 @@ import './ContractDetail.css'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { jwtDecode } from 'jwt-decode';
+import {apiUrl} from '../../config'
 
 function YourContract() {
   const [contract, setContract] = useState(null);
@@ -18,13 +19,22 @@ function YourContract() {
         Authorization: `Bearer ${token}`
       }
     })
-      .then(response => response.json())
-      .then(data => {
-        setContract(data);
-        if (data.monthlySalary) {
-          setDisplaySalary(data.monthlySalary.toString());
-        }
-      });
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      setContract(data);
+      if (data.monthlySalary) {
+        setDisplaySalary(data.monthlySalary.toString());
+      }
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+    });
+    
   }, [employeeCode]);
 
   

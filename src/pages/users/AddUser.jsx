@@ -3,6 +3,7 @@ import './AddUser.css'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PermissionTable from '../../components/Add/PermissionTable';
+import {apiUrl} from '../../config'
 
 const permissionMap = {
   "EMPLOYEE": { "VIEW": 1, "ADD": 2, "EDIT": 3, "DELETE": 4 },
@@ -55,7 +56,7 @@ const AddUser = ({ onUserAdded }) => {
   const fetchRolePermissions = async (id) => {
     const token = localStorage.getItem('accessToken');
     try {
-        const response = await fetch(`http://localhost:8080/users/role/${id}/permissions`, {
+        const response = await fetch(`${apiUrl}/users/role/${id}/permissions`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -79,7 +80,7 @@ const AddUser = ({ onUserAdded }) => {
       // Convert selectedUserPermissions to an array of permission IDs
       const permissionIds = selectedUserPermissions.map(p => permissionMap[p.module][p.permission]);
 
-      const response = await fetch('http://localhost:8080/users/register', {
+      const response = await fetch(`${apiUrl}/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

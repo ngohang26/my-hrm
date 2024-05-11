@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/dataTable/DataTable';
 import { CircularProgress, Box } from '@mui/material';
 import './Payroll.css';
+import {apiUrl} from '../../config'
 
 const payrollColumns = [
   { field: 'employeeCode', headerName: 'Mã nhân viên', flex: 2 },
@@ -13,7 +14,7 @@ const payrollColumns = [
 
 async function fetchPayroll(year, month) {
   const token = localStorage.getItem('accessToken');
-  const response = await fetch(`http://localhost:8080/employeeSalary/allSalaryDetails/${year}/${month}`, {
+  const response = await fetch(`${apiUrl}/employeeSalary/allSalaryDetails/${year}/${month}`, {
     headers: {
       Authorization: `Bearer ${token}`
     }

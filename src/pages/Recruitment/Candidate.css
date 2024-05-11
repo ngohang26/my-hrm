@@ -1,0 +1,82 @@
+.status-filter-column {
+  background-color: #fff;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 20px;
+}
+
+.status-filter-column button {
+  border: none;
+  color: #64728c;
+  background: #f8f9fa;
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.status-filter-column button.selected {
+  color: #8e8aeb;
+  background: #e1e1f4;
+}
+
+.status-count {
+  display: inline-block;
+  width: 20px;
+  padding: 4px;
+  height: 20px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.status-count-new { background-color: #f0ad4e; }
+.status-count-initial-review { background-color: #5bc0de; }
+.status-count-first-interview { background-color: #5cb85c; }
+.status-count-second-interview { background-color: #428bca; }
+.status-count-offer-made { background-color: #d9534f; }
+.status-count-contract-signed { background-color: #292b2c; }
+.status-count-refuse { background-color: #d9534f; }
+
+.interview-item {
+  display: flex;
+  flex-direction: column;
+  color: #495057;
+  margin-top: 20px;
+}
+
+.interview-row {
+  display: grid;
+  grid-template-columns: 2fr 3fr 2fr;
+  gap: 10px;
+  height: 26px;
+  padding: 8px 4px;
+}
+
+.interview-item .first {
+  color: #000;
+  background-color: #f5f5f5;
+}
+
+.interview-item .second {
+  border-bottom: 1px solid #e8e8e9;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 30px;
+}
+
+.info-row p {
+  border-bottom: 1px solid #ced4da;
+  width: 40%;
+}

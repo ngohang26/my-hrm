@@ -10,9 +10,10 @@ import AddUser from './AddUser.jsx';
 import { Modal } from '@mui/material';
 import PermissionTable from '../../components/Add/PermissionTable.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
+import {apiUrl} from '../../config'
 
 const getImageUrl = (image) => {
-  return `http://localhost:8080/api/FileUpload/files/images/${image}`;
+  return `${apiUrl}/api/FileUpload/files/images/${image}`;
 };
 
 const Users = () => {
@@ -71,7 +72,7 @@ const Users = () => {
   const fetchRolePermissions = async (roleId) => {
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://localhost:8080/users/role/${roleId}/permissions`, {
+      const response = await fetch(`${apiUrl}/users/role/${roleId}/permissions`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -94,7 +95,7 @@ const Users = () => {
     const token = localStorage.getItem('accessToken');
     const permissionIds = newPermissions.map(p => permissionMap[p.module][p.permission]);
     try {
-      const response = await fetch(`http://localhost:8080/users/${id}/change-permissions`, {
+      const response = await fetch(`${apiUrl}/users/${id}/change-permissions`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +121,7 @@ const Users = () => {
     const token = localStorage.getItem('accessToken');
     try {
       // Lấy thông tin vai trò của người dùng
-      const responseRole = await fetch(`http://localhost:8080/users/${id}/role`, {
+      const responseRole = await fetch(`${apiUrl}/users/${id}/role`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -131,7 +132,7 @@ const Users = () => {
         const responseRolePermissions = await fetchRolePermissions(roleId);
         const rolePermissions = responseRolePermissions || [];
 
-        const responseUserPermissions = await fetch(`http://localhost:8080/users/${id}/permissions`, {
+        const responseUserPermissions = await fetch(`${apiUrl}/users/${id}/permissions`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -174,7 +175,7 @@ const Users = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:8080/users/${selectedUserId}/form-box-for-admin`, {
+      const response = await fetch(`${apiUrl}/users/${selectedUserId}/form-box-for-admin`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -208,15 +209,19 @@ const Users = () => {
     },
     { field: 'username', headerName: 'MÃ NHÂN VIÊN', flex: 1 },
     { field: 'fullName', headerName: 'TÊN NHÂN VIÊN', flex: 1.4 },
-    { field: 'positionName', headerName: 'CHỨC VỤ', flex: 1 },
-
+    { 
+      field: 'positionName', 
+      headerName: 'CHỨC VỤ', 
+      flex: 1,
+      valueGetter: (params) => params.row.position ? params.row.position.positionName : '',
+    },
     {
       field: 'name',
       headerName: 'Role',
       renderCell: (params) => {
         let color;
         let backgroundColor;
-
+  
         switch (params.value) {
           case 'SUPER':
             color = '#fff';
@@ -258,6 +263,7 @@ const Users = () => {
       flex: 1
     },
   ];
+  
 
   const handleUserAdded = async () => {
     const updatedUsers = await fetchUsers();
@@ -267,7 +273,7 @@ const Users = () => {
 
   async function fetchUsers() {
     const token = localStorage.getItem('accessToken');
-    const response = await fetch('http://localhost:8080/users/all', {
+    const response = await fetch(`${apiUrl}/users/all`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

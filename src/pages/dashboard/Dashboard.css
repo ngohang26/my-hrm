@@ -1,6 +1,5 @@
 .dashboard {
   display: flex;
-  max-height:0%;
 }
 
 .dashboard .left-dashboard {
@@ -16,15 +15,13 @@
   justify-content: space-between;
   align-items: center;
   background-color: #e4dbff;
-  width: 94.5%;
   height: 130px;
   margin: 30px 0px;
-  padding: 4px 20px;
+  padding: 4px 10px;
   border-radius: 20px;
 }
 
 .dashboard .top-dashboard img {
-  width: 25vw;
   height: 22vh;
 }
 
@@ -64,5 +61,16 @@
   width: 310px;
   margin-left: 20px;
   margin-top: 20px;
-  padding: 20px;
+  padding: 0px 20px;
+}
+
+.dashboard .MuiDataGrid-root {
+  background-color: #fff;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.dashboard .MuiDataGrid-main {
+  padding: 20px 5px;
+
 }

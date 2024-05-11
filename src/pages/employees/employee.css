@@ -1,10 +1,12 @@
 .tablist, .tablist2 {
   display: flex;
+  cursor: pointer;
 }
 
 .tablist2 .tab-item {
   margin-right: 0px;
   border: 1px #ccc solid;
+  cursor: pointer;
 }
 
 .tablist2 .tab-item.active {
@@ -143,4 +145,35 @@ input[type="checkbox"] {
 
 .error {
   border-color: red;
+}
+
+.container-grid .grid-item progress {
+  width: 100px;
+  height: 15px;
+  border: 1px solid #d8dadd;
+    -webkit-appearance: none;  
+  appearance: none;
+}
+
+.container-grid .grid-item progress::-webkit-progress-bar {
+  background-color: white;  
+}
+
+.container-grid .grid-item progress::-webkit-progress-value {
+  background-color: RGBA(113, 75, 103, 1 );  
+}
+
+.skill-experience-item {
+  display: grid;
+  grid-template-columns: 3fr 2fr 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.skill-experience-item label {
+  white-space: nowrap;
+}
+
+.skill-experience-item .skill-experience-input input {
+  width: 50%;
 }

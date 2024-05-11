@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx'
 import { FiTrash, FiEdit } from 'react-icons/fi';
+import {apiUrl} from '../../config'
 
 const addJobPositionColumns = [
   { field: 'jobPositionName', headerName: 'CHỨC VỤ', flex: 1.5, },
@@ -16,7 +17,7 @@ const addJobPositionColumns = [
 
 async function fetchJobPositions() {
   const token = localStorage.getItem('accessToken');
-  const response = await fetch('http://localhost:8080/jobPositions/getAllJobPositions', {
+  const response = await fetch(`${apiUrl}/jobPositions/getAllJobPositions`, {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -33,7 +34,7 @@ async function fetchJobPositions() {
 async function addJobPosition(jobPosition) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/jobPositions/addJobPosition`, {
+    const response = await fetch(`${apiUrl}/jobPositions/addJobPosition`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -59,7 +60,7 @@ async function addJobPosition(jobPosition) {
 async function editJobPosition(id, jobPositionDetails) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/jobPositions/update/${id}`, {
+    const response = await fetch(`${apiUrl}/jobPositions/update/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ async function deleteJobPosition(id) {
   const token = localStorage.getItem('accessToken');
 
   try {
-    const response = await fetch(`http://localhost:8080/jobPositions/hardDelete/${id}`, {
+    const response = await fetch(`${apiUrl}/jobPositions/hardDelete/${id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`

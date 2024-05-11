@@ -3,7 +3,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import './employee.css'
-const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, positions, departments, fetchEmployees }) => {
+import { apiUrl } from '../../config'
+
+const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, positions, departments, fetchEmployees, selectedPositionId, setSelectedPositionId, selectedDepartmentId, setSelectedDepartmentId }) => {
 	const defaultImage = '/placeholder.png';
 
 	const [employeeData, setEmployeeData] = useState({
@@ -32,7 +34,13 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 	const [selectedFile, setSelectedFile] = useState();
 	const [provinces, setProvinces] = useState([]);
 	const [tabIndex2, setTabIndex2] = useState(0);
+	const handlePositionChange = (e) => {
+		setSelectedPositionId(e.target.value);
+	};
 
+	const handleDepartmentChange = (e) => {
+		setSelectedDepartmentId(e.target.value);
+	};
 	useEffect(() => {
 		if (mode === 'edit' && currentEmployee) {
 			setEmployeeData(currentEmployee);
@@ -61,107 +69,51 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 			});
 		}
 	}, [currentEmployee, mode]);
-
-	const addSkill = () => {
-		setEmployeeData(prevState => ({
-			...prevState,
-			skills: [...prevState.skills, { name: '', proficiency: '' }]
-		}));
-	};
-
-	const handleSkillChange = (e, index) => {
-		const { value } = e.target;
-		console.log(`handleSkillChange called with value: ${value} and index: ${index}`);
-		setEmployeeData(prevState => ({
-			...prevState,
-			skills: prevState.skills.map((skill, i) =>
-				i === index ? { ...skill, name: value } : skill
-			)
-		}));
-	};
-
-
-	const handleSkillProficiencyChange = (e, index) => {
-		const { value } = e.target;
-		setEmployeeData(prevState => ({
-			...prevState,
-			skills: prevState.skills.map((skill, i) =>
-				i === index ? { ...skill, proficiency: value } : skill
-			)
-		}));
-	};
-
-	const removeSkill = (index) => {
-		setEmployeeData(prevState => ({
-			...prevState,
-			skills: prevState.skills.filter((_, i) => i !== index)
-		}));
-	};
-
-	const addExperience = () => {
-		setEmployeeData(prevState => ({
-			...prevState,
-			experiences: [...prevState.experiences, { jobTitle: '', company: '', startDate: '', endDate: '' }]
-		}));
-	};
-
-	const handleExperienceChange = (e, index) => {
-		const { value } = e.target;
-		setEmployeeData(prevState => ({
-			...prevState,
-			experiences: prevState.experiences.map((experience, i) =>
-				i === index ? { ...experience, jobTitle: value } : experience
-			)
-		}));
-	};
-
-	const handleExperienceCompanyChange = (e, index) => {
-		const { value } = e.target;
-		setEmployeeData(prevState => ({
-			...prevState,
-			experiences: prevState.experiences.map((experience, i) =>
-				i === index ? { ...experience, company: value } : experience
-			)
-		}));
-	};
-
-	const handleExperienceStartDateChange = (e, index) => {
-		const { value } = e.target;
-		setEmployeeData(prevState => ({
-			...prevState,
-			experiences: prevState.experiences.map((experience, i) =>
-				i === index ? { ...experience, startDate: value } : experience
-			)
-		}));
-	};
-
-	const handleExperienceEndDateChange = (e, index) => {
-		const { value } = e.target;
-		setEmployeeData(prevState => ({
-			...prevState,
-			experiences: prevState.experiences.map((experience, i) =>
-				i === index ? { ...experience, endDate: value } : experience
-			)
-		}));
-	};
-
-	const removeExperience = (index) => {
-		setEmployeeData(prevState => ({
-			...prevState,
-			experiences: prevState.experiences.filter((_, i) => i !== index)
-		}));
-	};
-
+	const [skillNames, setSkillNames] = useState([]);
+	const [experienceNames, setExperienceNames] = useState([]);
+	useEffect(() => {
+		const token = localStorage.getItem("accessToken")
+		const fetchSkillNames = async () => {
+			const response = await fetch(`${apiUrl}/api/skillNames`, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			});
+			const data = await response.json();
+			setSkillNames(data);
+		}
+		fetchSkillNames();
+	}, []);
 
 	useEffect(() => {
-		const fetchProvinces = async () => {
-			const response = await fetch('https://vnprovinces.pythonanywhere.com/api/provinces/?basic=true&limit=100');
+		const token = localStorage.getItem("accessToken")
+		const fetchExperienceNames = async () => {
+			const response = await fetch(`${apiUrl}/api/experienceNames`, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			});
 			const data = await response.json();
-			const provinceNames = data.results.map(province => province.name);
-			setProvinces(provinceNames);
+			setExperienceNames(data);
 		}
-		fetchProvinces();
+		fetchExperienceNames();
 	}, []);
+
+useEffect(() => {
+    const fetchProvinces = async () => {
+        const response = await fetch(`https://vapi.vnappmob.com/api/province`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        const data = await response.json();
+        const provinceNames = data.results.map(results => results.province_name);
+        setProvinces(provinceNames);
+    }
+    fetchProvinces();
+}, []);
+
 
 	const handleFileChange = (e) => {
 		setSelectedFile(e.target.files[0]);
@@ -172,7 +124,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 		formData.append('file', selectedFile);
 		const token = localStorage.getItem('accessToken');
 
-		const response = await fetch('http://localhost:8080/api/FileUpload', {
+		const response = await fetch(`${apiUrl}/api/FileUpload`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${token}`
@@ -189,7 +141,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 	};
 
 	const getImageUrl = (image) => {
-		return `http://localhost:8080/api/FileUpload/files/images/${image}`;
+		return `${apiUrl}/api/FileUpload/files/images/${image}`;
 	};
 
 	const handleChange = (e) => {
@@ -201,6 +153,14 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 				...prevState,
 				personalInfo: {
 					...prevState.personalInfo,
+					[child]: value
+				},
+				position: {
+					...prevState.position,
+					[child]: value
+				},
+				department: {
+					...prevState.department,
 					[child]: value
 				}
 			}));
@@ -226,7 +186,10 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 
 		const employeeToSend = {
 			...employeeData,
-			image: image
+			image: image,
+			position: { id: selectedPositionId },
+			department: { id: selectedDepartmentId },
+
 		};
 
 		console.log("Data sent to server:", employeeToSend);
@@ -235,7 +198,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 		try {
 			let response;
 			if (mode === 'add') {
-				response = await fetch('http://localhost:8080/employees/addEmployee', {
+				response = await fetch(`${apiUrl}/employees/addEmployee`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -244,7 +207,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 					body: JSON.stringify(employeeToSend),
 				});
 			} else if (mode === 'edit') {
-				response = await fetch(`http://localhost:8080/employees/${employeeToSend.id}`, {
+				response = await fetch(`${apiUrl}/employees/${employeeToSend.id}`, {
 					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
@@ -293,19 +256,18 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 								<input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Full Name" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} />
 								<div style={{ display: "flex", gap: '20px', width: '101%' }}>
 
-									<select name="positionName" value={employeeData.positionName} onChange={handleChange} className='form-control select' >
+									<select name="positionName" value={selectedPositionId} onChange={handlePositionChange} className='form-control select' >
 										<option value=''>Chọn chức vụ ...</option>
 										{positions && positions.map((position, index) => (
-											<option key={index} value={position.positionName}>
+											<option key={index} value={position.id}>
 												{position.positionName}
 											</option>
 										))}
 									</select>
-
-									<select name="departmentName" value={employeeData.departmentName} onChange={handleChange} className='form-control select'>
+									<select name="departmentName" value={selectedDepartmentId} onChange={handleDepartmentChange} className='form-control select'>
 										<option value=''>Chọn bộ phận ...</option>
 										{departments && departments.map((department, index) => (
-											<option key={index} value={department.departmentName}>
+											<option key={index} value={department.id}>
 												{department.departmentName}
 											</option>
 										))}
@@ -331,63 +293,57 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 						</TabList>
 						<TabPanel>
 							<div className='container-grid'>
-								{/* Phần nhập thông tin kỹ năng */}
 								<div className="form-grid grid-item">
 									<label>KỸ NĂNG</label>
-									{employeeData.skills.map((skill, index) => (
-										<div key={index} className="item-info">
-											<input
-												type="text"
-												value={skill.name}
-												onChange={e => handleSkillChange(e, index)}
-												placeholder="Skill Name"
-											/>
-											<select
-												value={skill.proficiency}
-												onChange={e => handleSkillProficiencyChange(e, index)}
-											>
-												<option value="Beginner">Beginner</option>
-												<option value="Intermediate">Intermediate</option>
-												<option value="Advanced">Advanced</option>
-												<option value="Expert">Expert</option>
-											</select>
-											<button onClick={() => removeSkill(index)}>Remove</button>
-										</div>
-									))}
-									<button type='button' onClick={addSkill}>Add Skill</button>
+									{skillNames.map((skillName, index) => {
+										const skill = employeeData.skills.find(s => s.skillName.id === skillName.id);
+										return (
+											<div key={index} className="skill-experience-item">
+												<label>{skillName.name}</label>
+												<progress value={skill?.rating || 0} max="100" />
+												<div className='skill-experience-input'>
+
+													<input type="number" min="0" max="100" value={skill?.rating || ''} onChange={e => {
+														let newSkills = [...employeeData.skills];
+														if (skill) {
+															newSkills = newSkills.map(s => s.skillName.id === skillName.id ? { ...s, rating: e.target.value } : s);
+														} else {
+															newSkills.push({ skillName: { id: skillName.id }, rating: e.target.value });
+														}
+														setEmployeeData(prevState => ({ ...prevState, skills: newSkills }));
+													}} />
+													<span>%</span>
+												</div>
+											</div>
+										);
+									})}
+
 								</div>
 
-								{/* Phần nhập thông tin kinh nghiệm */}
 								<div className="form-grid grid-item">
 									<label>KINH NGHIỆM</label>
-									{employeeData.experiences.map((experience, index) => (
-										<div key={index} className="item-info">
-											<input
-												type="text"
-												value={experience.jobTitle}
-												onChange={e => handleExperienceChange(e, index)}
-												placeholder="Job Title"
-											/>
-											<input
-												type="text"
-												value={experience.company}
-												onChange={e => handleExperienceCompanyChange(e, index)}
-												placeholder="Company"
-											/>
-											<input
-												type="date"
-												value={experience.startDate}
-												onChange={e => handleExperienceStartDateChange(e, index)}
-											/>
-											<input
-												type="date"
-												value={experience.endDate}
-												onChange={e => handleExperienceEndDateChange(e, index)}
-											/>
-											<button onClick={() => removeExperience(index)}>Remove</button>
-										</div>
-									))}
-									<button type='button' onClick={addExperience}>Add Experience</button>
+									{experienceNames.map((experienceName, index) => {
+										const experience = employeeData.experiences.find(s => s.experienceName.id === experienceName.id);
+										return (
+											<div key={index} className="skill-experience-item">
+												<label>{experienceName.name}</label>
+												<progress value={experience?.rating || 0} max="100" />
+												<div className='skill-experience-input'>
+													<input type="number" min="0" max="100" value={experience?.rating || ''} onChange={e => {
+														let newSkills = [...employeeData.experiences];
+														if (experience) {
+															newSkills = newSkills.map(s => s.experienceName.id === experienceName.id ? { ...s, rating: e.target.value } : s);
+														} else {
+															newSkills.push({ experienceName: { id: experienceName.id }, rating: e.target.value });
+														}
+														setEmployeeData(prevState => ({ ...prevState, experiences: newSkills }));
+													}} />
+													<span>%</span>
+												</div>
+											</div>
+										);
+									})}
+
 								</div>
 							</div>
 						</TabPanel>

@@ -4,6 +4,7 @@ import '../employees/employee.css'
 import './ContractDetail.css'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {apiUrl} from '../../config'
 
 function ContractView() {
   const [contract, setContract] = useState(null);
@@ -13,7 +14,7 @@ function ContractView() {
   const token = localStorage.getItem('accessToken');
 
   useEffect(() => {
-    fetch(`http://localhost:8080/employees/${employeeCode}/contract`, {
+    fetch(`${apiUrl}/employees/${employeeCode}/contract`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

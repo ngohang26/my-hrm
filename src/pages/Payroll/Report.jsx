@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { PieChart, Pie, Cell } from 'recharts';
+import {apiUrl} from '../../config'
 
 const Report = () => {
   const [data, setData] = useState([]);
@@ -13,17 +14,17 @@ const Report = () => {
     const fetchData = async () => {
       const token = localStorage.getItem('accessToken');
 
-      const overtimeHoursResponse = await fetch(`http://localhost:8080/employeeSalary/totalOvertimeHoursByDepartment/${year}/${month}`, {
+      const overtimeHoursResponse = await fetch(`${apiUrl}/employeeSalary/totalOvertimeHoursByDepartment/${year}/${month}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const overtimeHours = await overtimeHoursResponse.json();
 
-      const incomeTaxResponse = await fetch(`http://localhost:8080/employeeSalary/totalIncomeTaxByDepartment/${year}/${month}`, {
+      const incomeTaxResponse = await fetch(`${apiUrl}/employeeSalary/totalIncomeTaxByDepartment/${year}/${month}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const incomeTax = await incomeTaxResponse.json();
 
-      const totalOvertimeHoursPerMonthResponse = await fetch(`http://localhost:8080/employeeSalary/totalOvertimeHoursPerMonth/${year}/${month}`, {
+      const totalOvertimeHoursPerMonthResponse = await fetch(`${apiUrl}/employeeSalary/totalOvertimeHoursPerMonth/${year}/${month}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const totalOvertimeHoursPerMonth = await totalOvertimeHoursPerMonthResponse.json();

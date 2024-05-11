@@ -9,18 +9,20 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx';
 import { FiTrash, FiEdit } from 'react-icons/fi';
+import {apiUrl} from '../../config'
 
 const addDepartmentColumns = [
   { field: 'departmentName', headerName: 'Tên bộ phận', flex: 2.5, },
   { field: 'managerCode', headerName: 'Mnv manager', flex: 1.3, },
 ];
 
-
 async function fetchDepartments() {
   const token = localStorage.getItem('accessToken');
-  const response = await fetch('http://localhost:8080/departments/getAllDepartments', {
+  const response = await fetch(`${apiUrl}/departments/getAllDepartments`, {
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      
     }
   });
   const departments = await response.json();
@@ -36,7 +38,7 @@ async function addDepartment(department, employeeCode) {
   const encodedEmployeeCode = encodeURIComponent(employeeCode);
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/departments/addDepartment?employeeCode=${encodedEmployeeCode}`, {
+    const response = await fetch(`${apiUrl}/departments/addDepartment?employeeCode=${encodedEmployeeCode}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +64,7 @@ async function addDepartment(department, employeeCode) {
 async function editDepartment(id, departmentDetails) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/departments/update/${id}`, {
+    const response = await fetch(`${apiUrl}/departments/update/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -89,10 +91,12 @@ async function editDepartment(id, departmentDetails) {
 async function deleteDepartment(id) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/departments/delete/${id}`, {
+    const response = await fetch(`${apiUrl}/departments/delete/${id}`, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+
       }
     });
 

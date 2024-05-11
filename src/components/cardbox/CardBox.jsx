@@ -1,38 +1,56 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import './cardbox.css'
 import { LuUsers2 } from "react-icons/lu";
-import { SlLike, SlEvent, SlCreditCard, SlCalculator, SlPieChart } from "react-icons/sl";
+import { FaRegFolderOpen } from "react-icons/fa";
+import { MdBadge } from 'react-icons/md';
+import { apiUrl } from '../../config';
+
+
+
+export const CardBox = () => {
+  const [summary, setSummary] = useState({});
+  const token = localStorage.getItem('accessToken');
+  useEffect(() => {
+    fetch(`${apiUrl}/summary/count`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+
+        console.log(data);
+        setSummary(data);
+      })
+    }, []);
+  
   const cardItems = [
     {
-      icon: <LuUsers2 />,
-      label: "Users"
+      icon: <LuUsers2 size={35}/>,
+      label: "Người dùng",
+      count: summary.userCount
     },
     {
-      icon: <SlLike />,
-      label: "Holidays"
+      icon: <FaRegFolderOpen size={35}/>,
+      label: "Ứng viên",
+      count: summary.candidateCount
     },
     {
-      icon: <SlEvent />,
-      label: "Events"
+      icon: <MdBadge size={35}/>,
+      label: "Nhân viên",
+      count: summary.employeeCount
     },
-    {
-      icon: <SlCreditCard   />,
-      label: "Payroll"
-    },
-
-    
-  ]
-export const CardBox = () => {
-
-
+  ];
   return (
     <div className='card-box'>
-      {cardItems.map((card) => (
-        <div className="card-item">
-            <span>{card.icon}</span>
-            <span>{card.label}</span>
-        </div>
-      ))}
+  {cardItems.map((card, index) => (
+    <div className={`card-item card-item-${index}`}>
+      <div className="card-tag">{card.count}</div>
+      <span>{card.icon}</span>
+      <span>{card.label}</span>
     </div>
+  ))}
+</div>
+
   )
 }

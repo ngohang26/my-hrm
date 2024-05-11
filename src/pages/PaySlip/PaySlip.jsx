@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './PaySlip.css'
 import { jwtDecode } from 'jwt-decode';
+import {apiUrl} from '../../config'
 
 const PaySlip = () => {
   const [employeeCode, setEmployeeCode] = useState(null);
@@ -33,7 +34,7 @@ const PaySlip = () => {
 
   async function fetchEmployeeSalaryDetails(employeeCode, year, month) {
     try {
-      const response = await fetch(`http://localhost:8080/employeeSalary/salaryDetails/${employeeCode}/${year}/${month}`, {
+      const response = await fetch(`${apiUrl}/employeeSalary/salaryDetails/${employeeCode}/${year}/${month}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

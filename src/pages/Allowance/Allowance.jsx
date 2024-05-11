@@ -9,16 +9,18 @@ import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx';
 import { FiTrash, FiEdit } from 'react-icons/fi';
 import EmployeeAllowance from './EmployeeAllowance.jsx';
+import { apiUrl } from '../../config.js';
 
 const addAllowanceColumns = [
   { field: 'allowanceName', headerName: 'Tên trợ cấp', flex: 2.5, },
   { field: 'allowanceAmount', headerName: 'Số tiền', flex: 1.3, },
 ];
 
+// const apiUrl = 'https://c870-116-98-34-179.ngrok-free.app'; 
 
 async function fetchAllowances() {
   const token = localStorage.getItem('accessToken');
-  const response = await fetch('http://localhost:8080/allowance/getAllAllowances', {
+  const response = await fetch(`${apiUrl}/allowance/getAllAllowances`, {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -35,7 +37,7 @@ async function fetchAllowances() {
 async function addAllowance(allowance) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/allowance/addAllowance`, {
+    const response = await fetch(`${apiUrl}/allowance/addAllowance`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +63,7 @@ async function addAllowance(allowance) {
 async function editAllowance(id, allowanceDetails) {
   const token = localStorage.getItem('accessToken');
   try {
-    const response = await fetch(`http://localhost:8080/allowance/updateAllowance/${id}`, {
+    const response = await fetch(`${apiUrl}/allowance/updateAllowance/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -88,7 +90,7 @@ async function deleteAllowance(id) {
   const token = localStorage.getItem('accessToken');
 
   try {
-    const response = await fetch(`http://localhost:8080/allowance/hardDelete/${id}`, {
+    const response = await fetch(`${apiUrl}/allowance/hardDelete/${id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`

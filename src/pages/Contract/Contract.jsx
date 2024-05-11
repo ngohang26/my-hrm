@@ -6,6 +6,8 @@ import FormComponent from '../../components/Add/FormComponent.jsx';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {FiEdit,FiEye} from 'react-icons/fi'
+import {apiUrl} from '../../config'
+
 const contractColumns = [
   { field: 'contractCode', headerName: 'Mã hợp đồng', flex: 3},
   { field: 'employeeCode', headerName: 'Mã nhân viên', flex: 2,},
@@ -42,7 +44,7 @@ const contractColumns = [
 
 async function fetchContracts() {
   const token = localStorage.getItem('accessToken');
-  const response = await fetch('http://localhost:8080/employees/contracts', {
+  const response = await fetch(`${apiUrl}/employees/contracts`, {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -53,7 +55,7 @@ async function fetchContracts() {
 async function fetchEmployeeCodes() {
   const token = localStorage.getItem('accessToken');
 
-  const response = await fetch('http://localhost:8080/employees/employeeCodes', {
+  const response = await fetch(`${apiUrl}/employees/employeeCodes`, {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -84,7 +86,7 @@ const Contract = () => {
   const handleFormSubmit = (formData) => {
   const token = localStorage.getItem('accessToken');
 
-    fetch(`http://localhost:8080/employees/${formData.employeeCode}/contract`, {
+    fetch(`${apiUrl}/employees/${formData.employeeCode}/contract`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

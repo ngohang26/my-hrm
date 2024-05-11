@@ -137,11 +137,6 @@ export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
         <div className="left-sidebar-item">
 
           <div className="dropdown">
-            {/* <a href="/x"><FaSearch className='navbar-link icon search' /></a>
-            <a href="/x"><FaCalendarAlt className='navbar-link icon calendar' /></a>
-            <a href="/x"><MdOutlineContactEmergency className='navbar-link icon contact' /></a>
-            <a href="/x"><IoChatbubbleEllipsesOutline className='navbar-link icon chat' /></a>
-            <a href="/x"><FaRegFolder className='navbar-link icon file' /></a> */}
           </div>
           <div className="dropdown">
             <span><IoSettings className='navbar-link icon setting' /></span>
