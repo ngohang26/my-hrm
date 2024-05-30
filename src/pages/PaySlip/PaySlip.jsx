@@ -3,8 +3,8 @@ import { Card, CardContent, Typography, Table, TableBody, TableCell, TableContai
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './PaySlip.css'
+import { apiUrl } from '../../config'
 import { jwtDecode } from 'jwt-decode';
-import {apiUrl} from '../../config'
 
 const PaySlip = () => {
   const [employeeCode, setEmployeeCode] = useState(null);
@@ -27,6 +27,14 @@ const PaySlip = () => {
   const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const token = localStorage.getItem('accessToken');
+  const [isDisabled, setIsDisabled] = useState(false);
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setIsDisabled(!decodedToken.authorities.includes('ADD_SALARY'));
+    }
+  }, []);
   useEffect(() => {
     const decodedToken = jwtDecode(token);
     setEmployeeCode(decodedToken.username);
@@ -34,14 +42,14 @@ const PaySlip = () => {
 
   async function fetchEmployeeSalaryDetails(employeeCode, year, month) {
     try {
-      const response = await fetch(`${apiUrl}/employeeSalary/salaryDetails/${employeeCode}/${year}/${month}`, {
+      const response = await fetch(`${apiUrl}/employeeSalary/salaryRecordDetails/${employeeCode}/${year}/${month}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
       if (!response.ok) {
         const errorMessage = await response.text();
-        throw new Error(errorMessage); 
+        throw new Error(errorMessage);
       }
       return await response.json();
     } catch (error) {
@@ -65,35 +73,35 @@ const PaySlip = () => {
         console.error('Error fetching data: ', error);
       });
   }, [employeeCode, year, month]);
-  
+
   useEffect(() => {
     if (employeeCode !== null) {
-      fetchData();
+      // fetchData();
     }
   }, [fetchData, employeeCode]);
-  
- 
+
+
   function formatCurrency(amount) {
     if (amount === undefined) {
       return '';
     }
-    
+
     const formattedAmount = amount.toLocaleString('vi-VN',);
     const integerPart = formattedAmount.split(',')[0];
     return integerPart;
   }
-  
-  
+
+
   return (
     <div className='pay-slip'>
       <ToastContainer />
-      <input type="text" value={employeeCode} onChange={e => setEmployeeCode(e.target.value)} placeholder="Nhập ID nhân viên" className='input-control'/>
-      <select value={year} onChange={e => setYear(Number(e.target.value))} className='input-control' >
+      <input type="text" value={employeeCode} onChange={e => setEmployeeCode(e.target.value)} placeholder="Nhập ID nhân viên" className='input-control' disabled={isDisabled} />
+      <select value={year} onChange={e => setYear(Number(e.target.value))} className='input-control' disabled={isDisabled}>
         {years.map(year => (
           <option key={year} value={year}>{year}</option>
         ))}
       </select>
-      <select value={month} onChange={e => setMonth(Number(e.target.value))} className='input-control'>
+      <select value={month} onChange={e => setMonth(Number(e.target.value))} className='input-control' disabled={isDisabled}>
         {months.map(month => (
           <option key={month} value={month}>{month}</option>
         ))}
@@ -114,13 +122,12 @@ const PaySlip = () => {
                   <TableBody>
                     <TableRow>
                       <TableCell>Họ và tên</TableCell>
-                      <TableCell>{employeeSalary.employeeName ? employeeSalary.employeeName : 'Loading...'}</TableCell>
+                      <TableCell>{employeeSalary.employee ? employeeSalary.employee.fullName : 'Loading...'}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Chức vụ</TableCell>
-                      <TableCell>{employeeSalary.departmentName}</TableCell>
+                      <TableCell>{employeeSalary ? employeeSalary.positionName : 'Loading...'}</TableCell>
                     </TableRow>
-
                     <TableRow>
                       <TableCell><b>Các khoản thu nhập</b></TableCell>
                       <TableCell><b>Số tiền</b></TableCell>

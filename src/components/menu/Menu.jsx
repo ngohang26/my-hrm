@@ -15,7 +15,7 @@ const menuItems = [
       { title: 'Bộ phận', path: '/hrm/departments', permission: 'ADD_DEPARTMENT' },
       { title: 'Nhân viên', path: '/hrm/employees', permission: 'ADD_EMPLOYEE' },
       { title: 'Hồ sơ của bạn', path: '/hrm/employee', permission: 'VIEW_EMPLOYEE' },
-      { title: 'Báo cáo', path: '/hrm/report', permission: 'VIEW_SALARY' }
+      { title: 'Báo cáo', path: '/hrm/report', permission: 'VIEW_USER' }
     ]
   },
   {

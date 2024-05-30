@@ -2,10 +2,8 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import './sidebar.css'
 import { TbBrand4Chan } from "react-icons/tb";
-import { FaSearch, FaCalendarAlt, FaUserAlt } from "react-icons/fa";
-import { MdOutlineContactEmergency } from "react-icons/md";
-import { IoChatbubbleEllipsesOutline, IoSettings, IoMenu } from "react-icons/io5";
-import { FaRegFolder } from "react-icons/fa";
+import { FaUserAlt } from "react-icons/fa";
+import { IoMenu } from "react-icons/io5";
 import { Menu } from '../menu/Menu';
 import { Modal } from '@mui/material';
 import { jwtDecode } from 'jwt-decode';
@@ -14,7 +12,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
-  const [showPassword, setShowPassword] = useState(false);
   const [openResetDialog, setOpenResetDialog] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
   const [password, setPassword] = useState('');
@@ -34,10 +31,6 @@ export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
     setIsUserMenuOpen(!isUserMenuOpen);
   }
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
   const handleCloseResetDialog = () => {
     setOpenResetDialog(false);
   }
@@ -52,14 +45,11 @@ export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
   const handleOpenEmailDialog = () => {
     const token = localStorage.getItem('accessToken');
     const decodeedToken = jwtDecode(token);
-    const email= decodeedToken.email;
+    const email = decodeedToken.email;
     setNewEmail(email);
     setOpenEmailDialog(true)
   }
-  
-  const handleSubmitEmail = () => {
-    handleOpenEmailDialog();
-  }
+
   const handleChangeEmail = async () => {
     const token = localStorage.getItem('accessToken');
     const decodedToken = jwtDecode(token);
@@ -133,16 +123,13 @@ export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
     <div className='sidebar'>
       <ToastContainer />
       <div className="left-sidebar">
-        <a href="/dashboard" className=''><TbBrand4Chan className='logo' /></a>
+        <a href="/dashboard" className='dashboard-logo'><TbBrand4Chan className='logo' /></a>
         <div className="left-sidebar-item">
-
           <div className="dropdown">
-          </div>
-          <div className="dropdown">
-            <span><IoSettings className='navbar-link icon setting' /></span>
+            {/* <span><IoSettings className='navbar-link icon setting' /></span> */}
             <span onClick={toggleUserMenu}><FaUserAlt className='navbar-link icon user' /></span>
             {isUserMenuOpen && (
-              <div className="user-menu">
+              <div className={`user-menu ${isMenuOpen ? 'menu-open' : ''}`}>
                 <button onClick={handleOpenEmailDialog}>Đổi email</button>
                 <button onClick={handleOpenResetDialog}>Đổi mật khẩu</button>
 
@@ -152,11 +139,10 @@ export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
             <Modal
               open={openEmailDialog}
               onClose={handleCloseEmailDialog}
-              aria-labelledby="modal-title"
-              aria-describedby="modal-description"
-            >
+              aria-labelledby="email-modal-title"
+              aria-describedby="email-modal-description" >
               <div className='user-form form-box'>
-                <h4>Đổi email</h4>
+              <h4 id="email-modal-title">Đổi email</h4>
                 <br />
                 <label>Nhập mật khẩu</label>
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Mật khẩu" className='form-control' />
@@ -171,11 +157,11 @@ export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
             <Modal
               open={openResetDialog}
               onClose={handleCloseResetDialog}
-              aria-labelledby="modal-title"
-              aria-describedby="modal-description"
+              aria-labelledby="reset-modal-title"
+              aria-describedby="reset-modal-description"
             >
               <div className='user-form form-box'>
-                <h4>Đổi mật khẩu</h4>
+              <h4 id="reset-modal-title">Đổi mật khẩu</h4>
                 <br />
                 <label>Nhập mật khẩu cũ</label>
                 <input type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} placeholder="Mật khẩu cũ" className='form-control' />

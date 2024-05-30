@@ -1,0 +1,120 @@
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  @media screen and (max-width: 1400px) {
+      font-size: 14px;
+  }
+}
+
+.title span {
+  font-size: 12px;
+}
+
+.chart-container {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  grid-auto-rows: minmax(90px, auto);
+  gap: 13px;
+}
+
+.reports h2, .reports h3, .reports h4 {
+  color: #5a527a;
+}
+
+.chart-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 10px 10px 0px 8px;
+}
+
+.chart-item2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px 0px 8px;
+  background-color: #fff;
+  border-radius: 15px;
+  margin-left: 10px;
+}
+
+.chart-large {
+  grid-column: span 2; 
+  grid-row: span 2; 
+}
+
+.chart-gauge {
+  display: flex;
+}
+
+.grid-left {
+  flex: 5;
+  margin-right: 15px;
+}
+
+.chart-employee {
+  flex: 2;
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.reports .grid-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #fff;
+
+}
+
+.reports .grid-item h2 {
+  margin-top: 10px;
+}
+
+.reports .grid-item p {
+  margin-top: 5px;
+}
+
+.report-employee {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.report {
+  display: flex;
+}
+
+.grid-items {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.reports .grid-item span {
+  font-size: 13px;
+}
+
+.chart-working-hours {
+  padding: 20px 0px;
+}
+
+.bottom-report {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}

@@ -6,20 +6,27 @@ import {apiUrl} from '../../config'
 
 const payrollColumns = [
   { field: 'employeeCode', headerName: 'Mã nhân viên', flex: 2 },
-  { field: 'employeeName', headerName: 'Tên nhân viên', flex: 3 },
-  { field: 'positionName', headerName: 'Chức vụ', flex: 2.5 },
-  { field: 'netSalary', headerName: 'Lương', flex: 2.5 },
+  { field: 'employee', headerName: 'Chức vụ', flex: 2.5,
+  valueGetter: (params) => params.row.employee.fullName,
+  
+},  
+{ field: 'positionName', headerName: 'Tên nhân viên', flex: 3 },
+{ field: 'netSalary', headerName: 'Lương', flex: 2.5 },
   { field: 'totalOvertimeHours', headerName: 'Giờ làm thêm', flex: 1.5 },
 ];
 
 async function fetchPayroll(year, month) {
   const token = localStorage.getItem('accessToken');
-  const response = await fetch(`${apiUrl}/employeeSalary/allSalaryDetails/${year}/${month}`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
-  return await response.json();
+  try {
+      const response = await fetch(`${apiUrl}/employeeSalary/allSalaryRecords/${year}/${month}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+      }
 }
 
 function formatCurrency(value) {

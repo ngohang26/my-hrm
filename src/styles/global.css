@@ -15,8 +15,8 @@
 
 .menuContainer {
     width: fit-content;
-    padding: 5px 20px;
-    border-right: 1px solid #e6e9ed;
+    padding: 5px 12px 5px 30px;
+    /* border-right: 1px solid #e6e9ed;  */
     transition: all .3s ease-in-out;
   
 }
@@ -27,7 +27,12 @@
     width: 100%;
     min-height: 100vh;
 }
-
+.menu {
+    position: fixed;
+    width: 200px;  
+    height: 100%;
+    overflow-y: auto;
+}
 /* .contentContainer.menuOpen {
 }
 

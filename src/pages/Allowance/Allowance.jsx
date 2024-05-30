@@ -16,7 +16,6 @@ const addAllowanceColumns = [
   { field: 'allowanceAmount', headerName: 'Số tiền', flex: 1.3, },
 ];
 
-// const apiUrl = 'https://c870-116-98-34-179.ngrok-free.app'; 
 
 async function fetchAllowances() {
   const token = localStorage.getItem('accessToken');
@@ -199,14 +198,15 @@ const Allowance = () => {
     setIsFormOpen(true)
 };
   return (
+    <>
     <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
-      <ToastContainer/>
       <TabList className='tablist'>
         <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
         <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>Trợ cấp của nhân viên</Tab>      
       </TabList>
 
       <TabPanel style={{display: 'flex', justifyContent: 'center'}}>
+      <ToastContainer/>
         <div className='allowances'>
         <div className='info'>
           <button onClick={openForm} className='btn-add'>+ Thêm</button>
@@ -226,6 +226,7 @@ const Allowance = () => {
         <EmployeeAllowance/>
       </TabPanel>
       </Tabs>
+    </>
 
   );
 }

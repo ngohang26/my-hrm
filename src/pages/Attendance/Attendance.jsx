@@ -7,7 +7,7 @@ import { FiEdit } from 'react-icons/fi'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PermissionContext from '../../Auth/PermissionContext';
-import {apiUrl} from '../../config'
+import { apiUrl } from '../../config'
 
 const Attendance = () => {
   const [attendances, setAttendances] = useState([]);
@@ -51,7 +51,7 @@ const Attendance = () => {
     }
     return false;
   });
-  
+
 
   const handleEditTime = (attendance) => {
     setEditingAttendance(attendance);
@@ -118,6 +118,7 @@ const Attendance = () => {
       <div className="attendance-header">
         <div>
           <select name="" id="" value={filterType} onChange={(e) => setFilterType(e.target.value)} className='input-control'>
+            <option>Chọn kiểu ...</option>
             <option value="day">Ngay</option>
             <option value="month">Thang</option>
           </select>
@@ -125,6 +126,9 @@ const Attendance = () => {
             : <input type="month" value={selectedMonth ? selectedMonth.toISOString().substr(0, 7) : ''} onChange={e => setSelectedMonth(new Date(e.target.value))} className='input-control' />
 
           }
+
+
+
         </div>
         <button onClick={() => { setFilterType('all'); setDateFilter(new Date()); setSelectedMonth(null); }} className='btn-submit'>Hiển thị tất cả</button>
       </div>

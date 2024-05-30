@@ -7,14 +7,28 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {FiEdit,FiEye} from 'react-icons/fi'
 import {apiUrl} from '../../config'
+const contractStatusMapping = {
+  0: 'ACTIVE',
+  1: 'CANCELLED',
+  2: 'EXPIRED',
+};
 
 const contractColumns = [
   { field: 'contractCode', headerName: 'Mã hợp đồng', flex: 3},
   { field: 'employeeCode', headerName: 'Mã nhân viên', flex: 2,},
   { field: 'fullName', headerName: 'Tên nhân viên',flex: 3,},
-  { field: 'positionName', headerName: 'Chức vụ', flex: 2.5,},
+  { field: 'positionName', headerName: 'Chức vụ', flex: 2.5,
+    valueGetter: (params) => params.row.position.positionName,
+    
+  },
   { field: 'startDate', headerName: 'Ngày bắt đầu', flex: 2.5,  },
   { field: 'endDate', headerName: 'Ngày kết thúc', flex: 2.5,},
+  { 
+    field: 'contractStatus', 
+    headerName: 'Tình trạng', 
+    flex: 2.5,
+    valueGetter: (params) => params.value 
+  },
   {
     field: 'monthlySalary',
     headerName: 'Lương cơ bản',
@@ -147,7 +161,9 @@ const Contract = () => {
     <div>
       <ToastContainer/>
         <div className='info'>
-          <button onClick={openForm} className='btn-add' onCalcel={closeForm}>+ Thêm</button>
+          <button onClick={openForm} className='btn-add' onCancel={closeForm}>+ Thêm</button>
+
+
         </div>
       <DataTable columns={contractColumns} data={contracts} slug="contract" showEditColumn={false} />;
       {isFormOpen && (

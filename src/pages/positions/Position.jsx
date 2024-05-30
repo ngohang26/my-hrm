@@ -8,18 +8,18 @@ import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx'
 import { FiTrash, FiEdit } from 'react-icons/fi';
 import { apiUrl } from '../../config.js';
 
-const addPositionColumns = [
-  {
-    field: 'positionName',
-    headerName: 'CHỨC VỤ',
-    flex: 1.5,
-  },
-  {
-    field: 'jobSummary',
-    headerName: 'TÓM TẮT',
-    flex: 2.5,
-  }
-];
+async function fetchDepartments() {
+  const token = localStorage.getItem('accessToken');
+  const response = await fetch(`${apiUrl}/departments/getAllDepartments`, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  });
+  const departments = await response.json();
+  return departments;
+}
+
 
 async function fetchPositions() {
   const token = localStorage.getItem('accessToken');
@@ -40,6 +40,11 @@ async function fetchPositions() {
 
 async function addPosition(position) {
   const token = localStorage.getItem('accessToken');
+  const positionData = {
+    ...position,
+    department: { id: position.department },
+  };
+  console.log('Data being sent to server:', positionData); // Log data here
   try {
     const response = await fetch(`${apiUrl}/positions/addPosition`, {
       method: 'POST',
@@ -47,9 +52,8 @@ async function addPosition(position) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(position)
-    });
-
+      body: JSON.stringify(positionData)
+    }); 
     if (response.ok) {
       toast.success('Thêm chức vụ thành công');
     } else if (response.status === 500) {
@@ -66,6 +70,11 @@ async function addPosition(position) {
 
 async function editPosition(id, positionDetails) {
   const token = localStorage.getItem('accessToken');
+  const positionData = {
+    ...positionDetails,
+    department: { id: positionDetails.department },
+  };
+  console.log('Data being sent to server:', positionData); // Log data here
   try {
     const response = await fetch(`${apiUrl}/positions/update/${id}`, {
       method: 'PUT',
@@ -73,7 +82,7 @@ async function editPosition(id, positionDetails) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(positionDetails)
+      body: JSON.stringify(positionData)
     });
 
     if (response.ok) {
@@ -97,14 +106,19 @@ async function deletePosition(id) {
     const response = await fetch(`${apiUrl}/positions/delete/${id}`, {
       method: 'DELETE',
       headers: {
-        
-        Authorization: `Bearer ${token}`
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       }
     });
 
+    const responseData = await response.json();  
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      toast.error(responseData.message);
+      throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
     }
+
+    toast.success('Xóa chức vụ thành công');
   } catch (error) {
     console.error('Failed to delete position:', error);
   }
@@ -116,11 +130,29 @@ const Position = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [positionToDelete, setPositionToDelete] = useState(null);
   const [editing, setEditing] = useState({});
+  const [departments, setDepartments] = useState([]);
   const openDeleteModal = (id) => {
     setPositionToDelete(id);
     setIsDeleteModalOpen(true);
   };
-
+  const addPositionColumns = [
+    {
+      field: 'positionName',
+      headerName: 'CHỨC VỤ',
+      flex: 1.5,
+    },
+    {
+      field: 'jobSummary',
+      headerName: 'TÓM TẮT',
+      flex: 2.5,
+    },
+    {
+      field: 'department',
+      headerName: 'PHÒNG BAN',
+      type: 'select',
+      options: departments.map(department => ({ id: department.id, name: department.departmentName })),
+    },
+  ];
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
   };
@@ -133,25 +165,23 @@ const Position = () => {
     }
     closeDeleteModal();
   };
-
   const handleFormSubmit = async (data) => {
     try {
       const positionDetails = {
         positionName: data.positionName,
-        jobSummary: data.jobSummary
+        jobSummary: data.jobSummary,
+        department: data.department
       };
       if (!editing.id) {
-        await addPosition(positionDetails, data);
+        await addPosition(positionDetails);
         const updatedPositions = await fetchPositions();
         setPositions(updatedPositions);
         setIsFormOpen(false);
         setEditing({});
       } else {
-        await editPosition(editing.id, data);
+        await editPosition(editing.id, positionDetails); 
         const updatedPositions = await fetchPositions();
-
         setPositions(updatedPositions);
-
         setIsFormOpen(false);
         setEditing({});
       }
@@ -159,11 +189,14 @@ const Position = () => {
       console.error('Failed to add or update position:', error);
     }
   }
+  
 
   useEffect(() => {
     const fetchInitialData = async () => {
       const initialPositions = await fetchPositions();
       setPositions(initialPositions);
+      const initialDepartments = await fetchDepartments();
+      setDepartments(initialDepartments);
     }
 
     fetchInitialData();
@@ -193,14 +226,22 @@ const Position = () => {
     };
   }, []);
   const handleEdit = (row) => {
-    setEditing(row)
-    setIsFormOpen(true)
+    setEditing({
+      ...row,
+      department: row.department.id,
+    });
+    setIsFormOpen(true);
   };
+  
 
   const positionColumns = [
-    { field: 'order', headerName: 'STT', flex: 1, },
+    { field: 'order', headerName: 'STT', flex: 0.5, },
     { field: 'positionName', headerName: 'CHỨC VỤ', flex: 1.5, },
     { field: 'jobSummary', headerName: 'TÓM TẮT', flex: 2.5, },
+    { field: 'employeeCount', headerName: 'SỐ NV', flex: 1},
+    {field: 'departmentName', headerName: 'BỘ PHẬN', flex: 1.5, 
+      valueGetter: (params) => params.row.department.departmentName
+    },
     {
       field: 'actions', headerName: 'Hành động', flex: 1, renderCell: (params) => (
         <div className='action'>
@@ -215,18 +256,18 @@ const Position = () => {
     },
   ];
   return (
-    <div className='positions' style={{width: '50vw'}}>
+    <div className='positions' style={{ width: '70vw' }}>
       <ToastContainer />
       <div className='info'>
         <button onClick={openForm} className='btn-add'>+ Thêm</button>
       </div>
 
-        <DataTable columns={positionColumns} data={positions} slug="position" showEditColumn={false} />;
-        {isFormOpen && (
-          <div className="overlay" onClick={closeForm}>
-            <FormComponent fields={addPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
-          </div>
-        )}
+      <DataTable columns={positionColumns} data={positions} slug="position" showEditColumn={false} />;
+      {isFormOpen && (
+        <div className="overlay" onClick={closeForm}>
+          <FormComponent fields={addPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
+        </div>
+      )}
       <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
     </div>
 

@@ -6,14 +6,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx'
 import { FiTrash, FiEdit } from 'react-icons/fi';
-import {apiUrl} from '../../config'
-
-const addJobPositionColumns = [
-  { field: 'jobPositionName', headerName: 'CHỨC VỤ', flex: 1.5, },
-  { field: 'jobDescription', headerName: 'Mô tả công việc', flex: 2.5, },
-  { field: 'skillsRequired', headerName: 'Yêu cầu', flex: 2.5, },
-  { field: 'applicationDeadline', headerName: 'Thời hạn', flex: 2.5, },
-];
+import { apiUrl } from '../../config'
+import { type } from '@testing-library/user-event/dist/type/index.js';
 
 async function fetchJobPositions() {
   const token = localStorage.getItem('accessToken');
@@ -30,9 +24,25 @@ async function fetchJobPositions() {
   }));
 }
 
+async function fetchPositions() {
+  const token = localStorage.getItem('accessToken');
+  const response = await fetch(`${apiUrl}/positions/getAllPositions`, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  });
+  const positions = await response.json();
+  return positions;
+}
 
 async function addJobPosition(jobPosition) {
   const token = localStorage.getItem('accessToken');
+  const jobPositionData = {
+    ...jobPosition,
+    position: { id: jobPosition.position },
+  };
+  console.log('Data being sent to server:', jobPositionData); // Log data here
   try {
     const response = await fetch(`${apiUrl}/jobPositions/addJobPosition`, {
       method: 'POST',
@@ -40,9 +50,8 @@ async function addJobPosition(jobPosition) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(jobPosition)
+      body: JSON.stringify(jobPositionData)
     });
-
     if (response.ok) {
       toast.success('Thêm vị trí ứng tuyển thành công');
     } else if (response.status === 500) {
@@ -59,6 +68,11 @@ async function addJobPosition(jobPosition) {
 
 async function editJobPosition(id, jobPositionDetails) {
   const token = localStorage.getItem('accessToken');
+  const jobPositionData = {
+    ...jobPositionDetails,
+    position: { id: jobPositionDetails.position },
+  };
+  console.log('Data being sent to server:', jobPositionData); // Log data here
   try {
     const response = await fetch(`${apiUrl}/jobPositions/update/${id}`, {
       method: 'PUT',
@@ -66,9 +80,8 @@ async function editJobPosition(id, jobPositionDetails) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(jobPositionDetails)
+      body: JSON.stringify(jobPositionData)
     });
-
     if (response.ok) {
       toast.success('Sửa vị trí ứng tuyển thành công');
     } else if (response.status === 500) {
@@ -108,6 +121,19 @@ const JobPosition = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [jobPositionToDelete, setJobPositionToDelete] = useState(null);
   const [editing, setEditing] = useState({});
+  const [positions, setPositions] = useState([])
+  const addJobPositionColumns = [
+    { field: 'jobPositionName', headerName: 'Vị trí ứng tuyển'},
+    {
+      field: 'position',
+      headerName: 'Chức vụ',
+      type: 'select',
+      options: positions.map(position => ({ id: position.id, name: position.positionName })),
+    },
+    { field: 'skillsRequired', headerName: 'Yêu cầu', flex: 2.5, },
+    { field: 'applicationDeadline', headerName: 'Thời hạn', flex: 2.5, type: Date},
+  ];
+
   const openDeleteModal = (id) => {
     setJobPositionToDelete(id);
     setIsDeleteModalOpen(true);
@@ -129,17 +155,21 @@ const JobPosition = () => {
   const handleFormSubmit = async (data) => {
     try {
       const jobPositionDetails = {
+        position: data.position,
         jobPositionName: data.jobPositionName,
-        jobSummary: data.jobSummary
+        skillsRequired: data.skillsRequired,
+        applicationDeadline: data.applicationDeadline
       };
       if (!editing.id) {
         await addJobPosition(jobPositionDetails, data);
         const updatedJobPositions = await fetchJobPositions();
+        
         setJobPositions(updatedJobPositions);
         setIsFormOpen(false);
         setEditing({});
       } else {
-        await editJobPosition(editing.id, data);
+        await editJobPosition(editing.id, jobPositionDetails);
+        
         const updatedJobPositions = await fetchJobPositions();
 
         setJobPositions(updatedJobPositions);
@@ -154,6 +184,8 @@ const JobPosition = () => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      const initialPositions = await fetchPositions();
+      setPositions(initialPositions);
       const initialJobPositions = await fetchJobPositions();
       setJobPositions(initialJobPositions);
     }
@@ -185,16 +217,26 @@ const JobPosition = () => {
     };
   }, []);
   const handleEdit = (row) => {
-    setEditing(row)
-    setIsFormOpen(true)
+    setEditing({
+      ...row,
+      position: row.position.id,
+    });
+    setIsFormOpen(true);
   };
 
   const jobPositionColumns = [
-    { field: 'order', headerName: 'STT', flex: 1, },
-    { field: 'jobPositionName', headerName: 'CHỨC VỤ', flex: 1.5, },
-    { field: 'jobDescription', headerName: 'Mô tả công việc', flex: 2.5, },
+    { field: 'order', headerName: 'STT', flex: 0.5, },
+    { field: 'jobPositionName', headerName: 'VỊ TRÍ ỨNG TUYỂN', flex: 2.2},
+    {
+      field: 'positionName', headerName: 'CHỨC VỤ', flex: 1.5,
+      valueGetter: (params) => params.row.position.positionName
+    },
+    {
+      field: 'jobSummary', headerName: 'MÔ TẢ', flex: 1.5,
+      valueGetter: (params) => params.row.position.jobSummary
+    },
     { field: 'skillsRequired', headerName: 'Yêu cầu', flex: 2.5, },
-    { field: 'applicationDeadline', headerName: 'Thời hạn', flex: 2.5, },
+    { field: 'applicationDeadline', headerName: 'Thời hạn', flex: 1, },
     {
       field: 'actions', headerName: 'Hành động', flex: 1, renderCell: (params) => (
         <div className='action'>
@@ -209,23 +251,23 @@ const JobPosition = () => {
     },
   ];
   return (
-    <div style={{display: 'flex', justifyContent: 'center'}}>
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
 
-    <div className='jobPositions' style={{ width: '50vw' }}>
-      <ToastContainer />
-      <h4>Vị trí tuyển dụng</h4>
-      <div className='info'>
-        <button onClick={openForm} className='btn-add'>+ Thêm</button>
-      </div>
-
-      <DataTable columns={jobPositionColumns} data={jobPositions} slug="jobPosition" showEditColumn={false} />;
-      {isFormOpen && (
-        <div className="overlay" onClick={closeForm}>
-          <FormComponent fields={addJobPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
+      <div className='jobPositions' style={{ width: '75vw' }}>
+        <ToastContainer />
+        <h4>Vị trí tuyển dụng</h4>
+        <div className='info'>
+          <button onClick={openForm} className='btn-add'>+ Thêm</button>
         </div>
-      )}
-      <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
-    </div>
+
+        <DataTable columns={jobPositionColumns} data={jobPositions} slug="jobPosition" showEditColumn={false} />;
+        {isFormOpen && (
+          <div className="overlay" onClick={closeForm}>
+            <FormComponent fields={addJobPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
+          </div>
+        )}
+        <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+      </div>
     </div>
 
 

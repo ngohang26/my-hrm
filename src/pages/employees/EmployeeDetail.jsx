@@ -18,8 +18,12 @@ export const EmployeeDetail = () => {
     phoneNumber: '',
     image: '',
     workEmail: '',
-    positionName: '',
-    departmentName: '',
+    position: {
+      positionName: ''
+    },
+    department: {
+      departmentName: ''
+    },
     personalInfo: {
       nationality: '',
       birthPlace: '',
@@ -73,21 +77,21 @@ export const EmployeeDetail = () => {
         <div>
           <div className='employee-info' style={{ display: "flex", flexWrap: 'wrap' }}>
             <div className="" style={{ flex: '2 0 50%', padding: '10px' }}>
-              <input type="text" name="fullName" id='fullName' value={employeeData.fullName} className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} readOnly />
+              <input type="text" name="fullName" id='fullName' defaultValue={employeeData.fullName} className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} readOnly />
               <div style={{ display: "flex", gap: '20px', width: '101%' }}>
 
-                <select name="positionName" value={employeeData.positionName} className='form-control select' disabled>
-                  <option value=''>{employeeData.position.positionName}</option>
+                <select className='form-control select' disabled>
+                  <option>{employeeData.position.positionName}</option>
                 </select>
 
-                <select name="departmentName" value={employeeData.departmentName} className='form-control select' disabled>
-                  <option value=''>{employeeData.department.departmentName}</option>
+                <select className='form-control select' disabled>
+                  <option>{employeeData.department.departmentName}</option>
                 </select>
 
               </div>
               <div style={{ display: "flex", gap: '20px', width: '93%' }}>
-                <input type="text" name="phoneNumber" value={employeeData.phoneNumber} className='form-control more' />
-                <input type="text" name="workEmail" value={employeeData.workEmail} className='form-control more' />
+                <input type="text" name="phoneNumber" defaultValue={employeeData.phoneNumber} className='form-control more' />
+                <input type="text" name="workEmail" defaultValue={employeeData.workEmail} className='form-control more' />
               </div>
             </div>
             <label className='empl-avt'>
@@ -100,9 +104,7 @@ export const EmployeeDetail = () => {
         <Tabs style={{ backgroundColor: '#fff' }}>
           <TabList className="tablist2">
             <Tab className={`tab-item ${tabIndex2 === 0 ? 'active' : ''}`} onClick={() => setTabIndex2(0)}>Tiếp tục</Tab>
-            <Tab className={`tab-item ${tabIndex2 === 1 ? 'active' : ''}`} onClick={() => setTabIndex2(1)}>Thông tin công việc</Tab>
-            <Tab className={`tab-item ${tabIndex2 === 2 ? 'active' : ''}`} onClick={() => setTabIndex2(2)}>Thông tin riêng tư</Tab>
-            <Tab className={`tab-item ${tabIndex2 === 3 ? 'active' : ''}`} onClick={() => setTabIndex2(3)}>Thiết lập nhân lực</Tab>
+            <Tab className={`tab-item ${tabIndex2 === 1 ? 'active' : ''}`} onClick={() => setTabIndex2(1)}>Thông tin riêng tư</Tab>
           </TabList>
           <TabPanel>
             <div className='container-grid'>
@@ -135,9 +137,7 @@ export const EmployeeDetail = () => {
               </div>
             </div>
           </TabPanel>
-          <TabPanel>
-            Thông tin công việc
-          </TabPanel>
+
           <TabPanel>
             <div className='container-grid'>
               <div className="form-grid grid-item">
@@ -167,18 +167,11 @@ export const EmployeeDetail = () => {
                 </div>
                 <div className="item-info">
                   <label>Nơi sinh</label>
-                  <select name="personalInfo.birthPlace" value={employeeData.personalInfo.birthPlace} >
-                    <option value="">Chọn tỉnh ...</option>
-                    {provinces.map((province, index) => (
-                      <option key={index} value={province}>
-                        {province}
-                      </option>
-                    ))}
-                  </select>
+                  <input type="text" name="personalInfo.birthPlace" value={employeeData.personalInfo.birthPlace} />
                 </div>
                 <div className="item-info">
                   <label>Giới tính</label>
-                  <select name="personalInfo.sex" value={employeeData.personalInfo.sex} >
+                  <select name="personalInfo.sex" value={employeeData.personalInfo.sex} disabled >
                     <option value="">Chọn giới tính...</option>
                     <option value="Nam">Nam</option>
                     <option value="Nữ">Nữ</option>
@@ -198,7 +191,7 @@ export const EmployeeDetail = () => {
                 <label>GIÁO DỤC</label>
                 <div className="item-info">
                   <label>Cấp bằng</label>
-                  <select name="personalInfo.certificateLevel" value={employeeData.personalInfo.certificateLevel} >
+                  <select name="personalInfo.certificateLevel" value={employeeData.personalInfo.certificateLevel} disabled>
                     <option value="">Chọn cấp...</option>
                     <option value="Tốt nghiệp">Tốt nghiệp</option>
                     <option value="Cử nhân">Cử nhân</option>
@@ -218,9 +211,7 @@ export const EmployeeDetail = () => {
               </div>
             </div>
           </TabPanel>
-          <TabPanel>
-            Tttt
-          </TabPanel>
+
         </Tabs>
       </Tabs>
     </>

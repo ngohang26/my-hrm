@@ -5,19 +5,25 @@ import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { PieChart, Pie, Cell, Tooltip, Legend, Treemap } from 'recharts';
 import { apiUrl } from '../../config'
+import { jwtDecode } from 'jwt-decode';
 import { DataGrid } from '@mui/x-data-grid';
 
 export const Dashboard = () => {
   const [date, setDate] = useState(new Date());
   const [genderData, setGenderData] = useState([]);
-  const [departmentData, setDepartmentData] = useState([]);
   const COLORS = ['#494764', '#cfcee9'];
   const [candidates, setCandidates] = useState([]);
+  const token = localStorage.getItem('accessToken');
+  const decodedToken = jwtDecode(token);
+  const positionName = decodedToken.positionName;
 
   const onChange = (date) => {
     setDate(date);
   };
+  const [loading, setLoading] = useState(true);
+
   const fetchCandidates = async () => {
+    setLoading(true);
     const token = localStorage.getItem('accessToken');
     try {
       const response = await fetch(`${apiUrl}/candidates/getAllCandidates`, {
@@ -31,6 +37,7 @@ export const Dashboard = () => {
     } catch (error) {
       console.error('Error:', error);
     }
+    setLoading(false);
   };
 
   const tableColumns = [
@@ -143,13 +150,19 @@ export const Dashboard = () => {
       <div className="left-dashboard">
         <div className="top-dashboard">
           <div className="top-text">
-            <h2>Xin chào,</h2>
-            <p>xxxxxx</p>
+            <h2>Xin chào, {positionName}</h2>
+            <p> 👋 👋 👋</p>
           </div>
           <img src='/HR_dashboard.png'></img>
         </div>
         <CardBox />
         <div>
+        {loading ? (
+          <div className="empty-data">
+            <img src="/empty.png" alt="Empty data" />
+            <div>Đang tải dữ liệu...</div>
+          </div>
+        ) : (
           <DataGrid
             rows={candidates}
             columns={tableColumns}
@@ -160,8 +173,8 @@ export const Dashboard = () => {
             disableColumnMenu={true}
             hideFooter
           />
-
-        </div>
+        )}
+      </div>
       </div>
       <div className="right-dashboard">
         <div className='calendar'>

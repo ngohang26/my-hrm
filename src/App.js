@@ -21,9 +21,12 @@ import PermissionContext from './Auth/PermissionContext';
 import { jwtDecode } from 'jwt-decode';
 import YourContract from './pages/Contract/YourContract';
 import Allowance from './pages/Allowance/Allowance';
-import Report from './pages/Payroll/Report';
 import JobPosition from './pages/Recruitment/JobPosition';
 import Candidate from './pages/Recruitment/Candidate';
+// import { Menu } from '@mui/material';
+import TerminationReason from './pages/TerminationReason/TerminationReason';
+import Report from './Report/Report';
+import { Menu } from './components/menu/Menu';
 
 const queryClient = new QueryClient();
 
@@ -43,10 +46,10 @@ function App() {
     return (
       <div className='main'>
         <div className='container'>
-          <div className='menuContainer'>
+          <div className='menuContainer' style={{ backgroundColor: "#fff" }}>
             <SideBar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
           </div>
-          <div className='contentContainer'>
+          <div className='contentContainer' style={{ marginLeft: `${isMenuOpen ? '210px' : '0'}` }}>
             <br />
             <QueryClientProvider client={queryClient}>
 
@@ -54,7 +57,6 @@ function App() {
             </QueryClientProvider>
           </div>
         </div>
-        {/* <Footer /> */}
       </div>
     )
   }
@@ -88,6 +90,10 @@ function App() {
         {
           path: "employee",
           element: <EmployeeDetail />
+        },
+        {
+          path: "employee/termination-reasons",
+          element: <TerminationReason />
         },
         {
           path: "departments",

@@ -206,9 +206,9 @@ const CandidateForm = ({ mode, currentCandidate, setTabIndex, setShowEditTab, jo
 				} else if (mode === 'edit') {
 					toast.success('Chỉnh sửa thông tin nhân viên thành công');
 					fetchCandidates();
-					setShowEditTab(false)
 					setTimeout(() => {
 						setTabIndex(0);
+						setShowEditTab(false)
 					}, 1000);
 
 				}
@@ -239,10 +239,13 @@ const CandidateForm = ({ mode, currentCandidate, setTabIndex, setShowEditTab, jo
 						<div class='candidate-info'>
 							<div class='input-group'>
 								<div>
+								{candidateData.candidateName !== null && (
 									<input type="text" name="candidateName" id='candidateName' value={candidateData.candidateName} placeholder='Họ và tên' onChange={handleChange} className='form-control more' />
-								</div>
+								
+									)}
+										</div>
 								<div>
-									<select name="jobPositionName" value={selectedJobPositionId} onChange={handleJobPositionChange} className='form-control select' >
+									<select name="positionName" value={selectedJobPositionId} onChange={handleJobPositionChange} className='form-control select' >
 										<option value=''>Chọn chức vụ ...</option>
 										{jobPositions && jobPositions.map((jobPosition, index) => (
 											<option key={index} value={jobPosition.id}>

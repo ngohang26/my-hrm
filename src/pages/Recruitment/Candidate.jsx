@@ -53,25 +53,30 @@ const Candidate = () => {
 
   const fetchData = async () => {
     const token = localStorage.getItem('accessToken');
-
+  
     try {
       const responseJobPosition = await fetch(`${apiUrl}/jobPositions/getAllJobPositions`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const jobPosition = await responseJobPosition.json();
-
+  
       const responseCandidateCountByStatus = await fetch(`${apiUrl}/candidates/getCandidateCountByStatus`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const candidateCountByStatus = await responseCandidateCountByStatus.json();
-
+  
+      const candidateCount = {};
+      for (let status in candidateCountByStatus) {
+        candidateCount[status] = candidateCountByStatus[status].count;
+      }
+  
       setJobPositions(jobPosition);
-      setCandidateCountByStatus(candidateCountByStatus);
+      setCandidateCountByStatus(candidateCount);
     } catch (error) {
       console.error('Error:', error);
     }
   };
-
+  
 
   const handleUpdateStatus = async (id, newStatus, interviewTime, secondInterviewTime, startDate, endDate, noteContract, monthlySalary, identityCardNumber) => {
     const token = localStorage.getItem('accessToken');

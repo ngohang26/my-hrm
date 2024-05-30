@@ -11,7 +11,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 	const [employeeData, setEmployeeData] = useState({
 		fullName: null,
 		phoneNumber: '',
-		image: defaultImage,
+		image: 'c1435efb00d84241b953a21e912ed8ce.png',
 		workEmail: '',
 		positionName: '',
 		departmentName: '',
@@ -34,22 +34,39 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 	const [selectedFile, setSelectedFile] = useState();
 	const [provinces, setProvinces] = useState([]);
 	const [tabIndex2, setTabIndex2] = useState(0);
+	const [selectedDepartmentName, setSelectedDepartmentName] = useState('');
+	const [isFileUploaded, setIsFileUploaded] = useState(false);
+
 	const handlePositionChange = (e) => {
-		setSelectedPositionId(e.target.value);
+		const selectedPositionId = Number(e.target.value); // Chuyển đổi thành số
+		setSelectedPositionId(selectedPositionId);
+
+		const selectedPosition = positions.find(position => position.id === selectedPositionId);
+
+		if (selectedPosition) {
+			setSelectedDepartmentId(selectedPosition.department.id);
+			setSelectedDepartmentName(selectedPosition.department.departmentName);
+		}
 	};
 
-	const handleDepartmentChange = (e) => {
-		setSelectedDepartmentId(e.target.value);
-	};
+	useEffect(() => {
+		const selectedPosition = positions.find(position => position.id === selectedPositionId);
+
+		if (selectedPosition) {
+			setSelectedDepartmentName(selectedPosition.department.departmentName);
+		}
+
+	}, [selectedPositionId, selectedDepartmentName]);
+
 	useEffect(() => {
 		if (mode === 'edit' && currentEmployee) {
 			setEmployeeData(currentEmployee);
-			setSelectedFile(currentEmployee.image); // Cập nhật selectedFile
+			setSelectedFile(currentEmployee.image);
 		} else {
 			setEmployeeData({
 				fullName: '',
 				phoneNumber: '',
-				image: defaultImage,
+				image: '',
 				workEmail: '',
 				positionName: '',
 				departmentName: '',
@@ -99,29 +116,39 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 		fetchExperienceNames();
 	}, []);
 
-useEffect(() => {
-    const fetchProvinces = async () => {
-        const response = await fetch(`https://vapi.vnappmob.com/api/province`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        const data = await response.json();
-        const provinceNames = data.results.map(results => results.province_name);
-        setProvinces(provinceNames);
-    }
-    fetchProvinces();
-}, []);
+	useEffect(() => {
+		const fetchProvinces = async () => {
+			const response = await fetch(`https://vapi.vnappmob.com/api/province`, {
+				method: 'GET',
+				headers: {
+					'Accept': 'application/json'
+				}
+			});
+			const data = await response.json();
+			const provinceNames = data.results.map(results => results.province_name);
+			setProvinces(provinceNames);
+		}
+		fetchProvinces();
+	}, []);
 
 
-	const handleFileChange = (e) => {
-		setSelectedFile(e.target.files[0]);
+	const handleFileChange = async (e) => {
+		const file = e.target.files[0];
+		setSelectedFile(file);
+		setIsFileUploaded(false);
+
+		if (file) {
+			const uploadedFilePath = await handleUpload(file);
+			if (uploadedFilePath) {
+				setIsFileUploaded(true);
+			}
+		}
 	};
 
-	const handleUpload = async () => {
+
+	const handleUpload = async (file) => {
 		const formData = new FormData();
-		formData.append('file', selectedFile);
+		formData.append('file', file);
 		const token = localStorage.getItem('accessToken');
 
 		const response = await fetch(`${apiUrl}/api/FileUpload`, {
@@ -131,13 +158,21 @@ useEffect(() => {
 			},
 			body: formData,
 		});
-
-		const data = await response.json();
-		if (data) {
+		if (response.ok) {
+			const data = await response.json();
+			setEmployeeData(prevState => ({
+				...prevState,
+				image: data.generatedFileName
+			}));
 			console.log("Response from FileUpload:", data);
+			toast.success(data.message);
+			return data.generatedFileName;
+		} else {
+			const errorText = await response.text();
+			console.log("Error from FileUpload:", errorText);
+			toast.error(errorText);
+			return null;
 		}
-
-		return data.generatedFileName;
 	};
 
 	const getImageUrl = (image) => {
@@ -176,10 +211,8 @@ useEffect(() => {
 
 		let image = employeeData.image;
 
-		if (selectedFile instanceof File) {
-			image = await handleUpload();
-		} else if (!employeeData.image || employeeData.image === defaultImage) {
-			image = defaultImage;
+		if (selectedFile instanceof File && !isFileUploaded) {
+			image = await handleUpload(selectedFile);
 		} else {
 			console.log("No file selected or user did not choose to update the image.");
 		}
@@ -192,7 +225,7 @@ useEffect(() => {
 
 		};
 
-		console.log("Data sent to server:", employeeToSend);
+		// console.log("Data sent to server:", employeeToSend);
 		const token = localStorage.getItem('accessToken');
 
 		try {
@@ -227,10 +260,10 @@ useEffect(() => {
 				} else if (mode === 'edit') {
 					toast.success('Chỉnh sửa thông tin nhân viên thành công');
 					fetchEmployees();
-					setShowEditTab(false)
 					setTimeout(() => {
 						setTabIndex(0);
-					}, 1000);
+						setShowEditTab(false)
+					}, 1200);
 
 				}
 			} else {
@@ -240,9 +273,7 @@ useEffect(() => {
 		} catch (error) {
 			console.error('Failed to handle employee:', error);
 		}
-
 	};
-
 
 	return (
 		<>
@@ -253,7 +284,11 @@ useEffect(() => {
 					<div>
 						<div className='employee-info' style={{ display: "flex", flexWrap: 'wrap' }}>
 							<div className="" style={{ flex: '2 0 50%', padding: '10px' }}>
-								<input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Full Name" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} />
+								{/* <input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Họ tên nhân viên" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} /> */}
+								{employeeData.fullName !== null && (
+    <input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Họ tên nhân viên" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} />
+)}
+
 								<div style={{ display: "flex", gap: '20px', width: '101%' }}>
 
 									<select name="positionName" value={selectedPositionId} onChange={handlePositionChange} className='form-control select' >
@@ -264,14 +299,7 @@ useEffect(() => {
 											</option>
 										))}
 									</select>
-									<select name="departmentName" value={selectedDepartmentId} onChange={handleDepartmentChange} className='form-control select'>
-										<option value=''>Chọn bộ phận ...</option>
-										{departments && departments.map((department, index) => (
-											<option key={index} value={department.id}>
-												{department.departmentName}
-											</option>
-										))}
-									</select>
+									<input value={selectedDepartmentName} disabled style={{ width: '42.5%', cursor: 'pointer', border: '1px solid #ced4da', borderColor: '#e8e9e9', fontSize: '16px', borderRadius: '5px', backgroundColor: '#fff', paddingLeft: '20px' }} />
 								</div>
 								<div style={{ display: "flex", gap: '20px', width: '93%' }}>
 									<input type="text" name="phoneNumber" value={employeeData.phoneNumber} onChange={handleChange} placeholder="Phone Number" className='form-control more' />
@@ -280,16 +308,18 @@ useEffect(() => {
 							</div>
 							<label className='empl-avt'>
 								<input type="file" onChange={handleFileChange} style={{ opacity: 0, position: 'absolute' }} />
-								{selectedFile instanceof File ? <img src={URL.createObjectURL(selectedFile)} alt="Preview" /> : <img src={mode === 'add' ? defaultImage : getImageUrl(employeeData.image)} alt="Default" width="100px" height="100px" />}
+								{selectedFile instanceof File && isFileUploaded ?
+									<img src={URL.createObjectURL(selectedFile)} alt="Preview" /> :
+									<img src={mode === 'add' ? defaultImage : getImageUrl(employeeData.image)} alt="Default" width="100px" height="100px" />}
+
 							</label>
+
 						</div>
 					</div>
 					<Tabs style={{ backgroundColor: '#fff' }}>
 						<TabList className="tablist2">
 							<Tab className={`tab-item ${tabIndex2 === 0 ? 'active' : ''}`} onClick={() => setTabIndex2(0)}>Tiếp tục</Tab>
-							<Tab className={`tab-item ${tabIndex2 === 1 ? 'active' : ''}`} onClick={() => setTabIndex2(1)}>Thông tin công việc</Tab>
-							<Tab className={`tab-item ${tabIndex2 === 2 ? 'active' : ''}`} onClick={() => setTabIndex2(2)}>Thông tin riêng tư</Tab>
-							<Tab className={`tab-item ${tabIndex2 === 3 ? 'active' : ''}`} onClick={() => setTabIndex2(3)}>Thiết lập nhân lực</Tab>
+							<Tab className={`tab-item ${tabIndex2 === 1 ? 'active' : ''}`} onClick={() => setTabIndex2(1)}>Thông tin riêng tư</Tab>
 						</TabList>
 						<TabPanel>
 							<div className='container-grid'>
@@ -346,10 +376,6 @@ useEffect(() => {
 
 								</div>
 							</div>
-						</TabPanel>
-
-						<TabPanel>
-							Thông tin công việc
 						</TabPanel>
 						<TabPanel>
 							<div className='container-grid'>
@@ -431,9 +457,7 @@ useEffect(() => {
 								</div>
 							</div>
 						</TabPanel>
-						<TabPanel>
-							Tttt
-						</TabPanel>
+
 					</Tabs>
 				</Tabs>
 			</form >

@@ -9,7 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx';
 import { FiTrash, FiEdit } from 'react-icons/fi';
-import {apiUrl} from '../../config'
+import { apiUrl } from '../../config'
 
 const addDepartmentColumns = [
   { field: 'departmentName', headerName: 'Tên bộ phận', flex: 2.5, },
@@ -22,12 +22,12 @@ async function fetchDepartments() {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
-      
+
     }
   });
   const departments = await response.json();
   return departments.map((department, index) => ({
-    order: index + 1,  
+    order: index + 1,
     id: index,
     ...department,
   }));
@@ -99,12 +99,15 @@ async function deleteDepartment(id) {
 
       }
     });
-
     if (!response.ok) {
+      const responseData = await response.text();
+      console.log(responseData);
+      toast.error(responseData);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+    toast.success('Xóa bộ phận thành công');
   } catch (error) {
-    console.error('Failed to delete department:', error);
+    console.error(`Failed to delete department: ${error.message}`);
   }
 }
 const Department = () => {
@@ -119,11 +122,11 @@ const Department = () => {
     setDepartmentToDelete(id);
     setIsDeleteModalOpen(true);
   };
-  
+
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
   };
-  
+
   const handleConfirmDelete = async () => {
     if (departmentToDelete !== null) {
       await deleteDepartment(departmentToDelete);
@@ -145,11 +148,11 @@ const Department = () => {
       flex: 1,
       renderCell: (params) => (
         <div className='action'>
-          <button onClick={() => handleEdit(params.row)} className='btn-action'>        
-            <FiEdit color='#000'/>
+          <button onClick={() => handleEdit(params.row)} className='btn-action'>
+            <FiEdit color='#000' />
           </button>
           <button onClick={() => openDeleteModal(params.row.id)} className='btn-action'>
-            <FiTrash color='#ff0000'/>
+            <FiTrash color='#ff0000' />
           </button>
         </div>
       ),
@@ -158,10 +161,10 @@ const Department = () => {
   const handleFormSubmit = async (data) => {
     try {
       const departmentDetails = {
-          departmentName: data.departmentName,
-          manager: {
-              employeeCode: data.managerCode
-          }
+        departmentName: data.departmentName,
+        manager: {
+          employeeCode: data.managerCode
+        }
       };
       if (!editing.id) {
         await addDepartment(departmentDetails, data.managerCode);
@@ -171,11 +174,11 @@ const Department = () => {
         setEditing({});
       } else {
         // update
-        await editDepartment(editing.id, departmentDetails, data.managerCode);  
+        await editDepartment(editing.id, departmentDetails, data.managerCode);
         const updatedDepartments = await fetchDepartments();
 
         setDepartments(updatedDepartments);
-      
+
         setIsFormOpen(false);
         setEditing({});
       }
@@ -218,36 +221,37 @@ const Department = () => {
   const handleEdit = (row) => {
     setEditing(row)
     setIsFormOpen(true)
-};
+  };
   return (
+    <div className='departments' >
+      <ToastContainer />
     <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
-      <ToastContainer/>
       <TabList className='tablist'>
         <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Bộ phận</Tab>
-        <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>Chức vụ</Tab>      
+        <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>Chức vụ</Tab>
       </TabList>
 
       <TabPanel>
         <div className='departments'>
-        <div className='info'>
-          <button onClick={openForm} className='btn-add'>+ Thêm</button>
-        </div>
-        <DataTable columns={departmentColumns} data={departments} slug="department" showEditColumn={false}/>;
-        {isFormOpen && (
-          <div className="overlay" onClick={closeForm}>
-            <FormComponent fields={addDepartmentColumns} onSubmit={handleFormSubmit} onCancel={closeForm} 
-            initialValues={editing}
-            />
+          <div className='info'>
+            <button onClick={openForm} className='btn-add'>+ Thêm</button>
           </div>
-        )}
-        <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+          <DataTable columns={departmentColumns} data={departments} slug="department" showEditColumn={false} />;
+          {isFormOpen && (
+            <div className="overlay" onClick={closeForm}>
+              <FormComponent fields={addDepartmentColumns} onSubmit={handleFormSubmit} onCancel={closeForm}
+                initialValues={editing}
+              />
+            </div>
+          )}
+          <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
         </div>
       </TabPanel>
-      <TabPanel style={{display: 'flex', justifyContent: 'center'}}>
-        <Position/>
+      <TabPanel style={{ display: 'flex', justifyContent: 'center' }}>
+        <Position />
       </TabPanel>
-      </Tabs>
-
+    </Tabs>
+          </div>
   );
 }
 

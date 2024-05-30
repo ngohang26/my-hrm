@@ -27,8 +27,8 @@ const DataTable = ({ columns, data }) => {
 
   const handleSearch = (event) => {
     setSearchText(event.target.value);
-    const filteredRows = data.filter((row) => 
-      columnsWithAction.some((column) => 
+    const filteredRows = data.filter((row) =>
+      columnsWithAction.some((column) =>
         row[column.field]?.toString().toLowerCase().includes(event.target.value.toLowerCase())
       )
     );
@@ -37,8 +37,8 @@ const DataTable = ({ columns, data }) => {
   const handleClearSearch = () => {
     setSearchText('');
     setRows(data);
-  };  
-  
+  };
+
   const handleFocus = () => {
     setIsInputFocused(true);
   };
@@ -50,12 +50,12 @@ const DataTable = ({ columns, data }) => {
 
   return (
     <div className="dataTable">
-<div className="search-container">
-  <input type="text" value={searchText} onChange={handleSearch} onFocus={handleFocus} onBlur={handleBlur} placeholder="Tìm kiếm..." className="form-search" />
-  {isInputFocused && (
-    <button onClick={handleClearSearch} className="clear-search-button">×</button>
-  )}
-</div>
+      <div className="search-container">
+        <input type="text" value={searchText} onChange={handleSearch} onFocus={handleFocus} onBlur={handleBlur} placeholder="Tìm kiếm..." className="form-search" />
+        {isInputFocused && (
+          <button onClick={handleClearSearch} className="clear-search-button">×</button>
+        )}
+      </div>
 
       {rows.length > 0 ? (
         <DataGrid
@@ -65,7 +65,7 @@ const DataTable = ({ columns, data }) => {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 100,
+                pageSize: 20,
               },
             },
           }}
@@ -73,15 +73,15 @@ const DataTable = ({ columns, data }) => {
             Toolbar: CustomToolbar,
 
           }}
-          pageSizeOptions={[10]}
+          pageSizeOptions={[20]}
           disableRowSelectionOnClick
           disableDensitySelector
           disableColumnSelector
         />
       ) : (
         <div className="empty-data">
-          <img src= "/empty.png" alt="Empty data" /> 
-          <div>Không có dữ liệu để hiển thị</div> 
+          <img src="/empty.png" alt="Empty data" />
+          <div>Không có dữ liệu để hiển thị</div>
         </div>
       )}
     </div>

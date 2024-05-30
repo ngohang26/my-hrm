@@ -14,7 +14,7 @@ function YourContract() {
   const decodedToken = jwtDecode(token);
   const employeeCode = decodedToken.username;
   useEffect(() => {
-    fetch(`http://localhost:8080/employees/${employeeCode}/contract`, {
+    fetch(`${apiUrl}/employees/${employeeCode}/contract`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -65,13 +65,13 @@ function YourContract() {
             <div className="form-grid grid-item">
               <div className="item-info">
                 <label>Ngày bắt đầu</label>
-                <input type="text" value={contract.startDate}   />
+                <input type="text" value={contract.startDate} readOnly  />
               </div>
               <div className="item-info">
                 <label>
                   Ngày kết thúc
                 </label>
-                <input type="text" value={contract.endDate}   />
+                <input type="text" value={contract.endDate}  readOnly />
               </div>
             </div>
             <div className="form-grid grid-item">
@@ -81,14 +81,15 @@ function YourContract() {
                   Lương cơ bản
                 </label>
 
-                <input type="text" value={displaySalary}   /> đ
+                <input type="text" value={displaySalary} readOnly  /> đ
+                
               </div>
               <div className="item-info">
 
                 <label>
                   Ghi chú
                 </label>
-                <input type="text" value={contract.noteContract}   />
+                <input type="text" value={contract.noteContract} readOnly  />
               </div>
             </div>
           </div>

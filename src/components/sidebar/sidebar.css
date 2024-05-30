@@ -1,15 +1,23 @@
 .left-sidebar {
+  display: flex;
+  flex-direction: column;
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 10;
 }
 
 .left-sidebar-item {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: end;
   height: 90vh;
 }
+
+.dashboard-logo {
+  margin: 5px;
+}
+
 .logo {
   width: 24px;
   height: 24px;
@@ -57,6 +65,7 @@
   z-index: 1;  
   box-shadow: 0 0 12px rgba(0,0,0,0.4); 
   text-align: center;
+  padding: 2px;
 }
 
 .user-menu a, .user-menu button {

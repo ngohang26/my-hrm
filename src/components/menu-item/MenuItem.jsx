@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 function MenuItem({ title, icon, subItems, isOpen, onTitleClick }) {
   const [subItemSelected, setSubItemSelected] = useState(-1);
   const permissions = useContext(PermissionContext); 
-  const location = useLocation(); // get the current location
+  const location = useLocation();  
 
   useEffect(() => {
     const index = subItems.findIndex(subItem => subItem.path === location.pathname);

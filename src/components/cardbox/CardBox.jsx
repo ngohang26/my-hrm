@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import './cardbox.css'
 import { LuUsers2 } from "react-icons/lu";
 import { FaRegFolderOpen } from "react-icons/fa";
@@ -19,38 +19,37 @@ export const CardBox = () => {
       .then(response => response.json())
       .then(data => {
 
-        console.log(data);
         setSummary(data);
       })
-    }, []);
-  
+  }, []);
   const cardItems = [
     {
-      icon: <LuUsers2 size={35}/>,
+      icon: <LuUsers2 size={35} />,
       label: "Người dùng",
       count: summary.userCount
     },
     {
-      icon: <FaRegFolderOpen size={35}/>,
+      icon: <FaRegFolderOpen size={35} />,
       label: "Ứng viên",
       count: summary.candidateCount
     },
     {
-      icon: <MdBadge size={35}/>,
+      icon: <MdBadge size={35} />,
       label: "Nhân viên",
       count: summary.employeeCount
     },
   ];
+  
   return (
     <div className='card-box'>
-  {cardItems.map((card, index) => (
-    <div className={`card-item card-item-${index}`}>
-      <div className="card-tag">{card.count}</div>
-      <span>{card.icon}</span>
-      <span>{card.label}</span>
+      {cardItems.map((card, index) => (
+        <div key={index} className={`card-item card-item-${index}`}>
+          <div className="card-tag">{card.count}</div>
+          <span>{card.icon}</span>
+          <span>{card.label}</span>
+        </div>
+      ))}
     </div>
-  ))}
-</div>
-
-  )
+  );
+  
 }

@@ -34,9 +34,10 @@ const Login = () => {
       }
 
       const data = await response.json();
-      console.log(data)
       localStorage.setItem('accessToken', data.accessToken);
-      navigate('/hrm/dashboard');
+      window.location.reload();
+      // navigate('/hrm/dashboard');
+
     } catch (error) {
       console.error('Lỗi đăng nhập', error);
     } finally {

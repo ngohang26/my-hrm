@@ -21,8 +21,8 @@ const EmployeeAllowance = () => {
     { field: 'order', headerName: 'STT', flex: 1 },
     { field: 'allowanceName', headerName: 'Tên trợ cấp', flex: 2.5 },
     { field: 'allowanceAmount', headerName: 'Số tiền', flex: 1.3 },
-    { field: 'startDate', headerName: 'Ngày bắt đầu', flex: 1.3 },
-    { field: 'endDate', headerName: 'Ngày kết thúc', flex: 1.3 },
+    { field: 'startDate', headerName: 'Tháng bắt đầu', flex: 1.3 },
+    { field: 'endDate', headerName: 'Tháng kết thúc', flex: 1.3 },
     {
       field: 'actions',
       headerName: 'Hành động',
@@ -54,7 +54,8 @@ const EmployeeAllowance = () => {
     if (response.ok) {
       const allowanceList = await response.json();
       setAllowanceEmployee(allowanceList);
-  
+      console.log('Allowance list:', allowanceList); // In ra danh sách trợ cấp
+
       const allowanceNameToId = {};
       for (let allowance of allowanceList) {
         allowanceNameToId[allowance.allowanceName] = allowance.id;
@@ -174,18 +175,25 @@ const EmployeeAllowance = () => {
     setIsDeleteModalOpen(false);
   };
 
-  const handleFormSubmit = async (data) => {
-    const allowanceDetails = {
-      allowance: {
-        id: allowanceNameToId[data.allowanceName],  
-      },
-      startDate: data.startDate,
-      endDate: data.endDate,
-    };
   
+  const handleFormSubmit = async (data) => {
+    const selectedAllowanceId = data.allowanceName;  
+    if (selectedAllowanceId) {
+      const allowanceDetails = {
+        allowance: {
+          id: selectedAllowanceId,
+        },
+        startDate: data.startDate,
+        endDate: data.endDate,
+      };
       await addEmployeeAllowance(allowanceDetails);
-
+      console.log(allowanceDetails);
+    } else {
+      toast.error("Bạn cần chọn trợ cấp")
+      console.error('Không tìm thấy trợ cấp được chọn.');
+    }
   };
+  
   
   const handleFormEditSubmit = async (data) => {
     const allowanceDetails = {
@@ -233,8 +241,8 @@ const EmployeeAllowance = () => {
           { field: 'allowanceName', headerName: 'Tên trợ cấp',type: 'select',
             options: allowanceEmployee.map(allowance => ({ id: allowance.id, name: allowance.allowanceName })),
           },
-          { field: 'startDate', label: 'Ngày bắt đầu', type: 'date' },
-          { field: 'endDate', label: 'Ngày kết thúc', type: 'date' },
+          { field: 'startDate', label: 'Tháng bắt đầu', type: 'month' },
+          { field: 'endDate', label: 'Tháng kết thúc', type: 'month' },
         ]}
         onSubmit={handleFormSubmit}
         onCancel={() => setIsFormAddOpen(false)}
@@ -255,8 +263,8 @@ const EmployeeAllowance = () => {
         <div className="overlay">
           <FormComponent
             fields={[
-              { field: 'startDate', label: 'Ngày bắt đầu', type: 'date' },
-              { field: 'endDate', label: 'Ngày kết thúc', type: 'date' },
+              { field: 'startDate', label: 'Tháng bắt đầu', type: 'month' },
+              { field: 'endDate', label: 'Tháng kết thúc', type: 'month' },
             ]}
             onSubmit={handleFormEditSubmit}
             onCancel={() => setIsFormOpen(false)}

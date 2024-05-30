@@ -58,7 +58,8 @@
 .form-component form .item{
   display: flex;
   justify-content: center;
-  padding: 0px 15px;
+  padding: 20px 15px 0px 15px;
+
 }
 
 .btn-control {

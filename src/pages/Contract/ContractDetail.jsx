@@ -49,7 +49,7 @@ function ContractDetail() {
         setContract(data);
         toast.success('Cập nhật thành công');  
         setTimeout(() => {
-          navigate('/contracts');
+          navigate('/hrm/contracts');
         }, 2000);
       })
       .catch(error => {
