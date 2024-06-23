@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/dataTable/DataTable';
-import FormComponent from '../../components/Add/FormComponent';
+import FormComponent from '../../components/Form/FormComponent';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal';
 import { FiTrash, FiEdit } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {apiUrl} from '../../config'
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const EmployeeAllowance = () => {
   const [employeeCode, setEmployeeCode] = useState("2403001");
@@ -54,7 +55,6 @@ const EmployeeAllowance = () => {
     if (response.ok) {
       const allowanceList = await response.json();
       setAllowanceEmployee(allowanceList);
-      console.log('Allowance list:', allowanceList); // In ra danh sách trợ cấp
 
       const allowanceNameToId = {};
       for (let allowance of allowanceList) {
@@ -146,7 +146,6 @@ const EmployeeAllowance = () => {
   }
   
   async function deleteEmployeeAllowance(id) {
-    console.log('Deleting allowance with id:', id);  // Thêm dòng này để kiểm tra giá trị của id
     const token = localStorage.getItem('accessToken');
     try {
       const response = await fetch(`${apiUrl}/employee-allowances/${employeeCode}/allowances/${id}`, {
@@ -187,7 +186,6 @@ const EmployeeAllowance = () => {
         endDate: data.endDate,
       };
       await addEmployeeAllowance(allowanceDetails);
-      console.log(allowanceDetails);
     } else {
       toast.error("Bạn cần chọn trợ cấp")
       console.error('Không tìm thấy trợ cấp được chọn.');
@@ -220,60 +218,66 @@ const EmployeeAllowance = () => {
   }, [employeeCode]);
 
   return (
-    <div>
-      <ToastContainer/>
-  <div className="employee-code-input">
-    <label htmlFor="employeeCode">Nhập mã nhân viên    </label>
-    <input
-      type="text"
-      id="employeeCode"
-      value={employeeCode}
-      onChange={(e) => setEmployeeCode(e.target.value)} className='input-control'
-    />
-  </div>
-  <div style={{width: '100%', textAlign: 'right'}}>
-    <button onClick={() => setIsFormAddOpen(true)} className='btn-add'>+ Thêm</button>
-  </div>
-  {isFormAddOpen && (
-    <div className="overlay">
-      <FormComponent
-        fields={[
-          { field: 'allowanceName', headerName: 'Tên trợ cấp',type: 'select',
-            options: allowanceEmployee.map(allowance => ({ id: allowance.id, name: allowance.allowanceName })),
-          },
-          { field: 'startDate', label: 'Tháng bắt đầu', type: 'month' },
-          { field: 'endDate', label: 'Tháng kết thúc', type: 'month' },
-        ]}
-        onSubmit={handleFormSubmit}
-        onCancel={() => setIsFormAddOpen(false)}
-        initialValues={editing}
+    <HelmetProvider>
+      <div>
+        <ToastContainer/>
+        <Helmet>
+          <title>Trợ cấp của nhân viên</title>
+        </Helmet>
+    <div className="employee-code-input">
+      <label htmlFor="employeeCode">Nhập mã nhân viên    </label>
+      <input
+        type="text"
+        id="employeeCode"
+        value={employeeCode}
+        onChange={(e) => setEmployeeCode(e.target.value)} className='input-control'
       />
     </div>
-
-
-      )}
-
-      <DataTable
-        columns={employeeAllowanceColumns}
-        data={allowances}
-        slug="allowance"
-        showEditColumn={false}
-      />
-      {isFormOpen && (
-        <div className="overlay">
-          <FormComponent
-            fields={[
-              { field: 'startDate', label: 'Tháng bắt đầu', type: 'month' },
-              { field: 'endDate', label: 'Tháng kết thúc', type: 'month' },
-            ]}
-            onSubmit={handleFormEditSubmit}
-            onCancel={() => setIsFormOpen(false)}
-            initialValues={editing}
-          />
-        </div>
-      )}
-      <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+    <div style={{width: '100%', textAlign: 'right'}}>
+      <button onClick={() => setIsFormAddOpen(true)} className='btn-add'>+ Thêm</button>
     </div>
+    {isFormAddOpen && (
+      <div className="overlay">
+        <FormComponent
+          fields={[
+            { field: 'allowanceName', headerName: 'Tên trợ cấp',type: 'select',
+              options: allowanceEmployee.map(allowance => ({ id: allowance.id, name: allowance.allowanceName })),
+            },
+            { field: 'startDate', label: 'Tháng bắt đầu', type: 'month' },
+            { field: 'endDate', label: 'Tháng kết thúc', type: 'month' },
+          ]}
+          onSubmit={handleFormSubmit}
+          onCancel={() => setIsFormAddOpen(false)}
+          initialValues={editing}
+        />
+      </div>
+
+
+        )}
+
+        <DataTable
+          columns={employeeAllowanceColumns}
+          data={allowances}
+          slug="allowance"
+          showEditColumn={false}
+        />
+        {isFormOpen && (
+          <div className="overlay">
+            <FormComponent
+              fields={[
+                { field: 'startDate', label: 'Tháng bắt đầu', type: 'month' },
+                { field: 'endDate', label: 'Tháng kết thúc', type: 'month' },
+              ]}
+              onSubmit={handleFormEditSubmit}
+              onCancel={() => setIsFormOpen(false)}
+              initialValues={editing}
+            />
+          </div>
+        )}
+        <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+      </div>
+
+    </HelmetProvider>
   );
 };
 

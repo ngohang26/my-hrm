@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, RouterProvider, createBrowserRouter, Route } from 'react-router-dom';
+import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { SideBar } from './components/sidebar/SideBar'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Dashboard } from './pages/dashboard/Dashboard';
@@ -16,17 +16,16 @@ import ContractView from './pages/Contract/ContractView';
 import AuthHandler from './Auth/AuthHandler';
 import { ProtectedRoute } from './Auth/ProtectedRoute';
 import ForgotPassword from './pages/login/ForgotPassword';
-import { EmployeeDetail } from './pages/employees/EmployeeDetail';
 import PermissionContext from './Auth/PermissionContext';
 import { jwtDecode } from 'jwt-decode';
 import YourContract from './pages/Contract/YourContract';
 import Allowance from './pages/Allowance/Allowance';
 import JobPosition from './pages/Recruitment/JobPosition';
 import Candidate from './pages/Recruitment/Candidate';
-// import { Menu } from '@mui/material';
-import TerminationReason from './pages/TerminationReason/TerminationReason';
+import TerminationReason from './pages/EmployeeSetting/TerminationReason';
 import Report from './Report/Report';
-import { Menu } from './components/menu/Menu';
+import ResignedEmployees from './pages/EmployeeSetting/ResignedEmployees';
+import { YourDetail } from './pages/employees/YourDetail';
 
 const queryClient = new QueryClient();
 
@@ -52,7 +51,6 @@ function App() {
           <div className='contentContainer' style={{ marginLeft: `${isMenuOpen ? '210px' : '0'}` }}>
             <br />
             <QueryClientProvider client={queryClient}>
-
               <Outlet />
             </QueryClientProvider>
           </div>
@@ -89,11 +87,15 @@ function App() {
         },
         {
           path: "employee",
-          element: <EmployeeDetail />
+          element: <YourDetail />
         },
         {
           path: "employee/termination-reasons",
           element: <TerminationReason />
+        },
+        {
+          path: "employee/resigned-employees",
+          element: <ResignedEmployees />
         },
         {
           path: "departments",

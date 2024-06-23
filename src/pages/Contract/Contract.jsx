@@ -2,32 +2,60 @@ import React from 'react'
 import DataTable from '../../components/dataTable/DataTable.jsx'
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import FormComponent from '../../components/Add/FormComponent.jsx';
+import FormComponent from '../../components/Form/FormComponent.jsx';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {FiEdit,FiEye} from 'react-icons/fi'
+import {FiEdit, FiEye} from 'react-icons/fi'
 import {apiUrl} from '../../config'
-const contractStatusMapping = {
-  0: 'ACTIVE',
-  1: 'CANCELLED',
-  2: 'EXPIRED',
-};
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+
+// const contractStatusMapping = {
+//   0: 'ACTIVE',
+//   1: 'CANCELLED',
+//   2: 'EXPIRED',
+// };
 
 const contractColumns = [
-  { field: 'contractCode', headerName: 'Mã hợp đồng', flex: 3},
+  { field: 'contractCode', headerName: 'Mã hợp đồng', flex: 2.7},
   { field: 'employeeCode', headerName: 'Mã nhân viên', flex: 2,},
-  { field: 'fullName', headerName: 'Tên nhân viên',flex: 3,},
+  { field: 'fullName', headerName: 'Tên nhân viên', flex: 3,},
   { field: 'positionName', headerName: 'Chức vụ', flex: 2.5,
     valueGetter: (params) => params.row.position.positionName,
-    
   },
-  { field: 'startDate', headerName: 'Ngày bắt đầu', flex: 2.5,  },
-  { field: 'endDate', headerName: 'Ngày kết thúc', flex: 2.5,},
-  { 
+  { field: 'startDate', headerName: 'Ngày bắt đầu', flex: 2.3,  },
+  { field: 'endDate', headerName: 'Ngày kết thúc', flex: 2.3,},
+
+  {
     field: 'contractStatus', 
     headerName: 'Tình trạng', 
-    flex: 2.5,
-    valueGetter: (params) => params.value 
+    renderCell: (params) => {
+      let color;
+      let backgroundColor;
+
+      switch (params.value) {
+        case 'ACTIVE':
+          color = '#fff';
+          backgroundColor = '#5a5279';
+          break;
+        case 'EXPIRED':
+          color = '#fff';
+          backgroundColor = '#ea8484';
+          break;
+        case 'CANCELED':
+          color = '#fff';
+          backgroundColor = '#84a4ea';
+          break;
+        default:
+          color = '#656262';
+          backgroundColor = '#d1d3d4';
+      }
+      return (
+        <div style={{ color, backgroundColor, padding: "3px 6px", borderRadius: '5px' }}>
+          {params.value}
+        </div>
+      );
+    },
+    flex: 2.2
   },
   {
     field: 'monthlySalary',
@@ -51,10 +79,7 @@ const contractColumns = [
       </div>
     ),
   },
-
 ];
-
-
 
 async function fetchContracts() {
   const token = localStorage.getItem('accessToken');
@@ -94,11 +119,10 @@ const Contract = () => {
     { field: 'startDate', headerName: 'Ngày bắt đầu', type: 'date' },
     { field: 'endDate', headerName: 'Ngày kết thúc', type: 'date' },
     { field: 'monthlySalary', headerName: 'Lương cơ bản',},
-  
   ];
 
   const handleFormSubmit = (formData) => {
-  const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
 
     fetch(`${apiUrl}/employees/${formData.employeeCode}/contract`, {
       method: 'POST',
@@ -117,7 +141,9 @@ const Contract = () => {
     })
     .then(response => {
       if (!response.ok) {
-        throw new Error('Hợp đồng đã tồn tại cho nhân viên này');
+        return response.text().then(message => {
+          throw new Error(message || 'Đã xảy ra lỗi');
+        });
       }
       return response.json();
     })
@@ -127,14 +153,12 @@ const Contract = () => {
     })
     .then(updatedContracts => {
       setContracts(updatedContracts);
+      toast.success('Thêm hợp đồng thành công');
     })
     .catch(error => {
-      if (error.message === 'Hợp đồng đã tồn tại cho nhân viên này') {
-        toast.error(error.message);  
-        setIsFormOpen(false);  
-      }
+      toast.error(error.message);
     });
-  };
+};
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -158,12 +182,13 @@ const Contract = () => {
   }
  
   return (
-    <div>
+    <HelmetProvider>
       <ToastContainer/>
+      <Helmet>
+        <title>Danh sách hợp đồng</title>
+      </Helmet>
         <div className='info'>
           <button onClick={openForm} className='btn-add' onCancel={closeForm}>+ Thêm</button>
-
-
         </div>
       <DataTable columns={contractColumns} data={contracts} slug="contract" showEditColumn={false} />;
       {isFormOpen && (
@@ -171,8 +196,8 @@ const Contract = () => {
           <FormComponent fields={addContractColumns} onSubmit={handleFormSubmit} onCancel={closeForm} />
         </div>
       )}
- 
-    </div>
+    </HelmetProvider>
   );
 }
+
 export default Contract

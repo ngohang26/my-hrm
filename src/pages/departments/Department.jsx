@@ -2,7 +2,7 @@ import React from 'react'
 import DataTable from '../../components/dataTable/DataTable.jsx'
 import './department.css'
 import { useState, useEffect } from 'react';
-import FormComponent from '../../components/Add/FormComponent.jsx';
+import FormComponent from '../../components/Form/FormComponent.jsx';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Position from '../positions/Position.jsx';
 import { ToastContainer, toast } from 'react-toastify';
@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx';
 import { FiTrash, FiEdit } from 'react-icons/fi';
 import { apiUrl } from '../../config'
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const addDepartmentColumns = [
   { field: 'departmentName', headerName: 'Tên bộ phận', flex: 2.5, },
@@ -32,7 +33,6 @@ async function fetchDepartments() {
     ...department,
   }));
 }
-
 
 async function addDepartment(department, employeeCode) {
   const encodedEmployeeCode = encodeURIComponent(employeeCode);
@@ -223,35 +223,39 @@ const Department = () => {
     setIsFormOpen(true)
   };
   return (
-    <div className='departments' >
-      <ToastContainer />
-    <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
-      <TabList className='tablist'>
-        <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Bộ phận</Tab>
-        <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>Chức vụ</Tab>
-      </TabList>
-
-      <TabPanel>
-        <div className='departments'>
-          <div className='info'>
-            <button onClick={openForm} className='btn-add'>+ Thêm</button>
-          </div>
-          <DataTable columns={departmentColumns} data={departments} slug="department" showEditColumn={false} />;
-          {isFormOpen && (
-            <div className="overlay" onClick={closeForm}>
-              <FormComponent fields={addDepartmentColumns} onSubmit={handleFormSubmit} onCancel={closeForm}
-                initialValues={editing}
-              />
+    <HelmetProvider>
+      <div className='departments' >
+        <ToastContainer />
+        <Helmet>
+          <title>Quản lý bộ phận</title>
+        </Helmet>
+        <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
+          <TabList className='tablist'>
+            <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Bộ phận</Tab>
+            <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>Chức vụ</Tab>
+          </TabList>
+          <TabPanel>
+            <div className='departments'>
+              <div className='info'>
+                <button onClick={openForm} className='btn-add'>+ Thêm</button>
+              </div>
+              <DataTable columns={departmentColumns} data={departments} slug="department" showEditColumn={false} />;
+              {isFormOpen && (
+                <div className="overlay" onClick={closeForm}>
+                  <FormComponent fields={addDepartmentColumns} onSubmit={handleFormSubmit} onCancel={closeForm}
+                    initialValues={editing}
+                  />
+                </div>
+              )}
+              <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
             </div>
-          )}
-          <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
-        </div>
-      </TabPanel>
-      <TabPanel style={{ display: 'flex', justifyContent: 'center' }}>
-        <Position />
-      </TabPanel>
-    </Tabs>
-          </div>
+          </TabPanel>
+          <TabPanel style={{ display: 'flex', justifyContent: 'center' }}>
+            <Position />
+          </TabPanel>
+        </Tabs>
+      </div>
+    </HelmetProvider>
   );
 }
 

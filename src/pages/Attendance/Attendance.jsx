@@ -8,12 +8,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PermissionContext from '../../Auth/PermissionContext';
 import { apiUrl } from '../../config'
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const Attendance = () => {
   const [attendances, setAttendances] = useState([]);
   const [filterType, setFilterType] = useState('all');
   const [dateFilter, setDateFilter] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [editingAttendance, setEditingAttendance] = useState(null);
@@ -113,47 +113,52 @@ const Attendance = () => {
     });
   }
   return (
-    <div className='attendance'>
-      <ToastContainer />
-      <div className="attendance-header">
-        <div>
-          <select name="" id="" value={filterType} onChange={(e) => setFilterType(e.target.value)} className='input-control'>
-            <option>Chọn kiểu ...</option>
-            <option value="day">Ngay</option>
-            <option value="month">Thang</option>
-          </select>
-          {filterType === 'day' ? <input type="date" onChange={(e) => setDateFilter(new Date(e.target.value))} className='input-control' />
-            : <input type="month" value={selectedMonth ? selectedMonth.toISOString().substr(0, 7) : ''} onChange={e => setSelectedMonth(new Date(e.target.value))} className='input-control' />
+    <HelmetProvider>
+      <div className='attendance'>
+        <ToastContainer />
+        <Helmet>
+          <title>Chấm công</title>
+        </Helmet>
+        <div className="attendance-header">
+          <div>
+            <select name="" id="" value={filterType} onChange={(e) => setFilterType(e.target.value)} className='input-control'>
+              <option>Chọn kiểu ...</option>
+              <option value="day">Ngay</option>
+              <option value="month">Thang</option>
+            </select>
+            {filterType === 'day' ? <input type="date" onChange={(e) => setDateFilter(new Date(e.target.value))} className='input-control' />
+              : <input type="month" value={selectedMonth ? selectedMonth.toISOString().substr(0, 7) : ''} onChange={e => setSelectedMonth(new Date(e.target.value))} className='input-control' />
 
-          }
+            }
 
 
 
-        </div>
-        <button onClick={() => { setFilterType('all'); setDateFilter(new Date()); setSelectedMonth(null); }} className='btn-submit'>Hiển thị tất cả</button>
-      </div>
-
-      <DataTable columns={attendanceColumns} data={filteredAttendances} slug="attendance" />;
-      <Modal
-        open={openEditDialog}
-        onClose={handleCloseEditDialog}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
-      >
-        <div className='user-form form-box'>
-          <h4>Chỉnh sửa thời gian chấm công</h4>
-          <br />
-          <label>Thời gian vào</label>
-          <input type="time" value={editingAttendance?.timeIn} onChange={e => setEditingAttendance({ ...editingAttendance, timeIn: e.target.value })} className='form-control' />
-          <label>Thời gian ra</label>
-          <input type="time" value={editingAttendance?.timeOut} onChange={e => setEditingAttendance({ ...editingAttendance, timeOut: e.target.value })} className='form-control' />
-          <div className="btn-control">
-            <button className='btn-close' onClick={handleCloseEditDialog}>Đóng</button>
-            <button onClick={handleUpdateTime} className='btn-save'>Cập nhật</button>
           </div>
+          <button onClick={() => { setFilterType('all'); setDateFilter(new Date()); setSelectedMonth(null); }} className='btn-submit'>Hiển thị tất cả</button>
         </div>
-      </Modal>
-    </div>
+
+        <DataTable columns={attendanceColumns} data={filteredAttendances} slug="attendance" />;
+        <Modal
+          open={openEditDialog}
+          onClose={handleCloseEditDialog}
+          aria-labelledby="modal-title"
+          aria-describedby="modal-description"
+        >
+          <div className='user-form form-box'>
+            <h4>Chỉnh sửa thời gian chấm công</h4>
+            <br />
+            <label>Thời gian vào</label>
+            <input type="time" value={editingAttendance?.timeIn} onChange={e => setEditingAttendance({ ...editingAttendance, timeIn: e.target.value })} className='form-control' />
+            <label>Thời gian ra</label>
+            <input type="time" value={editingAttendance?.timeOut} onChange={e => setEditingAttendance({ ...editingAttendance, timeOut: e.target.value })} className='form-control' />
+            <div className="btn-control">
+              <button className='btn-close' onClick={handleCloseEditDialog}>Đóng</button>
+              <button onClick={handleUpdateTime} className='btn-save'>Cập nhật</button>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    </HelmetProvider>
   );
 }
 export default Attendance

@@ -1,9 +1,12 @@
 import React from 'react';
 import Modal from 'react-modal';
-
+import './ModalOverplay.css'
 const customStyles = {
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Màu nền và độ mờ của overlay
+  },
   content: {
-    backgroundColor: 'white', // Màu nền của Modal
+    backgroundColor: '#fff', // Màu nền của Modal
     width: '35%', // Chiều rộng của Modal
     height: '15%', // Chiều cao của Modal
     margin: 'auto',
@@ -35,14 +38,16 @@ const customStyles = {
 
 const ConfirmDeleteModal = ({ isOpen, onConfirm, onCancel }) => {
   return (
-    <Modal isOpen={isOpen} onRequestClose={onCancel} contentLabel="Xác nhận xóa" style={customStyles}>
-      <h2>Xác nhận xóa</h2>
-      <p>Bạn có chắc chắn muốn xóa không?</p>
-      <div style={customStyles.button}>
-        <button onClick={onCancel} style={customStyles.cancelButton}>Hủy</button>
-        <button onClick={onConfirm} style={customStyles.deleteButton}>Xóa</button>
-      </div>
-    </Modal>
+    <div>
+      <Modal isOpen={isOpen} onRequestClose={onCancel} contentLabel="Xác nhận xóa" style={customStyles}>
+        <h2>Xác nhận xóa</h2>
+        <p>Bạn có chắc chắn muốn xóa không?</p>
+        <div style={customStyles.button}>
+          <button onClick={onCancel} style={customStyles.cancelButton}>Hủy</button>
+          <button onClick={onConfirm} style={customStyles.deleteButton}>Xóa</button>
+        </div>
+      </Modal>
+    </div>
   );
 };
 

@@ -1,12 +1,13 @@
 import React from 'react'
 import DataTable from '../../components/dataTable/DataTable.jsx'
 import { useState, useEffect } from 'react';
-import FormComponent from '../../components/Add/FormComponent.jsx';
+import FormComponent from '../../components/Form/FormComponent.jsx';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx'
 import { FiTrash, FiEdit } from 'react-icons/fi';
 import { apiUrl } from '../../config.js';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 async function fetchDepartments() {
   const token = localStorage.getItem('accessToken');
@@ -53,7 +54,7 @@ async function addPosition(position) {
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(positionData)
-    }); 
+    });
     if (response.ok) {
       toast.success('Thêm chức vụ thành công');
     } else if (response.status === 500) {
@@ -111,7 +112,7 @@ async function deletePosition(id) {
       }
     });
 
-    const responseData = await response.json();  
+    const responseData = await response.json();
 
     if (!response.ok) {
       toast.error(responseData.message);
@@ -179,7 +180,7 @@ const Position = () => {
         setIsFormOpen(false);
         setEditing({});
       } else {
-        await editPosition(editing.id, positionDetails); 
+        await editPosition(editing.id, positionDetails);
         const updatedPositions = await fetchPositions();
         setPositions(updatedPositions);
         setIsFormOpen(false);
@@ -189,7 +190,7 @@ const Position = () => {
       console.error('Failed to add or update position:', error);
     }
   }
-  
+
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -232,14 +233,15 @@ const Position = () => {
     });
     setIsFormOpen(true);
   };
-  
+
 
   const positionColumns = [
     { field: 'order', headerName: 'STT', flex: 0.5, },
     { field: 'positionName', headerName: 'CHỨC VỤ', flex: 1.5, },
     { field: 'jobSummary', headerName: 'TÓM TẮT', flex: 2.5, },
-    { field: 'employeeCount', headerName: 'SỐ NV', flex: 1},
-    {field: 'departmentName', headerName: 'BỘ PHẬN', flex: 1.5, 
+    { field: 'employeeCount', headerName: 'SỐ NV', flex: 1 },
+    {
+      field: 'departmentName', headerName: 'BỘ PHẬN', flex: 1.5,
       valueGetter: (params) => params.row.department.departmentName
     },
     {
@@ -256,20 +258,25 @@ const Position = () => {
     },
   ];
   return (
-    <div className='positions' style={{ width: '70vw' }}>
-      <ToastContainer />
-      <div className='info'>
-        <button onClick={openForm} className='btn-add'>+ Thêm</button>
-      </div>
-
-      <DataTable columns={positionColumns} data={positions} slug="position" showEditColumn={false} />;
-      {isFormOpen && (
-        <div className="overlay" onClick={closeForm}>
-          <FormComponent fields={addPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
+    <HelmetProvider>
+      <div className='positions' style={{ width: '70vw' }}>
+        <ToastContainer />
+        <Helmet>
+          <title>Quản lý chức vụ</title>
+        </Helmet>
+        <div className='info'>
+          <button onClick={openForm} className='btn-add'>+ Thêm</button>
         </div>
-      )}
-      <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
-    </div>
+
+        <DataTable columns={positionColumns} data={positions} slug="position" showEditColumn={false} />;
+        {isFormOpen && (
+          <div className="overlay" onClick={closeForm}>
+            <FormComponent fields={addPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
+          </div>
+        )}
+        <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+      </div>
+    </HelmetProvider>
 
 
   );

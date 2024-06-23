@@ -12,11 +12,12 @@ export const SubMenuItem = ({ title, path, index, subItemSelected, setSubItemSel
   };
 
   const listItemStyle = disabled ? { display: 'none' } : {};
+  const titleStyle = subItemSelected === index ? { fontWeight: 600 } : {};
 
   return (
     <Link to={path} onClick={handleClick} className='listItem' style={listItemStyle}>
       {subItemSelected === index ? <FaArrowRight className='icon arrow-right' /> : <BsThreeDots className='icon three-dots'/>}
-      {title}
+      <span style={titleStyle}>{title}</span>
     </Link>
   );
 };

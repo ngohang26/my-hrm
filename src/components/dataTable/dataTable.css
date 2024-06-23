@@ -23,7 +23,6 @@
   position: relative;
 }
 
-
 .dataTable .dataGrid .MuiDataGrid-toolbarContainer {
   flex-direction: row-reverse;
 
@@ -34,66 +33,6 @@
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
-}
-
-.dataTable .dataGrid .action {
-  display: flex;
-  gap: 15px;
-}
-
-.dataTable .dataGrid .action img {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-
-
-
-/* Style for modal buttons */
-.modalButtons {
-  display: flex;
-  justify-content: flex-end;
-  padding-right: 2.5rem;
-  margin-top: 10px;
-
-}
-
-.modalButtons button {
-  margin-left: 20px;
-  border: none;
-  width: 6rem;
-  height: 2.5rem;
-  border-radius: 5px;
-
-}
-
-
-.undoSnackbar {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background-color: #ffffff;
-  padding: 16px 24px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: black;
-
-}
-
-.undoSnackbar button {
-  background-color: #fbfbfb;
-  border: none;
-  color: #0c7cbc;
-  border-bottom: 1px solid #0c7cbc;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.undoSnackbar p {
-  margin:0 20px 0px 0px;
-  
 }
 
 .empty-data {
@@ -151,5 +90,4 @@
   cursor: pointer;
 }
 
-.dataTable button {
-}
+ 

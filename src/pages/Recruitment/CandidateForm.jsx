@@ -156,11 +156,11 @@ const CandidateForm = ({ mode, currentCandidate, setTabIndex, setShowEditTab, jo
 		e.preventDefault();
 		let resumeFilePath = candidateData.resumeFilePath;
 
-  if (selectedFile instanceof File && !isFileUploaded) {
-    resumeFilePath = await handleUpload(selectedFile);
-  } else {
-    console.log("File đã được upload hoặc không có file mới.");
-  }
+		if (selectedFile instanceof File && !isFileUploaded) {
+			resumeFilePath = await handleUpload(selectedFile);
+		} else {
+			console.log("File đã được upload hoặc không có file mới.");
+		}
 		setLoading(true)
 		const candidateToSend = {
 			...candidateData,
@@ -168,7 +168,7 @@ const CandidateForm = ({ mode, currentCandidate, setTabIndex, setShowEditTab, jo
 			jobPosition: { id: selectedJobPositionId },
 			firstInterviewStatus: candidateData.firstInterviewStatus || 'NOT_APPLICABLE',
 			secondInterviewStatus: candidateData.secondInterviewStatus || 'NOT_APPLICABLE',
-			jobOffer: null  
+			jobOffer: null
 		};
 
 		console.log("Data sent to server:", candidateToSend);
@@ -239,11 +239,11 @@ const CandidateForm = ({ mode, currentCandidate, setTabIndex, setShowEditTab, jo
 						<div class='candidate-info'>
 							<div class='input-group'>
 								<div>
-								{candidateData.candidateName !== null && (
-									<input type="text" name="candidateName" id='candidateName' value={candidateData.candidateName} placeholder='Họ và tên' onChange={handleChange} className='form-control more' />
-								
+									{candidateData.candidateName !== null && (
+										<input type="text" name="candidateName" id='candidateName' value={candidateData.candidateName} placeholder='Họ và tên' onChange={handleChange} className='form-control more' />
+
 									)}
-										</div>
+								</div>
 								<div>
 									<select name="positionName" value={selectedJobPositionId} onChange={handleJobPositionChange} className='form-control select' >
 										<option value=''>Chọn chức vụ ...</option>
@@ -294,7 +294,7 @@ const CandidateForm = ({ mode, currentCandidate, setTabIndex, setShowEditTab, jo
 						<TabPanel>
 							<div className='container-grid'>
 								<div className="form-grid grid-item">
-									<label>KỸ NĂNG</label>
+									<label id='a'>KỸ NĂNG</label>
 									{skillNames.map((skillName, index) => {
 										const skill = candidateData.skills.find(s => s.skillName.id === skillName.id);
 										return (
@@ -321,7 +321,7 @@ const CandidateForm = ({ mode, currentCandidate, setTabIndex, setShowEditTab, jo
 								</div>
 
 								<div className="form-grid grid-item">
-									<label>KINH NGHIỆM</label>
+									<label id='a'>KINH NGHIỆM</label>
 									{experienceNames.map((experienceName, index) => {
 										const experience = candidateData.experiences.find(s => s.experienceName.id === experienceName.id);
 										return (

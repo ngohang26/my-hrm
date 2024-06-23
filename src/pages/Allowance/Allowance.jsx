@@ -2,7 +2,7 @@ import React from 'react'
 import DataTable from '../../components/dataTable/DataTable.jsx'
 import './Allowance.css'
 import { useState, useEffect } from 'react';
-import FormComponent from '../../components/Add/FormComponent.jsx';
+import FormComponent from '../../components/Form/FormComponent.jsx';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,6 +10,7 @@ import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx';
 import { FiTrash, FiEdit } from 'react-icons/fi';
 import EmployeeAllowance from './EmployeeAllowance.jsx';
 import { apiUrl } from '../../config.js';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const addAllowanceColumns = [
   { field: 'allowanceName', headerName: 'Tên trợ cấp', flex: 2.5, },
@@ -87,7 +88,6 @@ async function editAllowance(id, allowanceDetails) {
 
 async function deleteAllowance(id) {
   const token = localStorage.getItem('accessToken');
-
   try {
     const response = await fetch(`${apiUrl}/allowance/hardDelete/${id}`, {
       method: 'DELETE',
@@ -96,13 +96,22 @@ async function deleteAllowance(id) {
       }
     });
 
-    if (!response.ok) {
+    const result = await response.json();  // Đọc response body
+
+    if (response.ok) {
+      toast.success(result.message || 'Xóa trợ cấp thành công');
+    } else if (response.status === 409) {
+      toast.error(result.message || 'Trợ cấp đang được sử dụng và không thể xóa');
+    } else if (response.status === 404) {
+      toast.error(result.message || 'Không tìm thấy trợ cấp để xóa');
+    } else {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   } catch (error) {
-    console.error('Failed to delete allowance:', error);
+    toast.error('Lỗi hệ thống! Không thể xóa trợ cấp');
   }
 }
+
 const Allowance = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [allowances, setAllowances] = useState([]);
@@ -142,9 +151,9 @@ const Allowance = () => {
           <button onClick={() => handleEdit(params.row)} className='btn-action'>        
             <FiEdit color='#000'/>
           </button>
-          {/* <button onClick={() => openDeleteModal(params.row.id)} className='btn-action'>
+          <button onClick={() => openDeleteModal(params.row.id)} className='btn-action'>
             <FiTrash color='#ff0000'/>
-          </button> */}
+          </button>
         </div>
       ),
     },
@@ -198,7 +207,10 @@ const Allowance = () => {
     setIsFormOpen(true)
 };
   return (
-    <>
+    <HelmetProvider>
+      <Helmet>
+        <title>Trợ cấp</title>
+      </Helmet>
     <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
       <TabList className='tablist'>
         <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
@@ -213,7 +225,8 @@ const Allowance = () => {
         </div>
         <DataTable columns={allowanceColumns} data={allowances} slug="allowance" showEditColumn={false}/>;
         {isFormOpen && (
-          <div className="overlay" onClick={closeForm}>
+          <div className="overlay" onClick={closeForm}>  
+          {/* css .overlay ở datatable */}
             <FormComponent fields={addAllowanceColumns} onSubmit={handleFormSubmit} onCancel={closeForm} 
             initialValues={editing}
             />
@@ -226,7 +239,7 @@ const Allowance = () => {
         <EmployeeAllowance/>
       </TabPanel>
       </Tabs>
-    </>
+    </HelmetProvider>
 
   );
 }

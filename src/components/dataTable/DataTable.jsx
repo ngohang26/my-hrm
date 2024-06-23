@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import './dataTable.css'
-import { DataGrid, GridToolbar, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from "@mui/x-data-grid";
 
 function CustomToolbar() {
   return (
+    //  để xuất dữ liệu sang CSV
     <GridToolbarContainer>
       <GridToolbarExport csvOptions={{ utf8WithBom: true }} />
     </GridToolbarContainer>
@@ -27,13 +28,20 @@ const DataTable = ({ columns, data }) => {
 
   const handleSearch = (event) => {
     setSearchText(event.target.value);
-    const filteredRows = data.filter((row) =>
-      columnsWithAction.some((column) =>
-        row[column.field]?.toString().toLowerCase().includes(event.target.value.toLowerCase())
-      )
-    );
+    const searchLowercase = event.target.value.toLowerCase();
+    const filteredRows = data.filter((row) => {
+      return columnsWithAction.some((column) => {
+        const value = row[column.field];
+        if (value && typeof value === 'object') {
+          return value.positionName?.toLowerCase().includes(searchLowercase) ||
+                 value.departmentName?.toLowerCase().includes(searchLowercase);
+        }
+        return value?.toString().toLowerCase().includes(searchLowercase);
+      });
+    });
     setRows(filteredRows);
-  };
+  };  
+  
   const handleClearSearch = () => {
     setSearchText('');
     setRows(data);
@@ -65,7 +73,7 @@ const DataTable = ({ columns, data }) => {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 20,
+                pageSize: 20, // số lượng ban đầu hiển thị 
               },
             },
           }}
@@ -73,7 +81,7 @@ const DataTable = ({ columns, data }) => {
             Toolbar: CustomToolbar,
 
           }}
-          pageSizeOptions={[20]}
+          pageSizeOptions={[10,20]} 
           disableRowSelectionOnClick
           disableDensitySelector
           disableColumnSelector

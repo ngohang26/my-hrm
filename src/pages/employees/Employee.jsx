@@ -6,9 +6,10 @@ import { apiUrl } from '../../config'
 import { FiEdit } from 'react-icons/fi'
 import { IoSettings } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
-import FormComponent from '../../components/Add/FormComponent';
+import FormComponent from '../../components/Form/FormComponent';
 import { MdOutlineSettings } from 'react-icons/md';
 import { toast } from 'react-toastify';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const Employee = () => {
   const [employees, setEmployees] = useState([]);
@@ -184,7 +185,7 @@ const Employee = () => {
       flex: 1,
       valueGetter: (params) => params.row.department.departmentName,
     },
-    { field: 'phoneNumber', headerName: 'PHONE NUMBER', flex: 1 },
+    { field: 'phoneNumber', headerName: 'SỐ ĐIỆN THOẠI', flex: 1 },
     {
       field: 'edit',
       headerName: 'HÀNH ĐỘNG',
@@ -231,61 +232,51 @@ const Employee = () => {
   }
 
   return (
-    <Tabs selectedIndex={tabIndex} onSelect={handleTabSelect}>
-      <TabList className='tablist tabemployee'>
-        <div style={{ display: 'flex' }}>
-          <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
-          <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>+ Thêm</Tab>
-          {showEditTab && (
-            <Tab className={`tab-item ${tabIndex === 2 ? 'active' : ''}`} style={{ color: tabIndex === 2 ? '#5a5279' : 'gray' }}>Sửa</Tab>
+    <HelmetProvider>
+      <Tabs selectedIndex={tabIndex} onSelect={handleTabSelect}>
+        <Helmet>
+          <title>Quản lý nhân viên</title>
+        </Helmet>
+        <TabList className='tablist tabemployee'>
+          <div style={{ display: 'flex' }}>
+            <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
+            <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>+ Thêm</Tab>
+            {showEditTab && (
+              <Tab className={`tab-item ${tabIndex === 2 ? 'active' : ''}`} style={{ color: tabIndex === 2 ? '#5a5279' : 'gray' }}>Sửa</Tab>
+            )}
+          </div>
+          <span onClick={toggleReasonMenu}><IoSettings className='navbar-link icon setting' /></span>
+          {isReasonMenuOpen && (
+            <div className='e-menu'>
+              <Link to="/hrm/employee/termination-reasons">Lý do thôi việc</Link>
+              <Link to="/hrm/employee/resigned-employees">Nhân viên đã nghỉ</Link>
+            </div>
           )}
-        </div>
-        <span onClick={toggleReasonMenu}><IoSettings className='navbar-link icon setting' /></span>
-        {isReasonMenuOpen && (
-          <div className='e-menu'>
-            <Link to="/hrm/employee/termination-reasons">Lý do thôi việc</Link>
-          </div>
-        )}
-      </TabList>
-      <TabPanel>
-        <DataTable columns={tableColumns} data={employees} />
-        {isFormOpen && (
-          <div className="overlay">
-            <FormComponent fields={[
-              {
-                field: 'reasonId',
-                headerName: 'Lý do thôi việc',
-                options: reasonEmployee.map(reason => ({ id: reason.id, name: reason.reason })),
-                type: 'select'
-              },
-
-              {
-                field: 'terminationDate',
-                headerName: 'Ngày thôi việc',
-                type: 'date',
-              },
-            ]} onSubmit={handleUpdateFormSubmit} onCancel={() => setIsFormOpen(false)} initialValues={{ reasonId, terminationDate }} />
-          </div>
-        )}
-      </TabPanel>
-      <TabPanel>
-        {mode === 'add' && <EmployeeForm mode={mode}
-          setTabIndex={setTabIndex}
-          positions={positions}
-          departments={departments}
-          fetchEmployees={fetchEmployees}
-          selectedPositionId={selectedPositionId}
-          selectedDepartmentId={selectedDepartmentId}
-          setSelectedPositionId={setSelectedPositionId}
-          setSelectedDepartmentId={setSelectedDepartmentId}
-        />}
-      </TabPanel>
-      {showEditTab && (
+        </TabList>
         <TabPanel>
-          {mode === 'edit' && editingEmployee && <EmployeeForm mode={mode}
-            currentEmployee={editingEmployee}
+          <DataTable columns={tableColumns} data={employees} />
+          {isFormOpen && (
+            <div className="overlay">
+              <FormComponent fields={[
+                {
+                  field: 'reasonId',
+                  headerName: 'Lý do thôi việc',
+                  options: reasonEmployee.map(reason => ({ id: reason.id, name: reason.reason })),
+                  type: 'select'
+                },
+
+                {
+                  field: 'terminationDate',
+                  headerName: 'Ngày thôi việc',
+                  type: 'date',
+                },
+              ]} onSubmit={handleUpdateFormSubmit} onCancel={() => setIsFormOpen(false)} initialValues={{ reasonId, terminationDate }} />
+            </div>
+          )}
+        </TabPanel>
+        <TabPanel>
+          {mode === 'add' && <EmployeeForm mode={mode}
             setTabIndex={setTabIndex}
-            setShowEditTab={setShowEditTab}
             positions={positions}
             departments={departments}
             fetchEmployees={fetchEmployees}
@@ -295,8 +286,24 @@ const Employee = () => {
             setSelectedDepartmentId={setSelectedDepartmentId}
           />}
         </TabPanel>
-      )}
-    </Tabs>
+        {showEditTab && (
+          <TabPanel>
+            {mode === 'edit' && editingEmployee && <EmployeeForm mode={mode}
+              currentEmployee={editingEmployee}
+              setTabIndex={setTabIndex}
+              setShowEditTab={setShowEditTab}
+              positions={positions}
+              departments={departments}
+              fetchEmployees={fetchEmployees}
+              selectedPositionId={selectedPositionId}
+              selectedDepartmentId={selectedDepartmentId}
+              setSelectedPositionId={setSelectedPositionId}
+              setSelectedDepartmentId={setSelectedDepartmentId}
+            />}
+          </TabPanel>
+        )}
+      </Tabs>
+    </HelmetProvider>
   );
 
 };

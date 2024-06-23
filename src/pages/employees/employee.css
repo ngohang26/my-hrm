@@ -189,11 +189,14 @@ input[type="checkbox"] {
   top: 8%;
   background-color: white;
   border-radius: 5px;
-  width: 135px; 
+  width:fit-content; 
+  height: fit-content;
   z-index: 1;  
   box-shadow: 0 0 12px rgba(0,0,0,0.4); 
   text-align: center;
   padding: 12px 4px;
+  display: flex;
+  flex-direction: column;
 }
 
 .e-menu button {
@@ -203,12 +206,17 @@ input[type="checkbox"] {
   width: 100%;
 }
 
-.e-menu a:last-child {
+.e-menu a{
   border-bottom: none;
   text-decoration: none;
   padding: 10px;
+  color: #494265;
 }
 
 .e-menu a:hover {
   background-color: #ddd;
+}
+
+#a {
+  font-weight: 500;
 }

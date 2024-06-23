@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { CardBox } from '../../components/cardbox/CardBox'
-import './Dashboard.css'
-import Calendar from 'react-calendar'
+import React, { useState, useEffect } from 'react';
+import { CardBox } from '../../components/cardbox/CardBox';
+import './Dashboard.css';
+import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { PieChart, Pie, Cell, Tooltip, Legend, Treemap } from 'recharts';
-import { apiUrl } from '../../config'
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'; // Removed unused Treemap
+import { apiUrl } from '../../config';
 import { jwtDecode } from 'jwt-decode';
 import { DataGrid } from '@mui/x-data-grid';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
-export const Dashboard = () => {
+export const Dashboard = ({ title }) => {
   const [date, setDate] = useState(new Date());
   const [genderData, setGenderData] = useState([]);
   const COLORS = ['#494764', '#cfcee9'];
@@ -47,7 +48,8 @@ export const Dashboard = () => {
     { field: 'dateApplied', headerName: 'NGÀY ỨNG TUYỂN', flex: 0.9, type: Date, sortable: false },
     {
       field: 'currentStatus',
-      headerName: 'TRẠNG THÁI ', sortable: false,
+      headerName: 'TRẠNG THÁI ',
+      sortable: false,
       renderCell: (params) => {
         let color;
         let backgroundColor;
@@ -94,118 +96,103 @@ export const Dashboard = () => {
             statusText = 'Không xác định';
         }
         return (
-          <div style={{ color, backgroundColor, padding: "3px 6px", borderRadius: '5px' }}>
+          <div style={{ color, backgroundColor, padding: '3px 6px', borderRadius: '5px' }}>
             {statusText}
           </div>
         );
       },
       flex: 1.2
     },
-  ]
+  ];
+
   useEffect(() => {
     fetchCandidates();
-
-    // const fetchData = async () => {
-    //   const token = localStorage.getItem('accessToken');
-    //   const response = await fetch(`${apiUrl}/departments/getAllDepartments`, {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //       'Content-Type': 'application/json',
-    //     }
-    //   });
-    //   const departments = await response.json();
-    //   console.log(departments)
-    //   const transformedData = departments.map(dept => ({
-    //     name: dept.departmentName,
-    //     size: dept.employeeCount,   
-    //     label: `${dept.departmentName} (${dept.employeeCount})`  
-    //   }));
-    //   console.log(transformedData)
-
-
-    //   setDepartmentData(transformedData);  
-    // };
-
-    // fetchData();
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken')
-    fetch(`${apiUrl}/employees/genderPercentage`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
+    const fetchGenderData = async () => {
+      const token = localStorage.getItem('accessToken');
+      try {
+        const response = await fetch(`${apiUrl}/employees/genderPercentage`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
         setGenderData([
           { name: 'Nam', value: data.malePercentage },
           { name: 'Nữ', value: data.femalePercentage }
         ]);
-      });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchGenderData();
   }, []);
 
   return (
-    <div className='dashboard'>
-      <div className="left-dashboard">
-        <div className="top-dashboard">
-          <div className="top-text">
-            <h2>Xin chào, {positionName}</h2>
-            <p> 👋 👋 👋</p>
+    <HelmetProvider>
+      <div className="dashboard">
+        <Helmet>
+          <title>Dashboard HRM</title>
+        </Helmet>
+        <div className="left-dashboard">
+          <div className="top-dashboard">
+            <div className="top-text">
+              <h2>Xin chào, {positionName}</h2>
+              <p> 👋 👋 👋</p>
+            </div>
+            <img src="/HR_dashboard.png" alt="HR Dashboard" />
           </div>
-          <img src='/HR_dashboard.png'></img>
-        </div>
-        <CardBox />
-        <div>
-        {loading ? (
-          <div className="empty-data">
-            <img src="/empty.png" alt="Empty data" />
-            <div>Đang tải dữ liệu...</div>
+          <CardBox />
+          <div>
+            {loading ? (
+              <div className="empty-data">
+                <img src="/empty.png" alt="Empty data" />
+                <div>Đang tải dữ liệu...</div>
+              </div>
+            ) : (
+              <DataGrid
+                rows={candidates}
+                columns={tableColumns}
+                pageSize={5}
+                rowsPerPageOptions={[5]}
+                checkboxSelection={false}
+                disableSelectionOnClick
+                disableColumnMenu={true}
+                hideFooter
+              />
+            )}
           </div>
-        ) : (
-          <DataGrid
-            rows={candidates}
-            columns={tableColumns}
-            pageSize={5}
-            rowsPerPageOptions={[5]}
-            checkboxSelection={false}
-            disableSelectionOnClick
-            disableColumnMenu={true}
-            hideFooter
-          />
-        )}
-      </div>
-      </div>
-      <div className="right-dashboard">
-        <div className='calendar'>
-          <Calendar
-            onChange={onChange}
-            value={date}
-          />
         </div>
-        <div className="chart-dashboard">
-          <h4>Giới tính của nhân viên</h4>
-          <PieChart width={280} height={280}>
-            <Pie
-              data={genderData}
-              cx={155}
-              cy={140}
-              innerRadius={60}
-              outerRadius={90}
-              fill="#8884d8"
-              paddingAngle={3}
-              dataKey="value"
-            >
-              {genderData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
+        <div className="right-dashboard">
+          <div className="calendar">
+            <Calendar onChange={onChange} value={date} />
+          </div>
+          <div className="chart-dashboard">
+            <h4>Giới tính của nhân viên</h4>
+            <PieChart width={280} height={280}>
+              <Pie
+                data={genderData}
+                cx={155}
+                cy={140}
+                innerRadius={60}
+                outerRadius={90}
+                fill="#8884d8"
+                paddingAngle={3}
+                dataKey="value"
+              >
+                {genderData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
-
+    </HelmetProvider>
+  );
+};

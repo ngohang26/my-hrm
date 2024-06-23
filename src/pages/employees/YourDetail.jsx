@@ -1,14 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { apiUrl } from '../../config';
+import { jwtDecode } from 'jwt-decode';
+import { apiUrl } from '../../config'
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import './EmployeeDetail.css'
-export const EmployeeDetail = ({ employeeCode }) => {
+
+export const YourDetail = () => {
   const [tabIndex2, setTabIndex2] = useState(0);
-  const [employeeData, setEmployeeData] = useState(null);
-  const [showEditTab, setShowEditTab] = useState(false);
+  const getImageUrl = (image) => {
+    return `${apiUrl}/api/FileUpload/files/images/${image}`;
+  };
+  const [employeeData, setEmployeeData] = useState({
+    fullName: '',
+    phoneNumber: '',
+    image: '',
+    workEmail: '',
+    position: {
+      positionName: ''
+    },
+    department: {
+      departmentName: ''
+    },
+    personalInfo: {
+      nationality: '',
+      birthPlace: '',
+      isResident: true,
+      sex: '',
+      birthDate: '',
+      identityCardNumber: '',
+      personalEmail: '',
+      fieldOfStudy: '',
+      school: ''
+    },
+    skills: [],
+    experiences: []
+  })
+  const [employeeCode, setEmployeeCode] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    const decodedToken = jwtDecode(token);
+    setEmployeeCode(decodedToken.username || '');
+  }, []);
 
   useEffect(() => {
     const fetchEmployeeData = async () => {
@@ -34,15 +68,6 @@ export const EmployeeDetail = ({ employeeCode }) => {
       fetchEmployeeData();
     }
   }, [employeeCode]);
-
-  const getImageUrl = (image) => {
-    return `${apiUrl}/api/FileUpload/files/images/${image}`;
-  };
-
-  if (!employeeData) {
-    return null;
-  }
-
   return (
     <HelmetProvider>
       <ToastContainer />
@@ -51,9 +76,6 @@ export const EmployeeDetail = ({ employeeCode }) => {
       </Helmet>
       <Tabs>
         <div>
-          <div className="resigned-label">
-            <span className="rotated-text">ĐÃ THÔI VIỆC</span>
-          </div>
           <div className='employee-info' style={{ display: "flex", flexWrap: 'wrap' }}>
             <div className="" style={{ flex: '2 0 50%', padding: '10px' }}>
               <input type="text" name="fullName" id='fullName' defaultValue={employeeData.fullName} className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} readOnly />
@@ -76,6 +98,8 @@ export const EmployeeDetail = ({ employeeCode }) => {
             <label className='empl-avt'>
               {employeeData.image ? <img src={getImageUrl(employeeData.image)} alt="Employee" width="100px" height="100px" /> : <p>No image available</p>}
             </label>
+
+
           </div>
         </div>
         <Tabs style={{ backgroundColor: '#fff' }}>
@@ -193,4 +217,5 @@ export const EmployeeDetail = ({ employeeCode }) => {
       </Tabs>
     </HelmetProvider>
   );
-};
+
+}

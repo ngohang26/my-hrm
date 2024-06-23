@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Checkbox, FormControlLabel, TextField } from '@mui/material';
-import './UpdateStatusModal.css'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Checkbox, FormControlLabel, TextField, CircularProgress } from '@mui/material';
+import './UpdateStatusModal.css';
+
 const UpdateStatusModal = ({ open, onClose, onUpdate, candidate, selectedCandidate }) => {
   const [newStatus, setNewStatus] = useState('');
   const [interviewTime, setInterviewTime] = useState('');
@@ -10,6 +11,7 @@ const UpdateStatusModal = ({ open, onClose, onUpdate, candidate, selectedCandida
   const [noteContract, setNoteContract] = useState('');
   const [monthlySalary, setMonthlySalary] = useState('');
   const [identityCardNumber, setIdentityCardNumber] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (candidate) {
@@ -26,7 +28,6 @@ const UpdateStatusModal = ({ open, onClose, onUpdate, candidate, selectedCandida
     }
   }, [selectedCandidate]);
 
-
   const getNextStatus = (currentStatus) => {
     switch (currentStatus) {
       case 'NEW': return ['INITIAL_REVIEW', 'REFUSE'];
@@ -38,12 +39,14 @@ const UpdateStatusModal = ({ open, onClose, onUpdate, candidate, selectedCandida
     }
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (candidate) {
       const formattedInterviewTime = `${interviewTime}:00`;
       const formattedSecondInterviewTime = `${secondInterviewTime}:00`;
 
-      onUpdate(candidate.id, newStatus, formattedInterviewTime, formattedSecondInterviewTime, startDate, endDate, noteContract, monthlySalary, identityCardNumber);
+      setLoading(true);
+      await onUpdate(candidate.id, newStatus, formattedInterviewTime, formattedSecondInterviewTime, startDate, endDate, noteContract, monthlySalary, identityCardNumber);
+      setLoading(false);
     }
     onClose();
   };
@@ -125,18 +128,23 @@ const UpdateStatusModal = ({ open, onClose, onUpdate, candidate, selectedCandida
             )}
 
             {newStatus === 'CONTRACT_SIGNED' && (
+              <>
+                <h5 style={{ color: '#969696' }}>Bạn cần nhập số cccd để cập nhập hồ sơ nhân viên</h5>
               <TextField
                 label="Số chứng minh nhân dân"
                 value={identityCardNumber}
                 onChange={(e) => setIdentityCardNumber(e.target.value)}
               />
+              </>
             )}
           </>
         )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">Hủy</Button>
-        <Button onClick={handleUpdate} color="primary">Cập nhật</Button>
+        <Button onClick={handleUpdate} color="primary" disabled={loading}>
+          {loading ? <CircularProgress size={24} /> : 'Cập nhật'}
+        </Button>
       </DialogActions>
     </Dialog>
   );

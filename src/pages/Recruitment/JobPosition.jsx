@@ -1,13 +1,13 @@
 import React from 'react'
 import DataTable from '../../components/dataTable/DataTable.jsx'
 import { useState, useEffect } from 'react';
-import FormComponent from '../../components/Add/FormComponent.jsx';
+import FormComponent from '../../components/Form/FormComponent.jsx';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx'
 import { FiTrash, FiEdit } from 'react-icons/fi';
 import { apiUrl } from '../../config'
-import { type } from '@testing-library/user-event/dist/type/index.js';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 async function fetchJobPositions() {
   const token = localStorage.getItem('accessToken');
@@ -235,10 +235,10 @@ const JobPosition = () => {
       field: 'jobSummary', headerName: 'MÔ TẢ', flex: 1.5,
       valueGetter: (params) => params.row.position.jobSummary
     },
-    { field: 'skillsRequired', headerName: 'Yêu cầu', flex: 2.5, },
-    { field: 'applicationDeadline', headerName: 'Thời hạn', flex: 1, },
+    { field: 'skillsRequired', headerName: 'YÊU CẦU', flex: 2.5, },
+    { field: 'applicationDeadline', headerName: 'THỜI HẠN', flex: 1, },
     {
-      field: 'actions', headerName: 'Hành động', flex: 1, renderCell: (params) => (
+      field: 'actions', headerName: 'HÀNH ĐỘNG', flex: 1, renderCell: (params) => (
         <div className='action'>
           <button onClick={() => handleEdit(params.row)} className='btn-action'>
             <FiEdit color='#000' />
@@ -251,24 +251,28 @@ const JobPosition = () => {
     },
   ];
   return (
-    <div style={{ display: 'flex', justifyContent: 'center' }}>
-
-      <div className='jobPositions' style={{ width: '75vw' }}>
-        <ToastContainer />
-        <h4>Vị trí tuyển dụng</h4>
-        <div className='info'>
-          <button onClick={openForm} className='btn-add'>+ Thêm</button>
-        </div>
-
-        <DataTable columns={jobPositionColumns} data={jobPositions} slug="jobPosition" showEditColumn={false} />;
-        {isFormOpen && (
-          <div className="overlay" onClick={closeForm}>
-            <FormComponent fields={addJobPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
+    <HelmetProvider>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Helmet>
+          <title>Vị trí tuyển dụng</title>
+        </Helmet>
+        <div className='jobPositions' style={{ width: '75vw' }}>
+          <ToastContainer />
+          <h4></h4>
+          <div className='info'>
+            <button onClick={openForm} className='btn-add'>+ Thêm</button>
           </div>
-        )}
-        <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+
+          <DataTable columns={jobPositionColumns} data={jobPositions} slug="jobPosition" showEditColumn={false} />;
+          {isFormOpen && (
+            <div className="overlay" onClick={closeForm}>
+              <FormComponent fields={addJobPositionColumns} onSubmit={handleFormSubmit} onCancel={closeForm} initialValues={editing} />
+            </div>
+          )}
+          <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+        </div>
       </div>
-    </div>
+    </HelmetProvider>
 
 
   );

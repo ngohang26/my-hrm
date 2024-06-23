@@ -1,16 +1,17 @@
 import React from 'react'
 import DataTable from '../../components/dataTable/DataTable.jsx'
 import { useState, useEffect } from 'react';
-import FormComponent from '../../components/Add/FormComponent.jsx';
+import FormComponent from '../../components/Form/FormComponent.jsx';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmDeleteModal from '../../components/Form/ConfirmDeleteModal.jsx';
 import { FiEdit, FiTrash } from 'react-icons/fi';
 import { apiUrl } from '../../config.js';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const addTerminationReasonColumns = [
-  { field: 'reason', headerName: 'Tên trợ cấp' },
+  { field: 'reason', headerName: 'Lý do' },
 ];
 
 async function fetchTerminationReasons() {
@@ -46,7 +47,7 @@ async function addTerminationReason(terminationReason) {
     } else if (response.status === 500) {
       toast.error('Tên lý do không hợp lệ');
     } else if (response.status === 409) {
-      toast.error('Trợ cấp đã tồn tại');
+      toast.error('Lý do đã tồn tại');
     } else {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -72,7 +73,7 @@ async function editTerminationReason(id, terminationReasonDetails) {
     } else if (response.status === 500) {
       toast.error('Tên lý do không hợp lệ');
     } else if (response.status === 409) {
-      toast.error('Trợ cấp đã tồn tại');
+      toast.error('Lý do đã tồn tại');
     } else {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -192,29 +193,34 @@ const TerminationReason = () => {
     setIsFormOpen(true)
   };
   return (
-    <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
-      <ToastContainer />
-      <TabList className='tablist'>
-        <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
-      </TabList>
+    <HelmetProvider>
+      <Helmet>
+        <title>Quản lý lý do</title>
+      </Helmet>
+      <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
+        <ToastContainer />
+        <TabList className='tablist'>
+          <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
+        </TabList>
 
-      <TabPanel style={{ display: 'flex', justifyContent: 'center' }}>
-        <div className='allowances'>
-          <div className='info'>
-            <button onClick={openForm} className='btn-add'>+ Thêm</button>
-          </div>
-          <DataTable columns={terminationReasonColumns} data={terminationReasons} slug="terminationReason" showEditColumn={false} />;
-          {isFormOpen && (
-            <div className="overlay" onClick={closeForm}>
-              <FormComponent fields={addTerminationReasonColumns} onSubmit={handleFormSubmit} onCancel={closeForm}
-                initialValues={editing}
-              />
+        <TabPanel style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className='allowances'>
+            <div className='info'>
+              <button onClick={openForm} className='btn-add'>+ Thêm</button>
             </div>
-          )}
-          <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
-        </div>
-      </TabPanel>
-    </Tabs>
+            <DataTable columns={terminationReasonColumns} data={terminationReasons} slug="terminationReason" showEditColumn={false} />;
+            {isFormOpen && (
+              <div className="overlay" onClick={closeForm}>
+                <FormComponent fields={addTerminationReasonColumns} onSubmit={handleFormSubmit} onCancel={closeForm}
+                  initialValues={editing}
+                />
+              </div>
+            )}
+            <ConfirmDeleteModal isOpen={isDeleteModalOpen} onConfirm={handleConfirmDelete} onCancel={closeDeleteModal} />
+          </div>
+        </TabPanel>
+      </Tabs>
+    </HelmetProvider>
   );
 }
 

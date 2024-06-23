@@ -5,6 +5,7 @@ import { PiLockKeyLight } from "react-icons/pi";
 import './menu.css'
 import MenuItem from "../menu-item/MenuItem";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 const menuItems = [
   {
     title: <strong>HRMS</strong>,
@@ -26,7 +27,7 @@ const menuItems = [
       { title: 'Hợp đồng', path: '/hrm/contracts', permission: 'ADD_CONTRACT' },
       { title: 'Hợp đồng của bạn', path: '/hrm/contract', permission: 'VIEW_CONTRACT' },
       { title: 'Phiếu lương', path: '/hrm/payslip', permission: 'VIEW_SALARY' },
-      { title: 'Quản lý trợ cấp', path: '/hrm/allowance', permission: 'ADD_SALARY' },
+      { title: 'Quản lý trợ cấp', path: '/hrm/allowance', permission: 'ADD_ALLOWANCE' },
     ]
   }, {
     title: <strong>Chấm công</strong>,
@@ -60,7 +61,8 @@ export const Menu = ({ isMenuOpen }) => {
 
   return (
     <div className='menu'>
-      <h5>ToLo HR</h5>
+      <Link to='/hrm/dashboard'><h5>ToLo HR</h5></Link>
+      
       {menuItems.map((item, index) => (
         <MenuItem
           key={index}

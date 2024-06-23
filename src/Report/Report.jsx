@@ -6,6 +6,8 @@ import { LineChartComponent } from '../components/Chart/LineChart';
 import { PieChartComponent } from '../components/Chart/PieChart';
 import './Report.css'
 import { FaArrowDown, FaArrowUp, FaClock, FaMoneyBillWave, FaUser } from 'react-icons/fa';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+
 const Report = () => {
   const [data, setData] = useState([]);
 
@@ -15,10 +17,11 @@ const Report = () => {
   const [employeeCountData, setEmployeeCountData] = useState([]);
   const [candidateStatusData, setCandidateStatusData] = useState({});
   const [workAndOvertimeData, setWorkAndOvertimeData] = useState([]);
-  const currentDate = new Date();
-  const lastMonth = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
-  const [year, setYear] = useState(lastMonth.getFullYear());
-  const [month, setMonth] = useState(lastMonth.getMonth() + 1);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(new Date().getMonth());
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+
   const [employeeData, setEmployeeData] = useState({});
   const [salaryData, setSalaryData] = useState({});
   const [workHoursData, setWorkHoursData] = useState({});
@@ -107,19 +110,31 @@ const Report = () => {
 
       setEmployeeCountData(employeeCount);
     }
-    const fetchCandidateStatusData = async () => {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${apiUrl}/candidates/getCandidateCountByStatus`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await response.json();
-      setCandidateStatusData(data);
-    };
-
     fetchEmployeeCountData();
-    fetchCandidateStatusData();
   }, []);
+  const fetchCandidateStatusDataByMonthAndYear = async () => {
+    const token = localStorage.getItem('accessToken');
+    const response = await fetch(`${apiUrl}/candidates/getCandidateCountByStatusAndMonth/${year}/${month}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await response.json();
+    statusesToShow.forEach(status => {
+      if (!data[status]) {
+        data[status] = { count: 0, percentage: 0 };
+      }
+    });
+    Object.keys(data).forEach(status => {
+      data[status].percentage = Math.round(data[status].percentage);
+    });
 
+    setCandidateStatusData(data);
+  };
+
+  useEffect(() => {
+    fetchCandidateStatusDataByMonthAndYear(year, month);
+  }, [year, month]);
+
+  const hasData = data.every(item => item.tax === 0);
   const transformDataForChart = (overtimeHours, incomeTax) => {
     const departments = Object.keys(overtimeHours);
     const transformedData = departments.map(department => ({
@@ -162,122 +177,147 @@ const Report = () => {
 
 
   return (
-    <div className='reports'>
-      <h3>Báo cáo</h3>
-      <div className="report-container">
-        <div className="report" >
-          <div className="grid-left">
-            <div className="report-employee">
-              <div className="grid-item">
-                <div className='grid-items'>
-                  <div>
-                    <h4>Số nhân viên</h4>
-                    <h2>{employeeData.count}</h2>
-                  </div>
-                  <FaUser size={50} color='#a893dd' />
-                </div>
-                <span>
-                  {employeeData.percentageChange > 0 ? <FaArrowUp /> : null}
-                  {employeeData.percentageChange < 0 ? <FaArrowDown /> : null}
-                  <strong>{Math.abs(employeeData.percentageChange)}%</strong> So với tháng trước
-                </span>
-              </div>
-              <div className="grid-item">
-                <div className="grid-items">
-                  <div>
-                    <h4>Tổng lương</h4>
-                    <h2>{salaryData.total} Tr</h2>
-                  </div>
-                  <FaMoneyBillWave size={50} color='#a5d1dd' />
-                </div>
-                <span>
-                  {employeeData.percentageChange > 0 ? <FaArrowUp /> : null}
-                  {employeeData.percentageChange < 0 ? <FaArrowDown /> : null}
-                  <strong>{Math.abs(salaryData.percentageChange)}%</strong> So với tháng trước
-                </span>
-              </div>
-
-              <div className="grid-item">
-                <div className="grid-items">
-                  <div>
-                    <h4>Tổng số giờ làm</h4>
-                    <h2> {workHoursData.total}</h2>
-
-                  </div>
-                  <FaClock size={50} color='#619ee8' />
-                </div>
-                <span>
-                  {employeeData.percentageChange > 0 ? <FaArrowUp /> : null}
-                  {employeeData.percentageChange < 0 ? <FaArrowDown /> : null}
-                  <strong>{Math.abs(workHoursData.percentageChange)}%</strong> So với tháng trước
-                </span>
-              </div>
-            </div>
-            <div className="chart-gauge">
-              <div className="chart-container">
-                {statusesToShow.slice(0, 6).map((status, index) => (
-                  <div className="chart-item" key={index}>
-                    <div>
-                      <div className="title">
-                        <img src={statusIcons[status]} alt={statusMapping[status]} />
-                        <span>{statusMapping[status]}</span>
+    <HelmetProvider>
+      <div className='reports'>
+        <Helmet>
+          <title>Báo cáo</title>
+        </Helmet>
+        <h3>Báo cáo</h3>
+        <select value={year} onChange={e => setYear(Number(e.target.value))} className='input-control'>
+          {Array.from({ length: currentYear - new Date().getFullYear() + 10 }, (_, i) => (
+            <option key={currentYear - i} value={currentYear - i}>
+              {currentYear - i}
+            </option>
+          ))}
+        </select>
+        <select value={month} onChange={e => setMonth(Number(e.target.value))} className='input-control'>
+          {Array.from({ length: year === currentYear ? currentMonth - 1 : 12 }, (_, i) => (
+            <option key={i + 1} value={i + 1}>
+              {i + 1}
+            </option>
+          ))}
+        </select>
+        {!hasData ? (
+          <div className="report-container">
+            <div className="report" >
+              <div className="grid-left">
+                <div className="report-employee">
+                  <div className="grid-item">
+                    <div className='grid-items'>
+                      <div>
+                        <h4>Số nhân viên</h4>
+                        <h2>{employeeData.count}</h2>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'row' }}>
-                        <h1 style={{ color: '#56546c', marginLeft: '20px' }}>{candidateStatusData[status]?.count}</h1>
-                        <span>📄</span>
-                      </div>
+                      <FaUser size={50} color='#a893dd' />
                     </div>
-                    <div>
-                      <GaugeChart value={candidateStatusData[status]?.percentage} />
-                    </div>
+                    <span>
+                      {employeeData.percentageChange > 0 ? <FaArrowUp /> : null}
+                      {employeeData.percentageChange < 0 ? <FaArrowDown /> : null}
+                      <strong>{Math.abs(employeeData.percentageChange)}%</strong> So với tháng trước
+                    </span>
                   </div>
-                ))}
-              </div>
-              <div className="chart-item2 chart-large">
-                <div className="title">
-                  <img src={statusIcons['REFUSE']} alt={statusMapping['REFUSE']} />
-                  <span>{statusMapping['REFUSE']}</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                  <h1 style={{ color: '#56546c' }}>{candidateStatusData['REFUSE']?.count}</h1>
-                  <span>📄</span>
-                </div>
-                <GaugeChart value={candidateStatusData['REFUSE']?.percentage} />
-              </div>
-            </div>
-          </div>
-          <div className="chart-employee">
-            <h4>Số lượng nhân viên theo bộ phận</h4>
-            <PieChartComponent data={employeeCountData} dataKey="employeeCount" nameKey="departmentName" colors={COLORS2} cx={90} cy={90} paddingAngle={3} outerRadius={80} innerRadius={55} fill="#8884d8" />
-          </div>
-        </div >
-        <br />
-        <div className="report">
-          <div className="grid-left">
-            <div className="chart-employee chart-working-hours">
-              <h4>Biểu đồ thể hiện thời gian làm việc bình thường và thời gian tăng ca</h4>
-              <br />
-              <BarChartComponent width={760} height={400} data={workAndOvertimeData} dataKey1="workTimeWithoutOvertime" dataKey2="overTime" nameKeyX="date" fill1="#82ca9d" fill2="#8884d8" layout="horizontal" barSize={10} legendPayload={customLegendPayload1} />
+                  <div className="grid-item">
+                    <div className="grid-items">
+                      <div>
+                        <h4>Tổng lương</h4>
+                        <h2>{salaryData.total} Tr</h2>
+                      </div>
+                      <FaMoneyBillWave size={50} color='#a5d1dd' />
+                    </div>
+                    <span>
+                      {employeeData.percentageChange > 0 ? <FaArrowUp /> : null}
+                      {employeeData.percentageChange < 0 ? <FaArrowDown /> : null}
+                      <strong>{Math.abs(salaryData.percentageChange)}%</strong> So với tháng trước
+                    </span>
+                  </div>
 
+                  <div className="grid-item">
+                    <div className="grid-items">
+                      <div>
+                        <h4>Tổng số giờ làm</h4>
+                        <h2> {workHoursData.total}</h2>
+
+                      </div>
+                      <FaClock size={50} color='#619ee8' />
+                    </div>
+                    <span>
+                      {employeeData.percentageChange > 0 ? <FaArrowUp /> : null}
+                      {employeeData.percentageChange < 0 ? <FaArrowDown /> : null}
+                      <strong>{Math.abs(workHoursData.percentageChange)}%</strong> So với tháng trước
+                    </span>
+                  </div>
+                </div>
+                <div className="chart-gauge">
+                  <div className="chart-container">
+                    {statusesToShow.slice(0, 6).map((status, index) => (
+                      <div className="chart-item" key={index}>
+                        <div>
+                          <div className="title">
+                            <img src={statusIcons[status]} alt={statusMapping[status]} />
+                            <span>{statusMapping[status]}</span>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'row' }}>
+                            <h1 style={{ color: '#56546c', marginLeft: '20px' }}>{candidateStatusData[status]?.count}</h1>
+                            <span>📄</span>
+                          </div>
+                        </div>
+                        <div>
+                          <GaugeChart value={candidateStatusData[status]?.percentage} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="chart-item2 chart-large">
+                    <div className="title">
+                      <img src={statusIcons['REFUSE']} alt={statusMapping['REFUSE']} />
+                      <span>{statusMapping['REFUSE']}</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                      <h1 style={{ color: '#56546c' }}>{candidateStatusData['REFUSE']?.count}</h1>
+                      <span>📄</span>
+                    </div>
+                    <GaugeChart value={candidateStatusData['REFUSE']?.percentage} />
+                  </div>
+                </div>
+              </div>
+              <div className="chart-employee">
+                <h4>Số lượng nhân viên theo bộ phận</h4>
+                <PieChartComponent data={employeeCountData} dataKey="employeeCount" nameKey="departmentName" colors={COLORS2} cx={90} cy={90} paddingAngle={3} outerRadius={80} innerRadius={55} fill="#8884d8" />
+              </div>
+            </div >
+            <br />
+            <div className="report">
+              <div className="grid-left">
+                <div className="chart-employee chart-working-hours">
+                  <h4>Biểu đồ thể hiện thời gian làm việc bình thường và thời gian tăng ca</h4>
+                  <br />
+                  <BarChartComponent width={760} height={400} data={workAndOvertimeData} dataKey1="workTimeWithoutOvertime" dataKey2="overTime" nameKeyX="date" fill1="#82ca9d" fill2="#8884d8" layout="horizontal" barSize={10} legendPayload={customLegendPayload1} />
+
+                </div>
+              </div>
+              <div className="chart-employee">
+                <h4>Giờ làm thêm mỗi tháng bộ phận</h4>
+                <PieChartComponent data={data} dataKey="overtime" colors={COLORS} cx={90} cy={90} paddingAngle={3} outerRadius={80} fill="#8884d8" />
+              </div>
             </div>
+            <br />
+            <div className='bottom-report'>
+              <div className="chart-employee">
+                <BarChartComponent width={480} height={250} data={data} dataKey1="tax" nameKey="tax" nameKeyX="name" fill1="#ffa228" fill2="#fff" layout="horizontal" barSize={32} legendPayload={customLegendPayload2} />
+              </div>
+              <div className="chart-employee">
+                <LineChartComponent data={lineChartData} dataKey1="overtimeHour" nameKey="name" stroke1="#8884d8" activeDot={{ r: 8 }} />
+              </div>
+            </div>
+            <br />
+          </div>) : (
+          <div className="empty-data">
+            <img src="/empty.png" alt="Empty data" />
+            <div>Không có dữ liệu để hiển thị</div>
           </div>
-          <div className="chart-employee">
-            <h4>Giờ làm thêm mỗi tháng bộ phận</h4>
-            <PieChartComponent data={data} dataKey="overtime" colors={COLORS} cx={90} cy={90} paddingAngle={3} outerRadius={80} fill="#8884d8" />
-          </div>
-        </div>
-        <br />
-        <div className='bottom-report'>
-          <div className="chart-employee">
-            <BarChartComponent width={480} height={250} data={data} dataKey1="tax" nameKey="tax" nameKeyX="name" fill1="#ffa228" fill2="#fff" layout="horizontal" barSize={32} legendPayload={customLegendPayload2} />
-          </div>
-          <div className="chart-employee">
-            <LineChartComponent data={lineChartData} dataKey1="overtimeHour" nameKey="name" stroke1="#8884d8" activeDot={{ r: 8 }} />
-          </div>
-        </div>
-        <br />
+        )}
       </div>
-    </div>
+    </HelmetProvider>
   );
 }
 

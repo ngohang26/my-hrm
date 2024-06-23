@@ -8,7 +8,6 @@ function AuthHandler() {
   useEffect(() => {
     if (accessToken) {
       navigate('/hrm/dashboard');
-      console.log("first")
     }
   }, [accessToken]);
 

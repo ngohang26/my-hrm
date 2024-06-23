@@ -8,15 +8,16 @@ import { MdOutlineSettings, MdLockReset } from 'react-icons/md'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import AddUser from './AddUser.jsx';
 import { Modal } from '@mui/material';
-import PermissionTable from '../../components/Add/PermissionTable.jsx';
+import PermissionTable from '../../components/Form/PermissionTable.jsx';
 import CircularProgress from '@mui/material/CircularProgress';
-import {apiUrl} from '../../config'
+import { apiUrl } from '../../config'
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const getImageUrl = (image) => {
   return `${apiUrl}/api/FileUpload/files/images/${image}`;
 };
 
-const Users = () => {
+const Users = ({ title }) => {
   const [users, setUsers] = useState([]);
   const [tabIndex, setTabIndex] = useState(0);
   const [openModal, setOpenModal] = useState(false);
@@ -209,19 +210,19 @@ const Users = () => {
     },
     { field: 'username', headerName: 'MÃ NHÂN VIÊN', flex: 1 },
     { field: 'fullName', headerName: 'TÊN NHÂN VIÊN', flex: 1.4 },
-    { 
-      field: 'positionName', 
-      headerName: 'CHỨC VỤ', 
+    {
+      field: 'positionName',
+      headerName: 'CHỨC VỤ',
       flex: 1,
       valueGetter: (params) => params.row.position ? params.row.position.positionName : '',
     },
     {
       field: 'name',
-      headerName: 'Role',
+      headerName: 'ROLE',
       renderCell: (params) => {
         let color;
         let backgroundColor;
-  
+
         switch (params.value) {
           case 'SUPER':
             color = '#fff';
@@ -249,7 +250,7 @@ const Users = () => {
     },
     {
       field: 'detail',
-      headerName: 'Hành động',
+      headerName: 'HÀNH ĐỘNG',
       renderCell: (params) => (
         <div className='action'>
           <button onClick={() => handleEditPermissions(params.row.id)} className='btn-action'>
@@ -263,7 +264,7 @@ const Users = () => {
       flex: 1
     },
   ];
-  
+
 
   const handleUserAdded = async () => {
     const updatedUsers = await fetchUsers();
@@ -293,7 +294,10 @@ const Users = () => {
 
 
   return (
-    <div>
+    <HelmetProvider>
+      <Helmet>
+        <title>Người dùng</title>
+      </Helmet>
       <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
         <TabList className='tablist'>
           <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Người dùng</Tab>
@@ -366,7 +370,7 @@ const Users = () => {
           <AddUser onUserAdded={handleUserAdded} />
         </TabPanel>
       </Tabs>
-    </div>
+    </HelmetProvider>
   )
 }
 

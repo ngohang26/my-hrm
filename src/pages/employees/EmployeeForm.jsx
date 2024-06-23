@@ -286,8 +286,8 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 							<div className="" style={{ flex: '2 0 50%', padding: '10px' }}>
 								{/* <input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Họ tên nhân viên" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} /> */}
 								{employeeData.fullName !== null && (
-    <input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Họ tên nhân viên" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} />
-)}
+									<input type="text" name="fullName" id='fullName' value={employeeData.fullName} onChange={handleChange} placeholder="Họ tên nhân viên" className='form-control' style={{ height: '50px', fontSize: '26px', fontWeight: "600", width: '90.5%', margin: '20px 0px' }} />
+								)}
 
 								<div style={{ display: "flex", gap: '20px', width: '101%' }}>
 
@@ -324,7 +324,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 						<TabPanel>
 							<div className='container-grid'>
 								<div className="form-grid grid-item">
-									<label>KỸ NĂNG</label>
+									<label id='a'>KỸ NĂNG</label>
 									{skillNames.map((skillName, index) => {
 										const skill = employeeData.skills.find(s => s.skillName.id === skillName.id);
 										return (
@@ -351,7 +351,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 								</div>
 
 								<div className="form-grid grid-item">
-									<label>KINH NGHIỆM</label>
+									<label id='a'>KINH NGHIỆM</label>
 									{experienceNames.map((experienceName, index) => {
 										const experience = employeeData.experiences.find(s => s.experienceName.id === experienceName.id);
 										return (
@@ -380,7 +380,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 						<TabPanel>
 							<div className='container-grid'>
 								<div className="form-grid grid-item">
-									<label>LIÊN HỆ CÁ NHÂN</label>
+									<label id='a'>LIÊN HỆ CÁ NHÂN</label>
 									<div className="item-info">
 										<label>Email cá nhân</label>
 										<input type="text" name="personalInfo.personalEmail" value={employeeData.personalInfo.personalEmail} onChange={handleChange} />
@@ -388,7 +388,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 								</div>
 
 								<div className="form-grid grid-item">
-									<label>LIÊN HỆ KHẨN CẤP</label>
+									<label id='a'>LIÊN HỆ KHẨN CẤP</label>
 									<div className="item-info">
 										<label >Tên liên hệ</label>
 										<input type="text" name="nameContactER" value={employeeData.nameContactER} onChange={handleChange} />
@@ -399,7 +399,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 									</div>
 								</div>
 								<div className="form-grid grid-item">
-									<label>CÔNG DÂN</label>
+									<label id='a'>CÔNG DÂN</label>
 									<div className="item-info">
 										<label>Quốc tịch</label>
 										<input type="text" name="personalInfo.nationality" value={employeeData.personalInfo.nationality} onChange={handleChange} className='f' />
@@ -434,7 +434,7 @@ const EmployeeForm = ({ mode, currentEmployee, setTabIndex, setShowEditTab, posi
 									</div>
 								</div>
 								<div className="form-grid grid-item">
-									<label>GIÁO DỤC</label>
+									<label id='a'>GIÁO DỤC</label>
 									<div className="item-info">
 										<label>Cấp bằng</label>
 										<select name="personalInfo.certificateLevel" value={employeeData.personalInfo.certificateLevel} onChange={handleChange}>

@@ -43,10 +43,6 @@ export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
   }
 
   const handleOpenEmailDialog = () => {
-    const token = localStorage.getItem('accessToken');
-    const decodeedToken = jwtDecode(token);
-    const email = decodeedToken.email;
-    setNewEmail(email);
     setOpenEmailDialog(true)
   }
 
@@ -55,38 +51,41 @@ export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
     const decodedToken = jwtDecode(token);
     const userId = decodedToken.userId;
     try {
-      const response = await fetch(`http://localhost:8080/users/${userId}/change-email`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          password: password,
-          newEmail
-        })
-      });
+        const response = await fetch(`http://localhost:8080/users/${userId}/change-email`, {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                password: password,
+                newEmail
+            })
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        toast.success(data.message)
-        handleCloseEmailDialog();
-      } else {
-        toast.error(data.message)
-      }
+        if (response.status === 200) {
+            toast.success(data.message);
+            handleCloseEmailDialog();
+        } else if (response.status === 400) {
+            toast.error(data.message);
+        } else if (response.status === 401) {
+            toast.error(data.message);
+        } else {
+            toast.error("Có lỗi xảy ra khi thay đổi email");
+        }
     } catch (error) {
-      console.error(error);
-      toast.error("Email không hợp lệccc")
+        console.error(error);
+        toast.error("Có lỗi xảy ra khi thay đổi email");
     }
-  }
-
+}
 
   const handleChangePassword = async () => {
     const token = localStorage.getItem('accessToken');
     const decodedToken = jwtDecode(token);
     const userId = decodedToken.userId;
-    const email = decodedToken.email;
+    // const email = decodedToken.email;
     try {
       const response = await fetch(`http://localhost:8080/users/change-password/${userId}`, {
         method: 'PUT',
@@ -123,10 +122,11 @@ export const SideBar = ({ isMenuOpen, setIsMenuOpen }) => {
     <div className='sidebar'>
       <ToastContainer />
       <div className="left-sidebar">
-        <a href="/dashboard" className='dashboard-logo'><TbBrand4Chan className='logo' /></a>
+        <a href="/hrm/dashboard" className='dashboard-logo'><TbBrand4Chan className='logo' /></a>
         <div className="left-sidebar-item">
           <div className="dropdown">
             {/* <span><IoSettings className='navbar-link icon setting' /></span> */}
+            {/* <a href="/hrm/chat"><IoChatbubbleEllipsesOutline className='navbar-link icon chat'/></a> */}
             <span onClick={toggleUserMenu}><FaUserAlt className='navbar-link icon user' /></span>
             {isUserMenuOpen && (
               <div className={`user-menu ${isMenuOpen ? 'menu-open' : ''}`}>

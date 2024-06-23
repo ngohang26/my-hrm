@@ -7,6 +7,8 @@ import { MdOutlineSettings } from 'react-icons/md';
 import UpdateStatusModal from './UpdateStatusModal';
 import './Candidate.css'
 import { apiUrl } from '../../config'
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Candidate = () => {
   const [candidates, setCandidates] = useState([]);
@@ -53,30 +55,30 @@ const Candidate = () => {
 
   const fetchData = async () => {
     const token = localStorage.getItem('accessToken');
-  
+
     try {
       const responseJobPosition = await fetch(`${apiUrl}/jobPositions/getAllJobPositions`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const jobPosition = await responseJobPosition.json();
-  
+
       const responseCandidateCountByStatus = await fetch(`${apiUrl}/candidates/getCandidateCountByStatus`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const candidateCountByStatus = await responseCandidateCountByStatus.json();
-  
+
       const candidateCount = {};
       for (let status in candidateCountByStatus) {
         candidateCount[status] = candidateCountByStatus[status].count;
       }
-  
+
       setJobPositions(jobPosition);
       setCandidateCountByStatus(candidateCount);
     } catch (error) {
       console.error('Error:', error);
     }
   };
-  
+
 
   const handleUpdateStatus = async (id, newStatus, interviewTime, secondInterviewTime, startDate, endDate, noteContract, monthlySalary, identityCardNumber) => {
     const token = localStorage.getItem('accessToken');
@@ -124,9 +126,7 @@ const Candidate = () => {
       case 'CONTRACT_SIGNED':
         body = {
           newStatus: newStatus,
-          candidateDetails: {
-            identityCardNumber: identityCardNumber
-          }
+          identityCardNumber: identityCardNumber
         };
         break;
       default:
@@ -142,10 +142,15 @@ const Candidate = () => {
       body: JSON.stringify(body)
     });
 
+    console.log(body)
     if (!response.ok) {
-      console.error('Error:', await response.text());
+      const error = await response.text()
+      console.error('Error:', error);
+      toast.error(error)
     } else {
+      toast.success("Cập nhật trạng thái tuyển dụng thành công!")
       fetchCandidates();
+      fetchData();
     }
   };
   const handleEditCandidate = (candidate) => {
@@ -270,63 +275,70 @@ const Candidate = () => {
   };
 
   return (
-    <Tabs selectedIndex={tabIndex} onSelect={handleTabSelect}>
-      <TabList className='tablist'>
-        <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
-        <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>+ Thêm</Tab>
-        {showEditTab && (
-          <Tab className={`tab-item ${tabIndex === 2 ? 'active' : ''}`} style={{ color: tabIndex === 2 ? '#5a5279' : 'gray' }}>Sửa</Tab>
-        )}
-      </TabList>
-      <TabPanel>
-        <div className="candidate-container">
-          <div className="status-filter-column">
-            <button className={selectedStatus === '' ? 'selected' : ''} onClick={() => handleFilterStatus('')}>Tất cả</button>
-            <button className={selectedStatus === 'NEW' ? 'selected' : ''} onClick={() => handleFilterStatus('NEW')}>Mới<span className="status-count status-count-new">{candidateCountByStatus['NEW'] || 0}</span></button>
-            <button className={selectedStatus === 'INITIAL_REVIEW' ? 'selected' : ''} onClick={() => handleFilterStatus('INITIAL_REVIEW')}>Đánh giá ban đầu<span className="status-count status-count-initial-review">{candidateCountByStatus['INITIAL_REVIEW'] || 0}</span></button>
-            <button className={selectedStatus === 'FIRST_INTERVIEW' ? 'selected' : ''} onClick={() => handleFilterStatus('FIRST_INTERVIEW')}>Phỏng vấn lần 1<span className="status-count status-count-first-interview">{candidateCountByStatus['FIRST_INTERVIEW'] || 0}</span></button>
-            <button className={selectedStatus === 'SECOND_INTERVIEW' ? 'selected' : ''} onClick={() => handleFilterStatus('SECOND_INTERVIEW')}>Phỏng vấn lần 2<span className="status-count status-count-second-interview">{candidateCountByStatus['SECOND_INTERVIEW'] || 0}</span></button>
-            <button className={selectedStatus === 'OFFER_MADE' ? 'selected' : ''} onClick={() => handleFilterStatus('OFFER_MADE')}>Đã đề nghị<span className="status-count status-count-offer-made">{candidateCountByStatus['OFFER_MADE'] || 0}</span></button>
-            <button className={selectedStatus === 'CONTRACT_SIGNED' ? 'selected' : ''} onClick={() => handleFilterStatus('CONTRACT_SIGNED')}>Đã ký hợp đồng<span className="status-count status-count-contract-signed">{candidateCountByStatus['CONTRACT_SIGNED'] || 0}</span></button>
-            <button className={selectedStatus === 'REFUSE' ? 'selected' : ''} onClick={() => handleFilterStatus('REFUSE')}>Từ chối<span className="status-count status-count-refuse">{candidateCountByStatus['REFUSE'] || 0}</span></button>
-          </div>
-          <div className="datatable-container">
-            <DataTable columns={tableColumns} data={getFilteredCandidates()} />
-          </div>
-        </div>
-      </TabPanel>
-      <TabPanel>
-        {mode === 'add' && <CandidateForm
-          mode={mode}
-          setTabIndex={setTabIndex}
-          jobPositions={jobPositions}
-          fetchCandidates={fetchCandidates}
-          selectedJobPositionId={selectedJobPositionId}
-          setSelectedJobPositionId={setSelectedJobPositionId}
-
-        />}
-      </TabPanel>
-      {showEditTab && (
+    <HelmetProvider>
+      <ToastContainer />
+      <Tabs selectedIndex={tabIndex} onSelect={handleTabSelect}>
+        <Helmet>
+          <title>Quản lý ứng viên</title>
+        </Helmet>
+        <TabList className='tablist'>
+          <Tab className={`tab-item ${tabIndex === 0 ? 'active' : ''}`} style={{ color: tabIndex === 0 ? '#5a5279' : 'gray' }}>Danh sách</Tab>
+          <Tab className={`tab-item ${tabIndex === 1 ? 'active' : ''}`} style={{ color: tabIndex === 1 ? '#5a5279' : 'gray' }}>+ Thêm</Tab>
+          {showEditTab && (
+            <Tab className={`tab-item ${tabIndex === 2 ? 'active' : ''}`} style={{ color: tabIndex === 2 ? '#5a5279' : 'gray' }}>Sửa</Tab>
+          )}
+        </TabList>
         <TabPanel>
-          {mode === 'edit' && editingCandidate && <CandidateForm mode={mode}
-            currentCandidate={editingCandidate}
+          <div className="candidate-container">
+            <div className="status-filter-column">
+              <button className={selectedStatus === '' ? 'selected' : ''} onClick={() => handleFilterStatus('')}>Tất cả</button>
+              <button className={selectedStatus === 'NEW' ? 'selected' : ''} onClick={() => handleFilterStatus('NEW')}>Mới<span className="status-count status-count-new">{candidateCountByStatus['NEW'] || 0}</span></button>
+              <button className={selectedStatus === 'INITIAL_REVIEW' ? 'selected' : ''} onClick={() => handleFilterStatus('INITIAL_REVIEW')}>Đánh giá ban đầu<span className="status-count status-count-initial-review">{candidateCountByStatus['INITIAL_REVIEW'] || 0}</span></button>
+              <button className={selectedStatus === 'FIRST_INTERVIEW' ? 'selected' : ''} onClick={() => handleFilterStatus('FIRST_INTERVIEW')}>Phỏng vấn lần 1<span className="status-count status-count-first-interview">{candidateCountByStatus['FIRST_INTERVIEW'] || 0}</span></button>
+              <button className={selectedStatus === 'SECOND_INTERVIEW' ? 'selected' : ''} onClick={() => handleFilterStatus('SECOND_INTERVIEW')}>Phỏng vấn lần 2<span className="status-count status-count-second-interview">{candidateCountByStatus['SECOND_INTERVIEW'] || 0}</span></button>
+              <button className={selectedStatus === 'OFFER_MADE' ? 'selected' : ''} onClick={() => handleFilterStatus('OFFER_MADE')}>Đã đề nghị<span className="status-count status-count-offer-made">{candidateCountByStatus['OFFER_MADE'] || 0}</span></button>
+              <button className={selectedStatus === 'CONTRACT_SIGNED' ? 'selected' : ''} onClick={() => handleFilterStatus('CONTRACT_SIGNED')}>Đã ký hợp đồng<span className="status-count status-count-contract-signed">{candidateCountByStatus['CONTRACT_SIGNED'] || 0}</span></button>
+              <button className={selectedStatus === 'REFUSE' ? 'selected' : ''} onClick={() => handleFilterStatus('REFUSE')}>Từ chối<span className="status-count status-count-refuse">{candidateCountByStatus['REFUSE'] || 0}</span></button>
+            </div>
+            <div className="datatable-container">
+              <DataTable columns={tableColumns} data={getFilteredCandidates()} />
+            </div>
+          </div>
+        </TabPanel>
+        <TabPanel>
+          {mode === 'add' && <CandidateForm
+            mode={mode}
             setTabIndex={setTabIndex}
-            setShowEditTab={setShowEditTab}
             jobPositions={jobPositions}
             fetchCandidates={fetchCandidates}
             selectedJobPositionId={selectedJobPositionId}
             setSelectedJobPositionId={setSelectedJobPositionId}
+
           />}
         </TabPanel>
-      )}
-      <UpdateStatusModal
-        open={openModal}
-        onClose={handleCloseModal}
-        onUpdate={handleUpdateStatus}
-        candidate={selectedCandidate}
-        selectedCandidate={selectedCandidate}
-      />
-    </Tabs>
+        {showEditTab && (
+          <TabPanel>
+            {mode === 'edit' && editingCandidate && <CandidateForm mode={mode}
+              currentCandidate={editingCandidate}
+              setTabIndex={setTabIndex}
+              setShowEditTab={setShowEditTab}
+              jobPositions={jobPositions}
+              fetchCandidates={fetchCandidates}
+              selectedJobPositionId={selectedJobPositionId}
+              setSelectedJobPositionId={setSelectedJobPositionId}
+            />}
+          </TabPanel>
+        )}
+        <UpdateStatusModal
+          open={openModal}
+          onClose={handleCloseModal}
+          onUpdate={handleUpdateStatus}
+          candidate={selectedCandidate}
+          selectedCandidate={selectedCandidate}
+        />
+      </Tabs>
+    </HelmetProvider>
+
   );
 
 };

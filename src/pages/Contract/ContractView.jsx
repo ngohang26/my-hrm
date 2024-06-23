@@ -5,6 +5,7 @@ import './ContractDetail.css'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {apiUrl} from '../../config'
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 function ContractView() {
   const [contract, setContract] = useState(null);
@@ -30,15 +31,18 @@ function ContractView() {
 
   
   
-  const formatNumber = (num) => {
-    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-  };
+  // const formatNumber = (num) => {
+  //   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+  // };
 
   if (!contract) {
     return <div>Loading...</div>;
   }
   return (
-    <div>
+    <HelmetProvider>
+      <Helmet>
+        <title>Chi tiết hợp đồng</title>
+      </Helmet>
 
       <ToastContainer/>
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '70px' }}>
@@ -56,13 +60,13 @@ function ContractView() {
             <div className="form-grid grid-item">
               <div className="item-info">
                 <label>Ngày bắt đầu</label>
-                <input type="text" value={contract.startDate}   />
+                <input type="text" value={contract.startDate} readOnly  />
               </div>
               <div className="item-info">
                 <label>
                   Ngày kết thúc
                 </label>
-                <input type="text" value={contract.endDate}   />
+                <input type="text" value={contract.endDate} readOnly  />
               </div>
             </div>
             <div className="form-grid grid-item">
@@ -72,20 +76,20 @@ function ContractView() {
                   Lương cơ bản
                 </label>
 
-                <input type="text" value={displaySalary}   /> đ
+                <input type="text" value={displaySalary} readOnly  />
               </div>
               <div className="item-info">
 
                 <label>
                   Ghi chú
                 </label>
-                <input type="text" value={contract.noteContract}   />
+                <input type="text" value={contract.noteContract} readOnly  />
               </div>
             </div>
           </div>
       </div>
     </div>
-    </div>
+    </HelmetProvider>
   );
 
 }

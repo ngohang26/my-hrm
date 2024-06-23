@@ -3,7 +3,7 @@
   position: relative;
   z-index: 0;
   flex-direction: column;
-  padding: 20px 3px 20px 26px;
+  padding: 20px 0px 20px 26px;
 }
 
 .menu h5 {
@@ -34,4 +34,14 @@
 
 .menu-item-title {
   font-weight: bold;
+}
+
+.menu h5 {
+  cursor: pointer;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #2c2946;
+
 }
