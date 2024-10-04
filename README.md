@@ -1,70 +1,33 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Human resource management software is created for the purpose of professional human resource management, supporting businesses in managing human resource-related tasks effectively.
+The main purposes of human resource management software include:
 
-## Available Scripts
+ Employee management: Store and manage personal information and work records of employees.
 
-In the project directory, you can run:
+ Department management: Store and manage departments and divisions of the company.
 
-### `npm start`
+ User management: Store and manage user accounts, account authorization.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+ Recruitment management: Support the recruitment process from receiving and managing candidate profiles, to interviewing and selecting.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+ Working time management - attendance: Track and manage working time and attendance of employees.
 
-### `npm test`
+ Salary management: Track and manage employee salaries by month.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+ Reporting: Provides charts of human resource-related data, helping business leaders make strategic decisions based on real data.  Contract management: Track and manage employee contracts.
 
-### `npm run build`
+**Home page interface**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+![image](https://github.com/user-attachments/assets/a84f2d02-f22d-40c9-ad1e-f63a1ee975dd)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Home page interface**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+![image](https://github.com/user-attachments/assets/8fa63fdc-e616-4583-a833-72884c56bc90)
 
-### `npm run eject`
+**Employee management interface**
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+![image](https://github.com/user-attachments/assets/533679f7-7e01-453c-88dc-a2b0815868fe)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**Report interface**
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+![image](https://github.com/user-attachments/assets/56e545dc-86f4-451e-9226-bc1d696ce706)
